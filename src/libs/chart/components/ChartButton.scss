@@ -1,0 +1,13 @@
+.btn {
+  height: 100%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  color: #dbdbdb;
+  font-size: 14px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #303030;
+  }
+}

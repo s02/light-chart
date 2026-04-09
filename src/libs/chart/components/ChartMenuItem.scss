@@ -1,0 +1,25 @@
+.chart-menu-item {
+  font-size: 14px;
+  line-height: 1;
+  padding: 9px 12px;
+  color: #dbdbdb;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+
+  &:hover {
+    background-color: #303030;
+    color: #c9c9c9;
+  }
+
+  &.active {
+    background-color: #f2ffff;
+    color: #000;
+  }
+}
+
+.chart-menu-item-body {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

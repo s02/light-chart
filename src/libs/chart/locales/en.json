@@ -1,0 +1,21 @@
+{
+  "resolution-1s": "1 second",
+  "resolution-5s": "5 seconds",
+  "resolution-10s": "10 seconds",
+  "resolution-15s": "15 seconds",
+  "resolution-30s": "30 seconds",
+  "resolution-1m": "1 minute",
+  "resolution-2m": "2 minutes",
+  "resolution-5m": "5 minutes",
+  "resolution-10m": "10 minutes",
+  "resolution-15m": "15 minutes",
+  "resolution-30m": "30 minutes",
+  "resolution-1h": "1 hour",
+  "resolution-2h": "2 hours",
+  "resolution-6h": "6 hours",
+  "resolution-12h": "12 hours",
+  "series-bar": "Bars",
+  "series-candlestick": "Candles",
+  "series-line": "Line",
+  "series-area": "Area"
+}

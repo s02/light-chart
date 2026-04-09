@@ -1,0 +1,31 @@
+.terminal {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.terminal-chart {
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
+.terminal-aside {
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px 10px;
+
+  select,
+  button {
+    width: 100%;
+  }
+}
+
+.buy-buttons {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 5px;
+}
