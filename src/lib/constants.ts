@@ -2,8 +2,10 @@ import {
   AreaSeries,
   BarSeries,
   CandlestickSeries,
+  CrosshairMode,
   LineSeries,
   type DeepPartial,
+  type SeriesOptionsCommon,
   type TimeChartOptions
 } from 'lightweight-charts'
 
@@ -29,12 +31,13 @@ export const CHART_PARAMS: DeepPartial<TimeChartOptions> = {
     borderColor: 'rgba(255, 255, 255, .25)'
   },
   crosshair: {
+    mode: CrosshairMode.Normal,
     horzLine: { labelBackgroundColor: '#3c3e43' },
     vertLine: { labelBackgroundColor: '#3c3e43' }
   }
 } as const
 
-export const SERIES_PARAMS = {
+export const SERIES_PARAMS: DeepPartial<SeriesOptionsCommon> = {
   priceFormat: {
     type: 'price',
     precision: 6,

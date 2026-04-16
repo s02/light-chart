@@ -76,6 +76,10 @@ export class Chart {
     this.#expirationShape = this.#createExpirationShape(this.#expirationShape.expiration)
     this.#optionShapes = this.#optionShapes.map((optShape) => this.#createOptionShape(optShape.option))
 
+    this.#indicators.forEach((indicator) => {
+      this.#chart.removeSeries(indicator.getSeries())
+    })
+
     await this.#initDatafeed()
 
     if (this.#onResolutionChange && resolutionId !== this.#datafeed.getResolutionId()) {

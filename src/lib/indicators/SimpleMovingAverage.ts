@@ -22,6 +22,10 @@ export class SimpleMovingAverage {
     this.#series = this.#chart.addSeries(LineSeries)
   }
 
+  getSeries() {
+    return this.#series
+  }
+
   async apply() {
     this.#subscriptionId = await this.#datafeed.subscribe((ev) => {
       if (ev.type === 'set') {
