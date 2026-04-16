@@ -4,6 +4,7 @@ import { CHART_PARAMS, SERIES_PARAMS, SERIES_SETTINGS } from './constants'
 import type { ResolutionId, SeriesId } from './constants'
 import { ExpirationPlugin } from './ExpirationPlugin'
 import { OptionPlugin } from './OptionPlugin'
+import { SimpleMovingAverage } from './indicators/SimpleMovingAverage'
 
 type Params = {
   datafeed: Datafeed
@@ -22,6 +23,8 @@ export class Chart {
     shape: ISeriesPrimitive<Time>
   }
   #optionShapes: { option: ChartOption; shape: ISeriesPrimitive<Time> }[] = []
+  #indicators: SimpleMovingAverage[] = []
+  #datafeedSubscriptionId?: number
   #onResolutionChange?: (resolution: ResolutionId) => void
   #onSeriesChange?: (series: SeriesId) => void
   #onAssetSymbolChange?: (asset: AssetSymbol) => void
@@ -65,7 +68,7 @@ export class Chart {
     const resolutionId = this.#datafeed.getResolutionId()
     const asset = this.#datafeed.getAssetSymbol()
 
-    await this.#datafeed.unsubscribe()
+    this.#datafeed.unsubscribe(this.#datafeedSubscriptionId!)
     this.#datafeed = datafeed
 
     this.#clearExpirationShape()
@@ -99,6 +102,12 @@ export class Chart {
     this.#clearExpirationShape()
     this.#expirationShape = this.#createExpirationShape(expiration)
     this.#drawExpirationShape()
+  }
+
+  addIndicator() {
+    const sma = new SimpleMovingAverage(this.#chart, this.#datafeed)
+    this.#indicators.push(sma)
+    sma.apply()
   }
 
   #clearExpirationShape() {
@@ -135,16 +144,20 @@ export class Chart {
 
   #initDatafeed(): Promise<void> {
     return new Promise((resolve) => {
-      this.#datafeed.subscribe((ev) => {
-        if (ev.type === 'set') {
-          this.#series.setData(ev.data)
-          this.#drawExpirationShape()
-          this.#drawOptionShapes()
-          resolve()
-        } else {
-          ev.data.forEach((bar) => this.#series.update(bar))
-        }
-      })
+      this.#datafeed
+        .subscribe((ev) => {
+          if (ev.type === 'set') {
+            this.#series.setData(ev.data)
+            this.#drawExpirationShape()
+            this.#drawOptionShapes()
+            resolve()
+          } else {
+            ev.data.forEach((bar) => this.#series.update(bar))
+          }
+        })
+        .then((id) => {
+          this.#datafeedSubscriptionId = id
+        })
     })
   }
 }
@@ -156,8 +169,8 @@ export type Datafeed = {
   getResolutionId(): ResolutionId
   getBars(): ChartBar[]
   loadHistory(): Promise<void>
-  unsubscribe: () => void
-  subscribe: (callback: DatafeedCallbackFn) => Promise<void>
+  unsubscribe: (id: number) => void
+  subscribe: (callback: DatafeedCallbackFn) => Promise<number>
 }
 
 export type ChartExpiration = {

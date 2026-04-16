@@ -29,6 +29,14 @@ onMounted(() => {
   })
 })
 
+const addIndicator = () => {
+  if (!chart) {
+    return
+  }
+
+  chart.addIndicator()
+}
+
 watch(chartState, (nextState, prevState) => {
   if (!chart) {
     return
@@ -91,6 +99,9 @@ watch(options, (next) => {
               {{ seriesId }}
             </option>
           </select>
+        </div>
+        <div class="chart-buttons">
+          <button @click="addIndicator()">SMA</button>
         </div>
         <div class="chart-buttons">
           <select

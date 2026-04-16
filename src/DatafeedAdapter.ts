@@ -14,7 +14,8 @@ export class DatafeedAdapter implements Datafeed {
   #earliestDate?: Date
   #subscriptionId?: number
   #loadingBars = false
-  #callback: DatafeedCallbackFn = () => {}
+  #callbacks: Map<number, DatafeedCallbackFn> = new Map()
+  #nextCallbackId = 0
 
   constructor(assetSymbol: AssetSymbol, resolution: ResolutionId, http: HttpTransport, ws: WsTransport) {
     this.#http = http
@@ -31,20 +32,23 @@ export class DatafeedAdapter implements Datafeed {
     return this.#resolution
   }
 
-  unsubscribe() {
-    if (!this.#subscriptionId) {
-      throw 'No subscription to unsubscribe'
-    }
+  unsubscribe(id: number) {
+    this.#callbacks.delete(id)
 
-    return this.#ws.unsubscribeFromQuotes(this.#assetSymbol.id, this.#subscriptionId)
+    if (this.#callbacks.size === 0 && this.#subscriptionId !== undefined) {
+      this.#ws.unsubscribeFromQuotes(this.#assetSymbol.id, this.#subscriptionId)
+      this.#subscriptionId = undefined
+    }
   }
 
-  async subscribe(callback: DatafeedCallbackFn) {
-    if (this.#subscriptionId) {
-      throw 'Already subscribed'
-    }
+  async subscribe(callback: DatafeedCallbackFn): Promise<number> {
+    const id = ++this.#nextCallbackId
+    this.#callbacks.set(id, callback)
 
-    this.#callback = callback
+    if (this.#subscriptionId !== undefined) {
+      callback({ type: 'set', data: this.#data })
+      return id
+    }
 
     let firstQuoteReceived = false
     let dataLoaded = false
@@ -52,7 +56,7 @@ export class DatafeedAdapter implements Datafeed {
     this.#subscriptionId = await this.#ws.subscribeToQuotes(this.#assetSymbol.id, async (quote) => {
       if (dataLoaded) {
         const bars = this.#update(quote)
-        this.#callback({ type: 'update', data: bars })
+        this.#fireCallbacks({ type: 'update', data: bars })
       } else {
         this.#quotesBuffer.push(quote)
       }
@@ -66,9 +70,11 @@ export class DatafeedAdapter implements Datafeed {
           this.#update(quote)
         })
         dataLoaded = true
-        this.#callback({ type: 'set', data: this.#data })
+        this.#fireCallbacks({ type: 'set', data: this.#data })
       }
     })
+
+    return id
   }
 
   async loadHistory() {
@@ -78,8 +84,12 @@ export class DatafeedAdapter implements Datafeed {
 
     this.#loadingBars = true
     await this.#loadBars()
-    this.#callback({ type: 'set', data: this.#data })
+    this.#fireCallbacks({ type: 'set', data: this.#data })
     this.#loadingBars = false
+  }
+
+  #fireCallbacks(event: { type: 'set' | 'update'; data: ChartBar[] }) {
+    this.#callbacks.forEach((cb) => cb(event))
   }
 
   getBars() {
