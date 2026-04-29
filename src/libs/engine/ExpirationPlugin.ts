@@ -98,22 +98,23 @@ class CloseLineView implements IPrimitivePaneView, PaneView {
 }
 
 class LockLineView extends CloseLineView {
-  #getTimer() {
+  #timer: { diff: number; label: string } | null = null
+
+  updateTimer() {
     const now = Math.floor(Date.now() / 1000)
     const diff = Math.max(0, this.time - now)
     const m = Math.floor(diff / 60)
     const s = diff % 60
     const label = diff > 0 ? `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}` : ''
 
-    return {
+    this.#timer = {
       diff,
       label
     }
   }
 
   override renderer() {
-    const timer = this.#getTimer()
-    return new LockLineRenderer(this.p, timer.diff <= 30 ? timer.label : '')
+    return new LockLineRenderer(this.p, this.#timer && this.#timer.diff <= 300 ? this.#timer.label : '')
   }
 }
 
@@ -122,8 +123,10 @@ export class ExpirationPlugin implements ISeriesPrimitive<Time> {
   #series: ISeriesApi<SeriesType> | null = null
   #expiration: ChartExpiration
   #resolutionId: ResolutionId
-  #paneViews: PaneView[] = []
   #timerInterval: ReturnType<typeof setInterval> | null = null
+
+  #lockLineView: LockLineView | null = null
+  #closeLineView: CloseLineView | null = null
 
   constructor(chart: IChartApi, expiration: ChartExpiration, resolutionId: ResolutionId) {
     this.#chart = chart
@@ -131,18 +134,23 @@ export class ExpirationPlugin implements ISeriesPrimitive<Time> {
     this.#resolutionId = resolutionId
 
     if (LOCK_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
-      this.#paneViews.push(new LockLineView(this, this.#expiration.lock))
+      this.#lockLineView = new LockLineView(this, this.#expiration.lock)
     }
 
     if (CLOSE_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
-      this.#paneViews.push(new CloseLineView(this, this.#expiration.close))
+      this.#closeLineView = new CloseLineView(this, this.#expiration.close)
     }
   }
 
   attached({ series, requestUpdate }: SeriesAttachedParameter<Time>) {
     this.#series = series as ISeriesApi<SeriesType>
 
+    if (!this.#lockLineView) {
+      return
+    }
+
     this.#timerInterval = setInterval(() => {
+      this.#lockLineView!.updateTimer()
       requestUpdate()
     }, 1000)
   }
@@ -176,10 +184,19 @@ export class ExpirationPlugin implements ISeriesPrimitive<Time> {
   }
 
   updateAllViews() {
-    this.#paneViews.forEach((pw) => pw.update())
+    this.paneViews().forEach((pw) => pw.update())
   }
 
   paneViews() {
-    return this.#paneViews
+    const paneViews = []
+    if (this.#closeLineView) {
+      paneViews.push(this.#closeLineView)
+    }
+
+    if (this.#lockLineView) {
+      paneViews.push(this.#lockLineView)
+    }
+
+    return paneViews
   }
 }

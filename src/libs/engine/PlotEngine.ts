@@ -1,9 +1,10 @@
 import { createChart } from 'lightweight-charts'
-import { CHART_PARAMS, RESOLUTION_SETTINGS, SERIES_PARAMS, SERIES_SETTINGS } from './constants'
+import { CHART_PARAMS, RESOLUTION_SETTINGS, COMMON_SERIES_SETTINGS, SERIES_MAP } from './constants'
 import { SimpleMovingAverage } from './indicators/SimpleMovingAverage'
 import { IndicatorsOverlay } from './IndicatorsOverlay'
 import { ExpirationOverlay } from './ExpirationOverlay'
 import { OptionOverlay } from './OptionOverlay'
+import { PluginOverlay } from './PluginOverlay'
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { AssetSymbol, ChartExpiration, ChartOption, Datafeed, ResolutionId, SeriesId } from '@engine/types'
 
@@ -23,13 +24,15 @@ export class PlotEngine {
   #indicatorsOverlay: IndicatorsOverlay
   #expOverlay: ExpirationOverlay
   #optOverlay: OptionOverlay
+  #pluginOverlay: PluginOverlay
   #onResolutionChange?: (resolution: ResolutionId) => void
   #onSeriesChange?: (series: SeriesId) => void
   #onAssetSymbolChange?: (asset: AssetSymbol) => void
 
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
-    this.#series = this.#chart.addSeries(SERIES_SETTINGS[params.seriesId || 'candlestick'].series, SERIES_PARAMS)
+    const seriesData = this.#getSeries(params.seriesId)
+    this.#series = this.#chart.addSeries(seriesData.series, seriesData.options)
     this.#datafeed = params.datafeed
     this.#onResolutionChange = params.onResolutionChange
     this.#onSeriesChange = params.onSeriesChange
@@ -46,16 +49,21 @@ export class PlotEngine {
     })
 
     this.#indicatorsOverlay = new IndicatorsOverlay()
-
     this.#expOverlay = new ExpirationOverlay(this.#chart, this.#series, this.#datafeed.getResolutionId())
     this.#optOverlay = new OptionOverlay(this.#chart, this.#series, this.#datafeed.getResolutionId())
+    this.#pluginOverlay = new PluginOverlay(this.#chart, this.#series, {
+      assetSymbol: this.#datafeed.getAssetSymbol(),
+      resolutionId: this.#datafeed.getResolutionId()
+    })
   }
 
   setSeriesId(seriesId: SeriesId) {
     this.#chart.removeSeries(this.#series)
 
-    this.#series = this.#chart.addSeries(SERIES_SETTINGS[seriesId].series, SERIES_PARAMS)
+    const seriesData = this.#getSeries(seriesId)
+    this.#series = this.#chart.addSeries(seriesData.series, seriesData.options)
     this.#series.setData(this.#datafeed.getBars())
+    this.#pluginOverlay.setSeries(this.#series)
     this.#expOverlay.setSeries(this.#series)
     this.#optOverlay.setSeries(this.#series)
 
@@ -73,6 +81,7 @@ export class PlotEngine {
 
     this.#expOverlay.setResolution(resolutionId)
     this.#optOverlay.setResolution(resolutionId)
+    this.#pluginOverlay.setConfig({ assetSymbol: datafeed.getAssetSymbol(), resolutionId: datafeed.getResolutionId() })
     this.#indicatorsOverlay.removeAll()
 
     await this.#subscribeToDatafeed()
@@ -102,7 +111,17 @@ export class PlotEngine {
     this.#datafeed.unsubscribe(this.#datafeedSubscriptionId!)
     this.#expOverlay.destroy()
     this.#optOverlay.destroy()
+    this.#pluginOverlay.destroy()
     this.#chart.remove()
+  }
+
+  #getSeries(seriesId?: SeriesId) {
+    const data = SERIES_MAP[seriesId || 'candlestick']
+    const options = { ...data.options, ...COMMON_SERIES_SETTINGS }
+    return {
+      series: data.series,
+      options
+    }
   }
 
   #requestCandles() {

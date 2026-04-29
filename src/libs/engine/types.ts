@@ -1,4 +1,4 @@
-import { RESOLUTION_SETTINGS, SERIES_SETTINGS } from '@engine/constants'
+import { RESOLUTION_SETTINGS, SERIES_MAP } from '@engine/constants'
 import type { UTCTimestamp } from 'lightweight-charts'
 
 export type { UTCTimestamp } from 'lightweight-charts'
@@ -43,4 +43,4 @@ export type Datafeed = {
 }
 
 export type ResolutionId = keyof typeof RESOLUTION_SETTINGS
-export type SeriesId = keyof typeof SERIES_SETTINGS
+export type SeriesId = keyof typeof SERIES_MAP

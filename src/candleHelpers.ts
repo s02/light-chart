@@ -9,28 +9,33 @@ const transform = (candle: Bar): ChartBar => ({
   value: candle.close
 })
 
-const smoothify = (candles: ChartBar[]): void => {
-  if (!candles.length) {
+const smoothify = (bar: ChartBar[]): void => {
+  if (!bar.length) {
     return
   }
 
-  let i = candles.length - 1
+  const fill = (bar: ChartBar) => {
+    if (!bar.open) {
+      bar.open = bar.close
+    }
+
+    if (!bar.high) {
+      bar.high = bar.open
+    }
+
+    if (!bar.low) {
+      bar.low = bar.open
+    }
+  }
+
+  let i = bar.length - 1
   while (i !== 0) {
-    if (!candles[i].open) {
-      candles[i].open = candles[i].close
-    }
-
-    if (!candles[i].high) {
-      candles[i].high = candles[i].open
-    }
-
-    if (!candles[i].low) {
-      candles[i].low = candles[i].open
-    }
-
-    candles[i - 1].close = candles[i].open
+    fill(bar[i])
+    bar[i - 1].close = bar[i].open
     i--
   }
+
+  fill(bar[i])
 }
 
 const createFromQuote = (quote: Quote): ChartBar => {

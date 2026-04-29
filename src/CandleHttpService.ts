@@ -9,7 +9,7 @@
  */
 
 import { candleHelpers } from './candleHelpers'
-import { RESOLUTION_SETTINGS } from '@engine/constants'
+import { RESOLUTION_SETTINGS } from '@chart/constants'
 import type { HttpTransport } from './transport/types'
 import type { AssetSymbol, ChartBar, ResolutionId } from '@chart/types'
 
