@@ -1,5 +1,6 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
 import { LegendPlugin } from '@engine/LegendPlugin'
+import { CloseBarCountdownPlugin } from '@engine/CloseBarCountdownPlugin'
 import type { AssetSymbol, ResolutionId } from '@engine/types'
 import type { IChartApi, ISeriesApi, ISeriesPrimitive, SeriesType, Time } from 'lightweight-charts'
 
@@ -25,7 +26,10 @@ export class PluginOverlay {
 
   #setupPlugins() {
     const resolution = RESOLUTION_SETTINGS[this.#config.resolutionId].name
-    this.#plugins = [new LegendPlugin(this.#chart, `${this.#config.assetSymbol.name} | ${resolution}`)]
+    this.#plugins = [
+      new LegendPlugin(this.#chart, `${this.#config.assetSymbol.name} | ${resolution}`),
+      new CloseBarCountdownPlugin(this.#config.resolutionId)
+    ]
   }
 
   #attach() {
@@ -34,26 +38,22 @@ export class PluginOverlay {
     })
   }
 
-  #detach() {
-    this.#plugins.forEach((plugin) => {
-      this.#series.detachPrimitive(plugin)
-    })
-  }
-
   setConfig(config: Config) {
-    this.#detach()
+    this.clear()
     this.#config = config
     this.#setupPlugins()
     this.#attach()
   }
 
   setSeries(series: ISeriesApi<SeriesType>) {
-    this.#detach()
+    this.clear()
     this.#series = series
     this.#attach()
   }
 
-  destroy() {
-    this.#detach()
+  clear() {
+    this.#plugins.forEach((plugin) => {
+      this.#series.detachPrimitive(plugin)
+    })
   }
 }
