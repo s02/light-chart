@@ -1,5 +1,5 @@
 import { RESOLUTION_SETTINGS } from './constants'
-import type { ITimeScaleApi, Logical, Time, UTCTimestamp } from 'lightweight-charts'
+import type { DataItem, ITimeScaleApi, Logical, Time, UTCTimestamp } from 'lightweight-charts'
 import type { ResolutionId } from '@engine/types'
 
 export const getBarOpenTime = (barTime: UTCTimestamp, resolutionId: ResolutionId): UTCTimestamp => {
@@ -33,6 +33,22 @@ export const getBarLogical = (
   }
 
   return (lastBarLogical + barDiff) as Logical
+}
+
+export const getBarPrice = (bar?: DataItem<Time>) => {
+  if (bar && 'close' in bar) {
+    return bar.close
+  }
+
+  if (bar && 'value' in bar) {
+    return bar.value
+  }
+
+  return null
+}
+
+export const getBarTime = (bar?: DataItem<Time>) => {
+  return bar?.time as UTCTimestamp
 }
 
 export const dateToEpoch = (date: string): UTCTimestamp => (new Date(date).getTime() / 1000) as UTCTimestamp

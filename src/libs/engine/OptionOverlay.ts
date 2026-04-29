@@ -15,7 +15,7 @@ export class OptionOverlay {
     this.#resolutionId = resolutionId
   }
 
-  destroy() {
+  clear() {
     this.#shapes.forEach((shape) => this.#series.detachPrimitive(shape))
   }
 
@@ -35,7 +35,7 @@ export class OptionOverlay {
   }
 
   #redraw() {
-    this.#shapes.forEach((shape) => this.#series.detachPrimitive(shape))
+    this.clear()
     this.#shapes = this.#createShapes()
     this.#shapes.forEach((shape) => this.#series.attachPrimitive(shape))
   }

@@ -30,17 +30,14 @@ export class ExpirationOverlay {
     this.#redraw()
   }
 
-  destroy() {
+  clear() {
     if (this.#shape) {
       this.#series.detachPrimitive(this.#shape)
     }
   }
 
   #redraw() {
-    if (this.#shape) {
-      this.#series.detachPrimitive(this.#shape)
-    }
-
+    this.clear()
     this.#shape = this.#createShape()
 
     if (this.#shape) {

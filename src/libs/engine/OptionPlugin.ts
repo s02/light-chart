@@ -1,4 +1,4 @@
-import { getBarLogical } from './helpers'
+import { getBarLogical, getBarPrice, getBarTime } from './helpers'
 import { verticalLine } from '@engine/primitives/vertical-line'
 import { circle } from '@engine/primitives/circle'
 import { horizontalLine } from '@engine/primitives/horizontal-line'
@@ -143,7 +143,7 @@ export class OptionPlugin implements ISeriesPrimitive<Time> {
   }
 
   getLastBarTime() {
-    return this.#series?.data().at(-1)?.time as UTCTimestamp | undefined
+    return getBarTime(this.#series?.data().at(-1))
   }
 
   getOption() {
@@ -185,14 +185,6 @@ export class OptionPlugin implements ISeriesPrimitive<Time> {
 
   #getLastBarPrice() {
     const lastBar = this.#series?.data().at(-1)
-    if (lastBar && 'close' in lastBar) {
-      return lastBar.close
-    }
-
-    if (lastBar && 'value' in lastBar) {
-      return lastBar.value
-    }
-
-    return null
+    return getBarPrice(lastBar)
   }
 }
