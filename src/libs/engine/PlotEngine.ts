@@ -7,6 +7,7 @@ import { OptionOverlay } from './OptionOverlay'
 import { PluginOverlay } from './PluginOverlay'
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { ChartExpiration, ChartOption, Datafeed, SeriesId } from '@engine/types'
+import { HollowCandleSeries } from '@engine/series/hollow-candle-series'
 
 type Params = {
   datafeed: Datafeed
@@ -26,7 +27,8 @@ export class PlotEngine {
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
     const seriesData = this.#getSeries(params.seriesId)
-    this.#series = this.#chart.addSeries(seriesData.series, seriesData.options)
+    //this.#series = this.#chart.addSeries(seriesData.series, seriesData.options)
+    this.#series = this.#chart.addCustomSeries(new HollowCandleSeries())
     this.#datafeed = params.datafeed
     this.#subscribeToDatafeed().then(() => {
       this.#chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
