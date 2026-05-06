@@ -1,6 +1,6 @@
-import { RESOLUTION_SETTINGS, SERIES_MAP } from '@engine/constants'
+import { RESOLUTION_SETTINGS } from '@engine/constants'
 import type { UTCTimestamp } from 'lightweight-charts'
-
+export type { SeriesId } from '@engine/series/types'
 export type { UTCTimestamp } from 'lightweight-charts'
 
 export type ChartExpiration = {
@@ -27,11 +27,11 @@ export type ChartBar = {
   high: number
   low: number
   close: number
-  value: number
-  date: string
 }
 
-export type DatafeedCallbackFn = (result: { type: 'set' | 'update'; data: ChartBar[] }) => void
+export type DatafeedResult = { type: 'set' | 'update'; data: ChartBar[] }
+
+export type DatafeedCallbackFn = (result: DatafeedResult) => void
 
 export type Datafeed = {
   getAssetSymbol(): AssetSymbol
@@ -40,7 +40,7 @@ export type Datafeed = {
   loadHistory({ minCandles }: { minCandles: number }): Promise<void>
   unsubscribe: (id: number) => void
   subscribe: (callback: DatafeedCallbackFn) => Promise<number>
+  destroy: () => void
 }
 
 export type ResolutionId = keyof typeof RESOLUTION_SETTINGS
-export type SeriesId = keyof typeof SERIES_MAP

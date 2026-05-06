@@ -10,7 +10,7 @@ export class IndicatorsOverlay {
     indicator.apply()
   }
 
-  clear() {
+  destroy() {
     this.#indicators.forEach((indicator) => {
       indicator.remove()
     })

@@ -1,5 +1,5 @@
-import { AreaSeries, BarSeries, CandlestickSeries, CrosshairMode, LineSeries } from 'lightweight-charts'
-import type { DeepPartial, SeriesOptionsCommon, TimeChartOptions } from 'lightweight-charts'
+import { CrosshairMode } from 'lightweight-charts'
+import type { DeepPartial, TimeChartOptions } from 'lightweight-charts'
 
 export const CANDLE_COLORS = {
   up: '#26a69a',
@@ -31,43 +31,6 @@ export const CHART_PARAMS: DeepPartial<TimeChartOptions> = {
     mode: CrosshairMode.Normal,
     horzLine: { labelBackgroundColor: '#3c3e43' },
     vertLine: { labelBackgroundColor: '#3c3e43' }
-  }
-} as const
-
-export const COMMON_SERIES_SETTINGS: DeepPartial<SeriesOptionsCommon> = {
-  priceFormat: {
-    type: 'price',
-    precision: 6,
-    minMove: 0.000001
-  }
-} as const
-
-export const SERIES_MAP = {
-  candlestick: {
-    series: CandlestickSeries,
-    options: {
-      upColor: CANDLE_COLORS.up,
-      downColor: CANDLE_COLORS.down,
-      borderUpColor: CANDLE_COLORS.up,
-      borderDownColor: CANDLE_COLORS.down,
-      wickUpColor: CANDLE_COLORS.up,
-      wickDownColor: CANDLE_COLORS.down
-    }
-  },
-  bar: {
-    series: BarSeries,
-    options: {
-      upColor: CANDLE_COLORS.up,
-      downColor: CANDLE_COLORS.down
-    }
-  },
-  line: {
-    series: LineSeries,
-    options: {}
-  },
-  area: {
-    series: AreaSeries,
-    options: {}
   }
 } as const
 

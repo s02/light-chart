@@ -6,8 +6,8 @@ export class ExpirationOverlay {
   #resolutionId: ResolutionId
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>
-  #expiration?: ChartExpiration
-  #shape?: ISeriesPrimitive<Time>
+  #expiration: ChartExpiration | null = null
+  #shape: ISeriesPrimitive<Time> | null = null
 
   constructor(chart: IChartApi, series: ISeriesApi<SeriesType>, resolutionId: ResolutionId) {
     this.#chart = chart
@@ -15,29 +15,19 @@ export class ExpirationOverlay {
     this.#series = series
   }
 
-  setResolution(resolutionId: ResolutionId) {
-    this.#resolutionId = resolutionId
-    this.#redraw()
-  }
-
-  setSeries(series: ISeriesApi<SeriesType>) {
-    this.#series = series
-    this.#redraw()
-  }
-
   setExpiration(expiration: ChartExpiration) {
     this.#expiration = expiration
     this.#redraw()
   }
 
-  clear() {
+  destroy() {
     if (this.#shape) {
       this.#series.detachPrimitive(this.#shape)
     }
   }
 
   #redraw() {
-    this.clear()
+    this.destroy()
     this.#shape = this.#createShape()
 
     if (this.#shape) {
@@ -50,6 +40,6 @@ export class ExpirationOverlay {
       return new ExpirationPlugin(this.#chart, this.#expiration, this.#resolutionId)
     }
 
-    return undefined
+    return null
   }
 }

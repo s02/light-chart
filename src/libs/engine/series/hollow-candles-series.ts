@@ -79,7 +79,7 @@ class HollowCandleRenderer<TData extends BarData> extends BarRenderer implements
   }
 }
 
-export class HollowCandleSeries<TData extends BarData> implements ICustomSeriesPaneView<
+export class HollowCandlesSeries<TData extends BarData> implements ICustomSeriesPaneView<
   Time,
   TData,
   HollowCandleSeriesOptions

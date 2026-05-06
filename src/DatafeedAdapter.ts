@@ -34,10 +34,12 @@ export class DatafeedAdapter implements Datafeed {
 
   unsubscribe(id: number) {
     this.#callbacks.delete(id)
+  }
 
-    if (this.#callbacks.size === 0 && this.#subscriptionId !== undefined) {
+  destroy() {
+    console.log('datafeed destroy', this.#subscriptionId)
+    if (this.#subscriptionId) {
       this.#ws.unsubscribeFromQuotes(this.#assetSymbol.id, this.#subscriptionId)
-      this.#subscriptionId = undefined
     }
   }
 

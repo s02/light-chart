@@ -15,18 +15,8 @@ export class OptionOverlay {
     this.#resolutionId = resolutionId
   }
 
-  clear() {
+  destroy() {
     this.#shapes.forEach((shape) => this.#series.detachPrimitive(shape))
-  }
-
-  setResolution(resolutionId: ResolutionId) {
-    this.#resolutionId = resolutionId
-    this.#redraw()
-  }
-
-  setSeries(series: ISeriesApi<SeriesType>) {
-    this.#series = series
-    this.#redraw()
   }
 
   setOptions(options: ChartOption[]) {
@@ -35,7 +25,7 @@ export class OptionOverlay {
   }
 
   #redraw() {
-    this.clear()
+    this.destroy()
     this.#shapes = this.#createShapes()
     this.#shapes.forEach((shape) => this.#series.attachPrimitive(shape))
   }
