@@ -5,4 +5,4 @@ export interface SeriesOverlay {
   getSeries: () => ISeriesApi<SeriesType>
 }
 
-export type SeriesId = 'candlestick' | 'area' | 'bar' | 'line' | 'heikin'
+export type SeriesId = 'candlestick' | 'area' | 'bar' | 'line' | 'heikin' | 'hollow'

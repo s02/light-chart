@@ -6,7 +6,7 @@ export const CANDLE_COLORS = {
   down: '#ef5350'
 } as const
 
-export const CHART_PARAMS: DeepPartial<TimeChartOptions> = {
+export const CHART_PARAMS = {
   autoSize: true,
   layout: {
     attributionLogo: false,
@@ -32,7 +32,7 @@ export const CHART_PARAMS: DeepPartial<TimeChartOptions> = {
     horzLine: { labelBackgroundColor: '#3c3e43' },
     vertLine: { labelBackgroundColor: '#3c3e43' }
   }
-} as const
+} as const satisfies DeepPartial<TimeChartOptions>
 
 export const RESOLUTION_SETTINGS = {
   '1S': {

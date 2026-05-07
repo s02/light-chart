@@ -1,6 +1,6 @@
 import type { ChartBar } from '@engine/types'
 
-export class HeikinAshiCalculator {
+export class HeikinAshiModel {
   #baseBars: ChartBar[] = []
 
   update(bar: ChartBar) {

@@ -1,4 +1,4 @@
-import { OptionPlugin } from './OptionPlugin'
+import { OptionPlugin } from '@engine/plugins/OptionPlugin'
 import type { IChartApi, ISeriesApi, ISeriesPrimitive, SeriesType, Time } from 'lightweight-charts'
 import type { ChartOption, ResolutionId } from '@engine/types'
 

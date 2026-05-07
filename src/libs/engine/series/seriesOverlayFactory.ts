@@ -2,6 +2,7 @@ import { AreaSeriesOverlay } from '@engine/series/AreaSeriesOverlay'
 import { BarSeriesOverlay } from '@engine/series/BarSeriesOverlay'
 import { CandlestickSeriesOverlay } from '@engine/series/CandlestickSeriesOverlay'
 import { HeikinAshiSeriesOverlay } from '@engine/series/HeikinAshiSeriesOverlay'
+import { HollowCandleSeriesOverlay } from '@engine/series/HollowCandleSeriesOverlay'
 import { LineSeriesOverlay } from '@engine/series/LineSeriesOverlay'
 import type { Datafeed, SeriesId } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
@@ -19,6 +20,8 @@ export const seriesOverlayFactory = (seriesId: SeriesId, chart: IChartApi, dataf
     return new LineSeriesOverlay(chart, datafeed)
   } else if (seriesId === 'heikin') {
     return new HeikinAshiSeriesOverlay(chart, datafeed)
+  } else if (seriesId === 'hollow') {
+    return new HollowCandleSeriesOverlay(chart, datafeed)
   } else {
     assertNever(seriesId)
   }

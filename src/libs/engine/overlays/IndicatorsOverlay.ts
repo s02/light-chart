@@ -1,4 +1,4 @@
-import type { Indicator } from './indicators/types'
+import type { Indicator } from '@engine/indicators/types'
 
 export class IndicatorsOverlay {
   #indicators: Indicator[] = []

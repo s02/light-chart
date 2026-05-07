@@ -1,4 +1,4 @@
-import { getBarLogical, getBarPrice, getBarTime } from './helpers'
+import { getBarLogical, getBarPrice, getBarTime } from '@engine/helpers'
 import { verticalLine } from '@engine/primitives/vertical-line'
 import { circle } from '@engine/primitives/circle'
 import { horizontalLine } from '@engine/primitives/horizontal-line'

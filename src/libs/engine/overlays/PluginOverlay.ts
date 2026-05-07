@@ -1,6 +1,6 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
-import { LegendPlugin } from '@engine/LegendPlugin'
-import { CloseBarCountdownPlugin } from '@engine/CloseBarCountdownPlugin'
+import { LegendPlugin } from '@engine/plugins/LegendPlugin'
+import { CloseBarCountdownPlugin } from '@engine/plugins/CloseBarCountdownPlugin'
 import type { AssetSymbol, ResolutionId } from '@engine/types'
 import type { IChartApi, ISeriesApi, ISeriesPrimitive, SeriesType, Time } from 'lightweight-charts'
 

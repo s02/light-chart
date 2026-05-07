@@ -1,4 +1,4 @@
-import { HeikinAshiCalculator } from '@engine/series/HeikinAshiCalculator'
+import { HeikinAshiModel } from '@engine/series/models/HeikinAshiModel'
 import type { UTCTimestamp } from '@engine/types'
 import { describe, it, expect, beforeEach } from 'vitest'
 
@@ -99,10 +99,10 @@ const result = [
 ]
 
 describe('Heikin Ashi Calculator', () => {
-  let calculator: HeikinAshiCalculator
+  let calculator: HeikinAshiModel
 
   beforeEach(() => {
-    calculator = new HeikinAshiCalculator()
+    calculator = new HeikinAshiModel()
   })
 
   it('should just calculate bars', () => {

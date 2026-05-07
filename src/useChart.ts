@@ -22,7 +22,7 @@ export const ASSETS = [
     name: 'ETHEREUM'
   },
   {
-    id: '111',
+    id: '116',
     name: 'PMX'
   }
 ]

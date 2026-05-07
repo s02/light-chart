@@ -16,7 +16,7 @@ const setSeries = (seriesId: SeriesId) => {
   emit('selected')
 }
 
-const values: SeriesId[] = ['bar', 'candlestick', 'line', 'area']
+const values: SeriesId[] = ['bar', 'candlestick', 'line', 'area', 'heikin', 'hollow']
 </script>
 <template>
   <div class="series-menu">

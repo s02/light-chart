@@ -1,12 +1,12 @@
 import { CANDLE_COLORS } from '@engine/constants'
 import { AbstractSeriesOverlay } from '@engine/series/AbstractSeriesOverlay'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
-import { HeikinAshiCalculator } from '@engine/series/HeikinAshiCalculator'
+import { HeikinAshiModel } from '@engine/series/models/HeikinAshiModel'
 import type { Datafeed, DatafeedResult } from '@engine/types'
 import { CandlestickSeries, type IChartApi } from 'lightweight-charts'
 
 export class HeikinAshiSeriesOverlay extends AbstractSeriesOverlay {
-  #calculator: HeikinAshiCalculator
+  #model: HeikinAshiModel
 
   constructor(chart: IChartApi, datafeed: Datafeed) {
     super(chart, datafeed, {
@@ -22,14 +22,15 @@ export class HeikinAshiSeriesOverlay extends AbstractSeriesOverlay {
       }
     })
 
-    this.#calculator = new HeikinAshiCalculator()
+    this.#model = new HeikinAshiModel()
   }
 
   protected override transformData(result: DatafeedResult) {
     if (result.type === 'set') {
-      this.series.setData(this.#calculator.setData(result.data))
+      const data = this.#model.setData(result.data)
+      this.series.setData(data)
     } else {
-      result.data.forEach((bar) => this.series.update(this.#calculator.update(bar)))
+      result.data.forEach((bar) => this.series.update(this.#model.update(bar)))
     }
   }
 }

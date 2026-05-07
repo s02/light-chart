@@ -17,5 +17,7 @@
   "series-bar": "Bars",
   "series-candlestick": "Candles",
   "series-line": "Line",
-  "series-area": "Area"
+  "series-area": "Area",
+  "series-heikin": "Heikin Ashi",
+  "series-hollow": "Hollow candles"
 }

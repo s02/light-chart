@@ -1,4 +1,4 @@
-import { getBarLogical } from './helpers'
+import { getBarLogical } from '@engine/helpers'
 import { verticalLine } from '@engine/primitives/vertical-line'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type {

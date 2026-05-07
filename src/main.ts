@@ -4,11 +4,11 @@ import { Http } from './transport/HttpClient'
 import { Ws } from './transport/WebSocketClient'
 
 Http.initialize({
-  api: 'https://api.binarium.com'
+  api: 'https://dev-api.bindev.info'
 })
 
 Ws.initialize(Http.get(), {
-  host: 'wss://ws.binarium.com'
+  host: 'wss://dev-ws.bindev.info'
 })
 
 const app = createApp(App)

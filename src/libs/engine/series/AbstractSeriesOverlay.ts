@@ -31,31 +31,31 @@ export type SeriesSettings = NativeSeriesSettings | CustomSeriesSettings
 export abstract class AbstractSeriesOverlay implements SeriesOverlay {
   protected series: ISeriesApi<SeriesType>
 
-  #datafeed: Datafeed
-  #chart: IChartApi
-  #datafeedSubscriptionId: number | null = null
+  private datafeed: Datafeed
+  private chart: IChartApi
+  private datafeedSubscriptionId: number | null = null
 
   constructor(chart: IChartApi, datafeed: Datafeed, settings: SeriesSettings) {
-    this.#chart = chart
-    this.#datafeed = datafeed
+    this.chart = chart
+    this.datafeed = datafeed
 
     if (settings.custom) {
-      this.series = this.#chart.addCustomSeries(settings.series, settings.options)
+      this.series = this.chart.addCustomSeries(settings.series, settings.options)
     } else {
-      this.series = this.#chart.addSeries(settings.series, settings.options)
+      this.series = this.chart.addSeries(settings.series, settings.options)
     }
 
-    this.#init()
+    queueMicrotask(() => this.#init())
   }
 
   destroy() {
-    this.#chart.removeSeries(this.series)
+    this.chart.removeSeries(this.series)
 
-    if (!this.#datafeedSubscriptionId) {
+    if (!this.datafeedSubscriptionId) {
       return
     }
 
-    this.#datafeed.unsubscribe(this.#datafeedSubscriptionId)
+    this.datafeed.unsubscribe(this.datafeedSubscriptionId)
   }
 
   getSeries() {
@@ -72,7 +72,7 @@ export abstract class AbstractSeriesOverlay implements SeriesOverlay {
 
   #init() {
     return this.#subscribeToDatafeed().then(() => {
-      this.#chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
+      this.chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
         if (!range) {
           return
         }
@@ -86,26 +86,26 @@ export abstract class AbstractSeriesOverlay implements SeriesOverlay {
 
   #subscribeToDatafeed(): Promise<void> {
     return new Promise((resolve) => {
-      this.#datafeed
+      this.datafeed
         .subscribe((ev) => this.transformData(ev))
         .then((id) => {
           resolve()
-          this.#datafeedSubscriptionId = id
+          this.datafeedSubscriptionId = id
         })
     })
   }
 
   #requestCandles() {
-    const timeRange = this.#chart.timeScale().getVisibleRange()
+    const timeRange = this.chart.timeScale().getVisibleRange()
 
     if (!timeRange?.from || !timeRange?.to) {
       return
     }
 
-    const resolution = RESOLUTION_SETTINGS[this.#datafeed.getResolutionId()]
+    const resolution = RESOLUTION_SETTINGS[this.datafeed.getResolutionId()]
     const diff = (timeRange.to as number) - (timeRange.from as number)
     const candlesCount = Math.round(diff / resolution.seconds)
 
-    this.#datafeed.loadHistory({ minCandles: candlesCount })
+    this.datafeed.loadHistory({ minCandles: candlesCount })
   }
 }

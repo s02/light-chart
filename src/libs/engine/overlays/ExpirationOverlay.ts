@@ -1,4 +1,4 @@
-import { ExpirationPlugin } from './ExpirationPlugin'
+import { ExpirationPlugin } from '@engine/plugins/ExpirationPlugin'
 import type { ChartExpiration, ResolutionId } from '@engine/types'
 import type { IChartApi, ISeriesApi, ISeriesPrimitive, SeriesType, Time } from 'lightweight-charts'
 
