@@ -1,34 +1,14 @@
 import { computed, reactive } from 'vue'
 import { useExpirations } from './useExpirations'
 import { dateToEpoch } from '@chart/helpers'
+import { ASSETS, PROFITABILITY } from './constants'
+import type { AppExpiration, ChartState, ChartUserState, ProfitabilityType } from './types'
+import type { AssetSymbol } from '@chart/types'
 import type { Expiration } from './transport/types'
-import type { AssetSymbol, ChartExpiration } from '@chart/types'
-
-type ChartUserState = {
-  assetSymbol: AssetSymbol
-  expiration?: Expiration
-}
-
-type ChartState = Omit<ChartUserState, 'expiration'> & {
-  expiration: {
-    appExpiration: Expiration | undefined
-    chartExpiration: ChartExpiration | undefined
-  }
-}
-
-export const ASSETS = [
-  {
-    id: '34',
-    name: 'ETHEREUM'
-  },
-  {
-    id: '116',
-    name: 'PMX'
-  }
-]
 
 const chartState = reactive<ChartUserState>({
-  assetSymbol: ASSETS[0]
+  assetSymbol: ASSETS[0],
+  profitabilityType: PROFITABILITY.TURBO
 })
 
 const getActualExpiration = (userExpiration: Expiration | undefined, actualExpirations: Expiration[]) => {
@@ -50,26 +30,42 @@ const getActualExpiration = (userExpiration: Expiration | undefined, actualExpir
 }
 
 export const useChart = () => {
-  const { data: expirations } = useExpirations()
+  const { data: expirationList } = useExpirations()
 
-  const state = computed<ChartState>(() => {
+  const expirations = computed<Expiration[]>(() =>
+    expirationList.value.filter((exp) => exp.type === chartState.profitabilityType)
+  )
+
+  const appExpiration = computed<AppExpiration | undefined>(() => {
     const expiration = getActualExpiration(chartState.expiration, expirations.value)
 
-    return {
-      ...chartState,
-      expiration: {
-        appExpiration: expiration,
-        chartExpiration: expiration && {
+    if (expiration) {
+      return {
+        expiration,
+        chartExpiration: {
           ...expiration,
           lock: dateToEpoch(expiration.lock),
           close: dateToEpoch(expiration.close)
         }
       }
     }
+
+    return undefined
   })
 
-  const setAssetSymbol = (assetSymbol: AssetSymbol) => {
+  const state = computed<ChartState>(() => {
+    const result = {
+      ...chartState,
+      expirations: expirations.value,
+      currentExpiration: appExpiration.value
+    }
+
+    return result
+  })
+
+  const setChart = (assetSymbol: AssetSymbol, profitabilityType: ProfitabilityType) => {
     chartState.assetSymbol = assetSymbol
+    chartState.profitabilityType = profitabilityType
   }
 
   const setExpiration = (expiration: Expiration) => {
@@ -77,7 +73,7 @@ export const useChart = () => {
   }
 
   return {
-    setAssetSymbol,
+    setChart,
     setExpiration,
     chartState: state
   }

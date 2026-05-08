@@ -53,7 +53,7 @@ export class SimpleMovingAverage implements Indicator {
   #getValue(data: ChartBar[], i: number) {
     let sum = 0
     for (let j = 0; j < this.#length; j++) {
-      sum += data[i - j].value
+      sum += data[i - j].close
     }
 
     return sum / this.#length

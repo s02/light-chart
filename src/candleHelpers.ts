@@ -12,6 +12,12 @@ const smoothify = (bar: ChartBar[]): void => {
     return
   }
 
+  const smooth = (bar: ChartBar, prevBar: ChartBar) => {
+    prevBar.close = bar.open
+    prevBar.high = Math.max(prevBar.high, prevBar.close)
+    prevBar.low = Math.min(prevBar.low, prevBar.close)
+  }
+
   const fill = (bar: ChartBar) => {
     if (!bar.open) {
       bar.open = bar.close
@@ -29,7 +35,8 @@ const smoothify = (bar: ChartBar[]): void => {
   let i = bar.length - 1
   while (i !== 0) {
     fill(bar[i])
-    bar[i - 1].close = bar[i].open
+    smooth(bar[i], bar[i - 1])
+
     i--
   }
 

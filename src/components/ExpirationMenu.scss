@@ -1,0 +1,77 @@
+.exp-menu {
+  border-radius: 0.25em;
+  border: 1px solid rgb(255 255 255 / 20%);
+  padding: 0.5em 0.5em 0.75em;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  cursor: pointer;
+}
+
+.exp-menu-container {
+  width: 100%;
+}
+
+.exp-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  margin-bottom: 7px;
+}
+
+.exp-icon {
+  width: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.exp-value {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.exp-ticks {
+  margin-top: 8px;
+  height: 20px;
+  display: flex;
+  gap: 4px;
+}
+
+.exp-tick {
+  background-color: rgb(255 255 255 / 20%);
+  border-radius: 4px;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  span {
+    transition: background-color 0.2s ease;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 2px;
+    background-color: currentcolor;
+    display: block;
+
+    &:nth-child(2) {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+  }
+
+  &:hover {
+    background-color: currentcolor;
+
+    span {
+      background-color: #001b36;
+    }
+  }
+}

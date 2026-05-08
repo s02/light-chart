@@ -2,15 +2,17 @@
 import { computed, toRef } from 'vue'
 import TerminalChart from '@chart/TerminalChart.vue'
 import { useChart } from './useChart'
-import { useExpirations } from './useExpirations'
-import { useTrading } from './useTrading'
+import { useQuoteHandler, useTrading } from './useTrading'
 import { datafeedFactory } from './datafeedFactory'
 import { dateToEpoch } from '@chart/helpers'
+import BuyButton from './components/BuyButton.vue'
+import ExpirationMenu from './components/ExpirationMenu.vue'
 import type { TerminalChartConfig } from '@chart/types'
 
-const { data: expirations, format: formatExp } = useExpirations()
-const { chartState, setExpiration } = useChart()
+const { chartState } = useChart()
 const { buyOption, options } = useTrading(toRef(() => chartState.value.assetSymbol.id))
+
+useQuoteHandler(toRef(() => chartState.value.assetSymbol.id))
 
 const chartOptions = computed(() =>
   options.value.map((option) => ({
@@ -24,6 +26,14 @@ const defaultConfig: TerminalChartConfig = {
   resolutionId: '5S',
   seriesId: 'candlestick'
 }
+
+const buy = (direction: 'up' | 'down') => {
+  const currentExp = chartState.value.currentExpiration
+  if (!currentExp) {
+    throw `Expiration is required when buying`
+  }
+  buyOption(direction, currentExp.expiration)
+}
 </script>
 
 <template>
@@ -31,24 +41,16 @@ const defaultConfig: TerminalChartConfig = {
     <div class="terminal-chart">
       <TerminalChart
         :options="chartOptions"
-        :expiration="chartState.expiration.chartExpiration"
+        :expiration="chartState.currentExpiration?.chartExpiration"
         :asset-symbol="chartState.assetSymbol"
         :default-config="defaultConfig"
-        :datafeed-factory="datafeedFactory"
-      />
+        :datafeed-factory="datafeedFactory" />
     </div>
     <div class="terminal-aside">
-      <select
-        :value="chartState.expiration.appExpiration"
-        @change="setExpiration(expirations[($event.target as HTMLSelectElement).selectedIndex])"
-      >
-        <option v-for="exp in expirations" :key="exp.close + exp.type" :value="exp">
-          {{ formatExp(exp.close) }}
-        </option>
-      </select>
+      <ExpirationMenu />
       <div class="buy-buttons">
-        <button @click="buyOption('up', chartState.expiration.appExpiration)">up</button>
-        <button @click="buyOption('down', chartState.expiration.appExpiration)">down</button>
+        <BuyButton direction="up" @click="buy('up')" />
+        <BuyButton direction="down" @click="buy('down')" />
       </div>
     </div>
   </div>

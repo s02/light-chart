@@ -23,8 +23,13 @@ let pe: PlotEngine | null = null
 const chartRef = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  pe = new PlotEngine(chartRef.value!, {
-    datafeed: props.datafeedFactory(props.assetSymbol, state.resolutionId)
+  if (!chartRef.value) {
+    throw 'Terminal Chart: no ref provided'
+  }
+
+  pe = new PlotEngine(chartRef.value, {
+    datafeed: props.datafeedFactory(props.assetSymbol, state.resolutionId),
+    seriesId: state.seriesId
   })
 
   if (props.expiration) {
@@ -37,7 +42,11 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  pe?.destroy()
+  if (!pe) {
+    throw 'Terminal Chart: already destroyed'
+  }
+
+  pe.destroy()
   pe = null
 })
 

@@ -1,24 +1,40 @@
 <script setup lang="ts">
 import AppTerminal from './AppTerminal.vue'
-import { ASSETS, useChart } from './useChart'
+import AssetButton from './components/AssetButton.vue'
+import { ASSETS, PROFITABILITY } from './constants'
+import { useChart } from './useChart'
 import { useExpirations } from './useExpirations'
 
 const { schedule: scheduleExpirationsUpdate } = useExpirations()
-const { chartState, setAssetSymbol } = useChart()
+const { chartState, setChart } = useChart()
 scheduleExpirationsUpdate()
+
+const assetMenu = [
+  {
+    asset: ASSETS[0],
+    profitability: PROFITABILITY.TURBO
+  },
+  {
+    asset: ASSETS[1],
+    profitability: PROFITABILITY.BINARY
+  }
+]
+
+const openChart = (el: (typeof assetMenu)[0]) => {
+  setChart(el.asset, el.profitability)
+}
 </script>
 
 <template>
   <div class="app">
     <div class="app-asset-menu">
-      <select
-        :value="chartState.assetSymbol.id"
-        @change="setAssetSymbol(ASSETS[($event.target as HTMLSelectElement).selectedIndex])"
-      >
-        <option v-for="el of ASSETS" :key="el.id" :value="el.id">
-          {{ el.name }}
-        </option>
-      </select>
+      <AssetButton
+        v-for="el of assetMenu"
+        :key="el.asset.id"
+        :name="el.asset.name"
+        :active="el.asset.id === chartState.assetSymbol.id"
+        :profitability="el.profitability"
+        @click="openChart(el)" />
     </div>
     <div class="app-terminal">
       <AppTerminal />
@@ -63,15 +79,17 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: 18px;
+  gap: 18px;
 }
 
 .app-terminal {
   flex-grow: 1;
+  overflow: hidden;
 }
 
 .app-asset-menu {
-  padding: 10px;
   display: flex;
-  gap: 5px;
+  gap: 8px;
 }
 </style>

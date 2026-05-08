@@ -46,8 +46,9 @@ export class CandleHttpService {
 
     result.forEach((candles) => {
       candles.forEach((candle) => {
-        if (!data.length || candle.time !== data[data.length - 1].date) {
-          data.push(candleHelpers.transform(candle))
+        const ct = candleHelpers.transform(candle)
+        if (!data.length || ct.time !== data[data.length - 1].time) {
+          data.push(ct)
         }
       })
     })

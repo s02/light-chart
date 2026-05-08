@@ -8,7 +8,7 @@ type CANDLE_MERGE_STRATEGY = 'continuous' | 'gap'
 export class CandleStoreService {
   #data: ChartBar[] = []
   #resolutionId: ResolutionId
-  #mergeStrategy: CANDLE_MERGE_STRATEGY = 'gap'
+  #mergeStrategy: CANDLE_MERGE_STRATEGY = 'continuous'
 
   constructor(resolutionId: ResolutionId) {
     this.#resolutionId = resolutionId
