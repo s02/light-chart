@@ -2,9 +2,12 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { PlotEngine } from '@engine/PlotEngine'
 import ChartHeader from '@chart/components/ChartHeader.vue'
+import ChartAside from '@chart/components/ChartAside.vue'
 import { useChart } from '@chart/useChart'
 import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
 import type { AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
+import ModalContainer from '@chart/ModalContainer.vue'
+import type { IndicatorScript } from '@engine/indicators/types'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
@@ -14,7 +17,7 @@ const props = defineProps<{
   expiration?: ChartExpiration
 }>()
 
-const { state } = useChart()
+const { state, registerEngine } = useChart()
 state.assetSymbol = props.assetSymbol
 state.resolutionId = props.defaultConfig.resolutionId
 state.seriesId = props.defaultConfig.seriesId
@@ -39,6 +42,16 @@ onMounted(() => {
   if (props.options) {
     pe.setOptions(props.options)
   }
+
+  registerEngine({
+    addIndicator: (key: IndicatorScript) => {
+      if (!pe) {
+        throw `engine isn't defined`
+      }
+
+      return pe.addIndicator(key)
+    }
+  })
 })
 
 onUnmounted(() => {
@@ -55,20 +68,25 @@ watch(
     assetSymbol: props.assetSymbol,
     resolutionId: state.resolutionId,
     seriesId: state.seriesId,
-    expiration: props.expiration
+    expiration: props.expiration,
+    indicators: state.indicators
   }),
   (next, prev) => {
+    if (!pe) {
+      throw `Engine isn't ready`
+    }
+
     if (next.assetSymbol.id !== prev.assetSymbol.id || next.resolutionId !== prev.resolutionId) {
       state.assetSymbol = props.assetSymbol
-      pe?.setDatafeed(props.datafeedFactory(state.assetSymbol, state.resolutionId))
+      pe.setDatafeed(props.datafeedFactory(state.assetSymbol, state.resolutionId))
     }
 
     if (next.seriesId !== prev.seriesId) {
-      pe?.setSeriesId(state.seriesId)
+      pe.setSeriesId(state.seriesId)
     }
 
     if (next.expiration && next.expiration.close !== prev.expiration?.close) {
-      pe?.setExpiration(next.expiration)
+      pe.setExpiration(next.expiration)
     }
   }
 )
@@ -84,12 +102,15 @@ watch(
 </script>
 
 <template>
-  <div class="chart">
-    <div class="chart-header">
+  <div class="t-chart">
+    <div class="t-chart-header">
       <ChartHeader />
     </div>
-    <div class="chart-aside"></div>
-    <div ref="chartRef" class="chart-plot"></div>
+    <div class="t-chart-aside">
+      <ChartAside />
+    </div>
+    <div ref="chartRef" class="t-chart-plot"></div>
+    <ModalContainer />
   </div>
 </template>
 

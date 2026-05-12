@@ -14,8 +14,7 @@ import type {
   SeriesType,
   Time,
   Coordinate,
-  Point,
-  UTCTimestamp
+  Point
 } from 'lightweight-charts'
 import type { ChartOption, ResolutionId } from '@engine/types'
 

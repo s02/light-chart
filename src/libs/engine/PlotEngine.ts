@@ -8,6 +8,8 @@ import type { IChartApi } from 'lightweight-charts'
 import type { ChartExpiration, ChartOption, Datafeed, SeriesId } from '@engine/types'
 import type { SeriesOverlay } from '@engine/series/types'
 import { seriesOverlayFactory } from '@engine/series/seriesOverlayFactory'
+import type { IndicatorScript } from '@engine/indicators/types'
+import { INDICATOR_SCRIPTS } from '@engine/indicators'
 
 type Params = {
   datafeed: Datafeed
@@ -59,8 +61,14 @@ export class PlotEngine {
     this.#overlays.exp.setExpiration(expiration)
   }
 
-  addIndicator() {
-    //this.#indicatorsOverlay.add(new SimpleMovingAverage(this.#chart, this.#datafeed))
+  addIndicator(key: IndicatorScript) {
+    const script = INDICATOR_SCRIPTS.find((s) => s.key === key)
+    if (!script) {
+      throw 'unknown indicator key'
+    }
+
+    this.#overlays.indicators.add(new script.indicator(this.#chart, this.#datafeed))
+    return 8
   }
 
   destroy() {

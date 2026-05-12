@@ -1,9 +1,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="btn"><slot></slot></div>
+  <div>sdfsdf</div>
 </template>
 
 <style lang="scss" scoped>
-@use 'ChartButton.scss';
+@use 'LineDrawingMenu.scss';
 </style>

@@ -8,6 +8,7 @@ export class LineSeriesOverlay extends AbstractSeriesOverlay {
     super(chart, datafeed, {
       series: LineSeries,
       options: {
+        lineWidth: 1,
         ...COMMON_SERIES_SETTINGS
       }
     })

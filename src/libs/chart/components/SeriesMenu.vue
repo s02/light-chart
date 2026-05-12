@@ -25,8 +25,7 @@ const values: SeriesId[] = ['bar', 'candlestick', 'line', 'area', 'heikin', 'hol
       :key="series"
       :active="state.seriesId === series"
       class="series-menu-item"
-      @click="setSeries(series)"
-    >
+      @click="setSeries(series)">
       <SeriesIcon :series-id="series" />
       {{ i18n.translate(`series-${series}`) }}</ChartMenuItem
     >

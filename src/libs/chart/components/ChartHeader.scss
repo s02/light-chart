@@ -1,7 +1,6 @@
 .chart-header {
   display: flex;
   align-items: center;
-  height: 100%;
 }
 
 .chart-header-separator {
@@ -12,10 +11,28 @@
   width: 1px;
 }
 
-.btn-series {
-  padding: 0 3px;
+.chart-header-btn {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  color: #dbdbdb;
+  font-size: 14px;
+  border-radius: 4px;
+  min-width: 34px;
+  height: 34px;
+  text-align: center;
+  justify-content: center;
+  padding: 3px;
+  gap: 2px;
+  box-shadow: none;
+  border: none;
+  background-color: transparent;
+
+  &:hover {
+    background-color: #303030;
+  }
 }
 
-.btn-resolution {
-  padding: 0 9px;
+.chart-header-btn-indicator {
+  padding-inline: 5px 10px;
 }

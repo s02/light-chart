@@ -19,5 +19,13 @@
   "series-line": "Line",
   "series-area": "Area",
   "series-heikin": "Heikin Ashi",
-  "series-hollow": "Hollow candles"
+  "series-hollow": "Hollow candles",
+  "indicator-bollinger-bands": "Bollinger Bands",
+  "indicator-supertrend":"Supertrend",
+  "indicator-parabolic-sar":"Parabolic SAR",
+  "indicator-rsi":"RSI",
+  "indicator-macd":"MACD",
+  "indicator-stochastic":"Stochastic",
+  "indicator-stochastic-rsi":"Stochastic RSI",
+  "indicator-sma": "SMA"
 }

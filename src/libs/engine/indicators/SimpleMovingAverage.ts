@@ -8,6 +8,8 @@ import {
 } from 'lightweight-charts'
 import type { Indicator } from './types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import { BarQueue } from '@engine/indicators/BarQueue'
+import { math } from '@engine/indicators/math'
 
 export class SimpleMovingAverage implements Indicator {
   #chart: IChartApi
@@ -15,30 +17,38 @@ export class SimpleMovingAverage implements Indicator {
   #series: ISeriesApi<SeriesType>
   #subscriptionId?: number
   #length = 20
-  #lastPoints: ChartBar[] = []
+  #queue: BarQueue
 
   constructor(chart: IChartApi, datafeed: Datafeed) {
     this.#chart = chart
     this.#datafeed = datafeed
-    this.#series = this.#chart.addSeries(LineSeries)
+    this.#series = this.#chart.addSeries(LineSeries, { lineWidth: 1 })
+    this.#queue = new BarQueue(this.#length)
   }
 
   async apply() {
     this.#subscriptionId = await this.#datafeed.subscribe((ev) => {
       if (ev.type === 'set') {
-        const sma = this.#calculate(ev.data)
-        this.#series.setData(sma)
-        this.#lastPoints = ev.data.slice(-this.#length)
+        this.#queue = new BarQueue(this.#length)
+        const result: (LineData | WhitespaceData)[] = []
+        for (const bar of ev.data) {
+          this.#queue.push(bar)
+
+          if (this.#queue.isFull()) {
+            result.push(this.#createBar(bar))
+          } else {
+            result.push({
+              time: bar.time
+            })
+          }
+        }
+
+        this.#series.setData(result)
       } else {
-        ev.data.forEach((bar) => {
-          this.#lastPoints.shift()
-          this.#lastPoints.push(bar)
-          const value = this.#getValue(this.#lastPoints, this.#lastPoints.length - 1)
-          this.#series.update({
-            time: bar.time,
-            value
-          })
-        })
+        for (const bar of ev.data) {
+          this.#queue.push(bar)
+          this.#series.update(this.#createBar(bar))
+        }
       }
     })
   }
@@ -50,31 +60,11 @@ export class SimpleMovingAverage implements Indicator {
     }
   }
 
-  #getValue(data: ChartBar[], i: number) {
-    let sum = 0
-    for (let j = 0; j < this.#length; j++) {
-      sum += data[i - j].close
+  #createBar(bar: ChartBar) {
+    const mean = math.sma(this.#queue.map((bar) => bar.close))
+    return {
+      time: bar.time,
+      value: mean
     }
-
-    return sum / this.#length
-  }
-
-  #calculate(data: ChartBar[]) {
-    const result: (LineData | WhitespaceData)[] = []
-
-    for (let i = 0; i < data.length; i++) {
-      if (i < this.#length - 1) {
-        result.push({
-          time: data[i].time
-        })
-      } else {
-        result.push({
-          time: data[i].time,
-          value: this.#getValue(data, i)
-        })
-      }
-    }
-
-    return result
   }
 }
