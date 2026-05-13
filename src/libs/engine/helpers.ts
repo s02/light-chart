@@ -1,6 +1,7 @@
-import { RESOLUTION_SETTINGS } from './constants'
-import type { DataItem, ITimeScaleApi, Logical, Time, UTCTimestamp } from 'lightweight-charts'
+import { CANDLE_COLORS, RESOLUTION_SETTINGS } from './constants'
+import type { BarData, DataItem, ITimeScaleApi, Logical, Time, UTCTimestamp } from 'lightweight-charts'
 import type { ResolutionId } from '@engine/types'
+import { SERIES_DEFAULTS } from '@engine/series/constants'
 
 export const getBarOpenTime = (barTime: UTCTimestamp, resolutionId: ResolutionId): UTCTimestamp => {
   const interval = RESOLUTION_SETTINGS[resolutionId].seconds
@@ -52,3 +53,10 @@ export const getBarTime = (bar?: DataItem<Time>) => {
 }
 
 export const dateToEpoch = (date: string): UTCTimestamp => (new Date(date).getTime() / 1000) as UTCTimestamp
+
+export const formatPrice = (price: number) => {
+  return price.toFixed(SERIES_DEFAULTS.pricePrecision)
+}
+
+export const getBarColor = (bar: BarData<Time>) =>
+  (bar.color ?? bar.close >= bar.open) ? CANDLE_COLORS.up : CANDLE_COLORS.down

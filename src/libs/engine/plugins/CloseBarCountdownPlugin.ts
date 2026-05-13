@@ -1,5 +1,6 @@
-import { RESOLUTION_SETTINGS } from '@engine/constants'
+import { CANDLE_COLORS, RESOLUTION_SETTINGS } from '@engine/constants'
 import type {
+  BarData,
   ISeriesApi,
   ISeriesPrimitive,
   ISeriesPrimitiveAxisView,
@@ -8,7 +9,7 @@ import type {
   Time
 } from 'lightweight-charts'
 import type { ResolutionId } from '@engine/types'
-import { getBarPrice, getBarTime } from '@engine/helpers'
+import { getBarColor, getBarPrice, getBarTime } from '@engine/helpers'
 
 const formatSeconds = (seconds: number) => {
   const h = Math.floor(seconds / 3600)
@@ -19,12 +20,13 @@ const formatSeconds = (seconds: number) => {
   return h > 0 ? `${h}:${time}` : time
 }
 
-const PRICE_LABEL_HEIGHT = 22
+const PRICE_LABEL_HEIGHT = 16
 
 class CountdownAxisView implements ISeriesPrimitiveAxisView {
   #source: CloseBarCountdownPlugin
   #y = 0
   #visible = false
+  #color: string = CANDLE_COLORS.up
 
   constructor(source: CloseBarCountdownPlugin) {
     this.#source = source
@@ -39,7 +41,8 @@ class CountdownAxisView implements ISeriesPrimitiveAxisView {
       return
     }
 
-    const price = getBarPrice(series.data().at(-1))
+    const lastBar = series.data().at(-1)
+    const price = getBarPrice(lastBar)
 
     if (!price) {
       this.#visible = false
@@ -51,6 +54,19 @@ class CountdownAxisView implements ISeriesPrimitiveAxisView {
     if (!y) {
       this.#visible = false
       return
+    }
+
+    const opts = series.options()
+
+    if ('color' in opts) {
+      this.#color = opts.color
+    } else if (lastBar && 'open' in lastBar && 'close' in lastBar) {
+      if ('color' in lastBar && lastBar.color) {
+        this.#color = lastBar.color === 'transparent' ? 'black' : lastBar.color
+      } else if ('upColor' in opts && 'downColor' in opts) {
+        const color = getBarColor(lastBar as BarData<Time>)
+        this.#color = color === CANDLE_COLORS.up ? opts.upColor : opts.downColor
+      }
     }
 
     this.#y = y
@@ -66,11 +82,11 @@ class CountdownAxisView implements ISeriesPrimitiveAxisView {
   }
 
   textColor() {
-    return '#ffffffb3'
+    return '#ffffffcc'
   }
 
   backColor() {
-    return '#2962ff'
+    return this.#color
   }
 
   visible() {
@@ -85,7 +101,7 @@ class CountdownAxisView implements ISeriesPrimitiveAxisView {
 export class CloseBarCountdownPlugin implements ISeriesPrimitive<Time> {
   #series: ISeriesApi<SeriesType> | null = null
   #resolutionId: ResolutionId
-  #timerInterval: ReturnType<typeof setInterval> | null = null
+  #timerInterval: number | null = null
   #label = ''
   #axisView: CountdownAxisView
 

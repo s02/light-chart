@@ -2,7 +2,7 @@
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import { i18n } from '@chart/i18n'
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
-import type { IndicatorScript } from '@engine/indicators/types'
+import type { IndicatorScript } from '@engine/types'
 
 const emit = defineEmits<{
   (e: 'close', result?: IndicatorScript): void

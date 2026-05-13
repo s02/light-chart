@@ -4,10 +4,11 @@ import { PlotEngine } from '@engine/PlotEngine'
 import ChartHeader from '@chart/components/ChartHeader.vue'
 import ChartAside from '@chart/components/ChartAside.vue'
 import { useChart } from '@chart/useChart'
-import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
-import type { AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
 import ModalContainer from '@chart/ModalContainer.vue'
-import type { IndicatorScript } from '@engine/indicators/types'
+import ChartLegend from '@chart/components/ChartLegend.vue'
+import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
+import type { ChartSeriesLegend, AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
+import type { IndicatorScript } from '@engine/types'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
@@ -23,7 +24,9 @@ state.resolutionId = props.defaultConfig.resolutionId
 state.seriesId = props.defaultConfig.seriesId
 
 let pe: PlotEngine | null = null
+let unsub: () => void
 const chartRef = ref<HTMLElement | null>(null)
+const legends = ref<ChartSeriesLegend[]>([])
 
 onMounted(() => {
   if (!chartRef.value) {
@@ -52,6 +55,10 @@ onMounted(() => {
       return pe.addIndicator(key)
     }
   })
+
+  unsub = pe.subscribeToLegends((l) => {
+    legends.value = l
+  })
 })
 
 onUnmounted(() => {
@@ -61,6 +68,10 @@ onUnmounted(() => {
 
   pe.destroy()
   pe = null
+
+  if (unsub) {
+    unsub()
+  }
 })
 
 watch(
@@ -109,7 +120,13 @@ watch(
     <div class="t-chart-aside">
       <ChartAside />
     </div>
-    <div ref="chartRef" class="t-chart-plot"></div>
+    <div class="t-chart-wrapper">
+      <div class="t-chart-legends">
+        <ChartLegend :legends="legends" />
+      </div>
+      <div ref="chartRef" class="t-chart-plot"></div>
+    </div>
+
     <ModalContainer />
   </div>
 </template>

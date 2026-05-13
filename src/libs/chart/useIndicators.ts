@@ -1,7 +1,7 @@
 import { useModal } from '@chart/composables/useModal'
 import ModalIndicatorsList from '@chart/components/ModalIndicatorsList.vue'
-import type { IndicatorScript } from '@engine/indicators/types'
 import { useChart } from '@chart/useChart'
+import type { IndicatorScript } from '@engine/types'
 
 export const openScriptList = () => {}
 

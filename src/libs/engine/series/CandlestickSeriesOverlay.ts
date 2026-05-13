@@ -1,8 +1,10 @@
 import { CANDLE_COLORS } from '@engine/constants'
 import { AbstractSeriesOverlay } from '@engine/series/AbstractSeriesOverlay'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
+import { CandlestickSeries } from 'lightweight-charts'
+import { formatPrice, getBarColor } from '@engine/helpers'
 import type { Datafeed } from '@engine/types'
-import { CandlestickSeries, type IChartApi } from 'lightweight-charts'
+import type { BarData, IChartApi, Time } from 'lightweight-charts'
 
 export class CandlestickSeriesOverlay extends AbstractSeriesOverlay {
   constructor(chart: IChartApi, datafeed: Datafeed) {
@@ -18,5 +20,35 @@ export class CandlestickSeriesOverlay extends AbstractSeriesOverlay {
         wickDownColor: CANDLE_COLORS.down
       }
     })
+  }
+
+  getLegend(bar: BarData<Time>) {
+    const color = getBarColor(bar)
+    return {
+      category: 'main',
+      key: 'candlestick-series',
+      data: [
+        {
+          label: 'O',
+          value: formatPrice(bar.open),
+          color
+        },
+        {
+          label: 'H',
+          value: formatPrice(bar.high),
+          color
+        },
+        {
+          label: 'L',
+          value: formatPrice(bar.low),
+          color
+        },
+        {
+          label: 'C',
+          value: formatPrice(bar.close),
+          color
+        }
+      ]
+    }
   }
 }

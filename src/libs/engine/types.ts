@@ -1,6 +1,16 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
-import type { UTCTimestamp } from 'lightweight-charts'
-export type { SeriesId } from '@engine/series/types'
+import type { INDICATOR_SCRIPTS } from '@engine/indicators'
+import type {
+  BarData,
+  CustomData,
+  HistogramData,
+  ISeriesApi,
+  LineData,
+  SeriesType,
+  Time,
+  UTCTimestamp
+} from 'lightweight-charts'
+
 export type { UTCTimestamp } from 'lightweight-charts'
 
 export type ChartExpiration = {
@@ -44,3 +54,35 @@ export type Datafeed = {
 }
 
 export type ResolutionId = keyof typeof RESOLUTION_SETTINGS
+
+export type ChartSeriesLegend = {
+  category: 'main' | 'indicators'
+  id: number
+  key: string
+  data: {
+    value: string
+    color: string
+    label?: string
+  }[]
+}
+
+export type Indicator = {
+  apply: () => Promise<void>
+  remove: () => Promise<void> | void
+  getLegend: (seriesData: SeriesMap) => Omit<ChartSeriesLegend, 'category' | 'id'> | undefined
+}
+
+export type IndicatorScript = (typeof INDICATOR_SCRIPTS)[number]['key']
+
+export type SeriesOverlayData = BarData<Time> | LineData<Time> | HistogramData<Time> | CustomData<Time>
+
+export type SeriesMap = Map<ISeriesApi<SeriesType, Time>, SeriesOverlayData>
+
+export interface SeriesOverlay<TData extends SeriesOverlayData = SeriesOverlayData> {
+  destroy(): void
+  getSeries(): ISeriesApi<SeriesType>
+  getLegend(data: TData): Omit<ChartSeriesLegend, 'category' | 'id'>
+  moveToTop(): void
+}
+
+export type SeriesId = 'candlestick' | 'area' | 'bar' | 'line' | 'heikin' | 'hollow'

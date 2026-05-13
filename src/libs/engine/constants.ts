@@ -1,11 +1,6 @@
 import { CrosshairMode } from 'lightweight-charts'
 import type { DeepPartial, TimeChartOptions } from 'lightweight-charts'
 
-export const CANDLE_COLORS = {
-  up: '#26a69a',
-  down: '#ef5350'
-} as const
-
 export const CHART_PARAMS = {
   autoSize: true,
   layout: {
@@ -33,6 +28,17 @@ export const CHART_PARAMS = {
     vertLine: { labelBackgroundColor: '#3c3e43' }
   }
 } as const satisfies DeepPartial<TimeChartOptions>
+
+export const CANDLE_COLORS = {
+  up: '#26a69a',
+  down: '#ef5350'
+} as const
+
+export const HOLLOW_CANDLE_COLORS = {
+  hollow: 'transparent',
+  up: '#26a69a',
+  down: '#ef5350'
+} as const
 
 export const RESOLUTION_SETTINGS = {
   '1S': {

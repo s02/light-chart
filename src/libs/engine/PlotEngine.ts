@@ -4,12 +4,18 @@ import { IndicatorsOverlay } from '@engine/overlays/IndicatorsOverlay'
 import { ExpirationOverlay } from '@engine/overlays/ExpirationOverlay'
 import { OptionOverlay } from '@engine/overlays/OptionOverlay'
 import { PluginOverlay } from '@engine/overlays/PluginOverlay'
-import type { IChartApi } from 'lightweight-charts'
-import type { ChartExpiration, ChartOption, Datafeed, SeriesId } from '@engine/types'
-import type { SeriesOverlay } from '@engine/series/types'
 import { seriesOverlayFactory } from '@engine/series/seriesOverlayFactory'
-import type { IndicatorScript } from '@engine/indicators/types'
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
+import type { IChartApi, MouseEventParams } from 'lightweight-charts'
+import type {
+  ChartExpiration,
+  ChartOption,
+  ChartSeriesLegend,
+  Datafeed,
+  SeriesId,
+  SeriesOverlay,
+  IndicatorScript
+} from '@engine/types'
 
 type Params = {
   datafeed: Datafeed
@@ -37,6 +43,32 @@ export class PlotEngine {
     this.#datafeed = params.datafeed
     this.#seriesId = params.seriesId || 'candlestick'
     this.#overlays = this.#createOverlays()
+  }
+
+  subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
+    const handler = (params: MouseEventParams) => {
+      const result: ChartSeriesLegend[] = []
+      const series = this.#overlays.series.getSeries()
+      const data = params.seriesData.get(series)
+
+      if (data) {
+        result.push({
+          category: 'main',
+          id: -1,
+          ...this.#overlays.series.getLegend(data)
+        })
+      }
+
+      const legends = this.#overlays.indicators.getLegends(params.seriesData)
+      result.push(...legends)
+
+      if (result.length) {
+        cb(result)
+      }
+    }
+
+    this.#chart.subscribeCrosshairMove(handler)
+    return () => this.#chart.unsubscribeCrosshairMove(handler)
   }
 
   setSeriesId(seriesId: SeriesId) {
@@ -68,6 +100,7 @@ export class PlotEngine {
     }
 
     this.#overlays.indicators.add(new script.indicator(this.#chart, this.#datafeed))
+    this.#overlays.series.moveToTop()
     return 8
   }
 
@@ -84,11 +117,10 @@ export class PlotEngine {
 
   #createOverlays() {
     const resolutionId = this.#datafeed.getResolutionId()
-    const assetSymbol = this.#datafeed.getAssetSymbol()
     const seriesOverlay = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
 
     const series = seriesOverlay.getSeries()
-    const pluginOverlay = new PluginOverlay(this.#chart, series, assetSymbol, resolutionId)
+    const pluginOverlay = new PluginOverlay(series, resolutionId)
     const indicatorsOverlay = new IndicatorsOverlay()
 
     const expOverlay = new ExpirationOverlay(this.#chart, series, resolutionId)

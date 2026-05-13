@@ -1,0 +1,27 @@
+.chart-legends {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chart-legend-name {
+  color: #dbdbdb;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1;
+  transition: opacity 200ms ease;
+  cursor: default;
+
+  &.main {
+    padding-bottom: 4px;
+  }
+
+  &:hover:not(.main) {
+    cursor: pointer;
+    opacity: 0.8;
+  }
+}

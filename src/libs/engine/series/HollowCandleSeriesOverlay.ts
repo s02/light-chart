@@ -1,9 +1,11 @@
-import { CANDLE_COLORS, CHART_PARAMS } from '@engine/constants'
+import { CANDLE_COLORS, HOLLOW_CANDLE_COLORS } from '@engine/constants'
 import { AbstractSeriesOverlay } from '@engine/series/AbstractSeriesOverlay'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { HollowCandleModel, type HollowBar } from '@engine/series/models/HollowCandleModel'
+import { CandlestickSeries } from 'lightweight-charts'
 import type { Datafeed, DatafeedResult } from '@engine/types'
-import { CandlestickSeries, type CandlestickData, type IChartApi } from 'lightweight-charts'
+import type { BarData, CandlestickData, IChartApi, Time } from 'lightweight-charts'
+import { formatPrice, getBarColor } from '@engine/helpers'
 
 export class HollowCandleSeriesOverlay extends AbstractSeriesOverlay {
   #model: HollowCandleModel
@@ -43,19 +45,49 @@ export class HollowCandleSeriesOverlay extends AbstractSeriesOverlay {
     }
 
     if (bar.isGreenFilled) {
-      hwbar.color = CANDLE_COLORS.up
-      hwbar.borderColor = CANDLE_COLORS.up
+      hwbar.color = HOLLOW_CANDLE_COLORS.up
+      hwbar.borderColor = HOLLOW_CANDLE_COLORS.up
     } else if (bar.isRedFilled) {
-      hwbar.color = CANDLE_COLORS.down
-      hwbar.borderColor = CANDLE_COLORS.down
+      hwbar.color = HOLLOW_CANDLE_COLORS.down
+      hwbar.borderColor = HOLLOW_CANDLE_COLORS.down
     } else if (bar.isGreenHollow) {
-      hwbar.color = CHART_PARAMS.layout.background.color
-      hwbar.borderColor = CANDLE_COLORS.up
+      hwbar.color = HOLLOW_CANDLE_COLORS.hollow
+      hwbar.borderColor = HOLLOW_CANDLE_COLORS.up
     } else if (bar.isRedHollow) {
-      hwbar.color = CHART_PARAMS.layout.background.color
-      hwbar.borderColor = CANDLE_COLORS.down
+      hwbar.color = HOLLOW_CANDLE_COLORS.hollow
+      hwbar.borderColor = HOLLOW_CANDLE_COLORS.down
     }
 
     return hwbar
+  }
+
+  getLegend(bar: BarData<Time>) {
+    const color = getBarColor(bar)
+
+    return {
+      key: 'candlestick-series',
+      data: [
+        {
+          label: 'O',
+          value: formatPrice(bar.open),
+          color
+        },
+        {
+          label: 'H',
+          value: formatPrice(bar.high),
+          color
+        },
+        {
+          label: 'L',
+          value: formatPrice(bar.low),
+          color
+        },
+        {
+          label: 'C',
+          value: formatPrice(bar.close),
+          color
+        }
+      ]
+    }
   }
 }

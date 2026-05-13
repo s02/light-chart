@@ -1,15 +1,9 @@
-import {
-  LineSeries,
-  type IChartApi,
-  type ISeriesApi,
-  type LineData,
-  type SeriesType,
-  type WhitespaceData
-} from 'lightweight-charts'
-import type { Indicator } from './types'
-import type { ChartBar, Datafeed } from '@engine/types'
+import { LineSeries } from 'lightweight-charts'
 import { BarQueue } from '@engine/indicators/BarQueue'
 import { math } from '@engine/indicators/math'
+import { formatPrice } from '@engine/helpers'
+import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
+import type { ChartBar, Datafeed, SeriesMap, Indicator } from '@engine/types'
 
 export class SimpleMovingAverage implements Indicator {
   #chart: IChartApi
@@ -22,7 +16,7 @@ export class SimpleMovingAverage implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed) {
     this.#chart = chart
     this.#datafeed = datafeed
-    this.#series = this.#chart.addSeries(LineSeries, { lineWidth: 1 })
+    this.#series = this.#chart.addSeries(LineSeries, { lineWidth: 1, color: 'green' })
     this.#queue = new BarQueue(this.#length)
   }
 
@@ -47,7 +41,10 @@ export class SimpleMovingAverage implements Indicator {
       } else {
         for (const bar of ev.data) {
           this.#queue.push(bar)
-          this.#series.update(this.#createBar(bar))
+
+          if (this.#queue.isFull()) {
+            this.#series.update(this.#createBar(bar))
+          }
         }
       }
     })
@@ -66,5 +63,23 @@ export class SimpleMovingAverage implements Indicator {
       time: bar.time,
       value: mean
     }
+  }
+
+  getLegend(seriesData: SeriesMap) {
+    const data = seriesData.get(this.#series)
+
+    if (data) {
+      return {
+        key: 'SMA',
+        data: [
+          {
+            value: formatPrice((data as LineData<Time>).value),
+            color: 'green'
+          }
+        ]
+      }
+    }
+
+    return undefined
   }
 }

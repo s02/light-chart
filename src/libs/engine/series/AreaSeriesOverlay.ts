@@ -1,7 +1,9 @@
 import { AbstractSeriesOverlay } from '@engine/series/AbstractSeriesOverlay'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
+import { formatPrice } from '@engine/helpers'
+import { AreaSeries } from 'lightweight-charts'
+import type { IChartApi, LineData, SingleValueData, Time } from 'lightweight-charts'
 import type { ChartBar, Datafeed, DatafeedResult } from '@engine/types'
-import { AreaSeries, type IChartApi, type SingleValueData } from 'lightweight-charts'
 
 export class AreaSeriesOverlay extends AbstractSeriesOverlay {
   constructor(chart: IChartApi, datafeed: Datafeed) {
@@ -26,6 +28,18 @@ export class AreaSeriesOverlay extends AbstractSeriesOverlay {
     return {
       ...bar,
       value: bar.close
+    }
+  }
+
+  getLegend(data: LineData<Time>) {
+    return {
+      key: 'area-series',
+      data: [
+        {
+          value: formatPrice(data.value),
+          color: 'green'
+        }
+      ]
     }
   }
 }

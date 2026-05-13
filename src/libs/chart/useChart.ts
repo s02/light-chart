@@ -1,5 +1,4 @@
-import type { IndicatorScript } from '@engine/indicators/types'
-import type { AssetSymbol, ResolutionId, SeriesId } from '@engine/types'
+import type { AssetSymbol, ResolutionId, SeriesId, IndicatorScript } from '@engine/types'
 import { reactive } from 'vue'
 
 type IndicatorSettings = {

@@ -9,10 +9,8 @@
 }
 
 .t-chart-plot {
-  grid-column: 2;
-  grid-row: 2;
-  position: relative;
-  z-index: 1;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -27,4 +25,19 @@
 .t-chart-aside {
   grid-column: 1;
   grid-row: 2;
+}
+
+.t-chart-wrapper {
+  grid-column: 2;
+  grid-row: 2;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.t-chart-legends {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  z-index: 3;
 }

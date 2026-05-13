@@ -1,36 +1,16 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
-import type { SeriesOverlay } from '@engine/series/types'
-import type { Datafeed, DatafeedResult } from '@engine/types'
-import type {
-  CustomData,
-  CustomSeriesOptions,
-  IChartApi,
-  ICustomSeriesPaneView,
-  ISeriesApi,
-  SeriesDefinition,
-  SeriesPartialOptions,
-  SeriesPartialOptionsMap,
-  SeriesType,
-  Time
-} from 'lightweight-charts'
+import type { ChartSeriesLegend, Datafeed, DatafeedResult, SeriesOverlay, SeriesOverlayData } from '@engine/types'
+import type { IChartApi, ISeriesApi, SeriesDefinition, SeriesPartialOptionsMap, SeriesType } from 'lightweight-charts'
 
-type NativeSeriesSettings = {
-  custom?: false
+type SeriesSettings = {
   series: SeriesDefinition<SeriesType>
   options: SeriesPartialOptionsMap[SeriesType]
 }
 
-type CustomSeriesSettings = {
-  custom: true
-  series: ICustomSeriesPaneView<Time, CustomData, CustomSeriesOptions>
-  options: SeriesPartialOptions<CustomSeriesOptions>
-}
-
-export type SeriesSettings = NativeSeriesSettings | CustomSeriesSettings
-
-export abstract class AbstractSeriesOverlay implements SeriesOverlay {
+export abstract class AbstractSeriesOverlay<
+  TData extends SeriesOverlayData = SeriesOverlayData
+> implements SeriesOverlay<TData> {
   protected series: ISeriesApi<SeriesType>
-
   private datafeed: Datafeed
   private chart: IChartApi
   private datafeedSubscriptionId: number | null = null
@@ -38,15 +18,12 @@ export abstract class AbstractSeriesOverlay implements SeriesOverlay {
   constructor(chart: IChartApi, datafeed: Datafeed, settings: SeriesSettings) {
     this.chart = chart
     this.datafeed = datafeed
-
-    if (settings.custom) {
-      this.series = this.chart.addCustomSeries(settings.series, settings.options)
-    } else {
-      this.series = this.chart.addSeries(settings.series, settings.options)
-    }
+    this.series = this.chart.addSeries(settings.series, settings.options)
 
     queueMicrotask(() => this.#init())
   }
+
+  abstract getLegend(data: TData): Omit<ChartSeriesLegend, 'id' | 'category'>
 
   destroy() {
     this.chart.removeSeries(this.series)
@@ -60,6 +37,10 @@ export abstract class AbstractSeriesOverlay implements SeriesOverlay {
 
   getSeries() {
     return this.series
+  }
+
+  moveToTop() {
+    this.series.setSeriesOrder(Number.MAX_SAFE_INTEGER)
   }
 
   protected transformData(result: DatafeedResult) {

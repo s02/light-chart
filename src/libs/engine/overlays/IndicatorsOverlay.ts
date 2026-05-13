@@ -1,18 +1,35 @@
-import type { Indicator } from '@engine/indicators/types'
+import type { ChartSeriesLegend, SeriesMap, Indicator } from '@engine/types'
 
 export class IndicatorsOverlay {
-  #indicators: Indicator[] = []
+  #indicators: { id: number; indicator: Indicator }[] = []
+  #id = 0
 
-  constructor() {}
+  getLegends(seriesData: SeriesMap) {
+    const legends: ChartSeriesLegend[] = []
+    this.#indicators.forEach((el) => {
+      const legend = el.indicator.getLegend(seriesData)
+      if (legend) {
+        legends.push({
+          id: el.id,
+          category: 'indicators',
+          ...legend
+        })
+      }
+    })
+    return legends
+  }
 
   add(indicator: Indicator) {
-    this.#indicators.push(indicator)
+    this.#indicators.push({
+      id: this.#id++,
+      indicator
+    })
     indicator.apply()
   }
 
   destroy() {
-    this.#indicators.forEach((indicator) => {
-      indicator.remove()
+    this.#indicators.forEach((el) => {
+      el.indicator.remove()
     })
   }
 }

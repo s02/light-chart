@@ -1,16 +1,10 @@
+import { formatPrice } from '@engine/helpers'
 import { BarQueue } from '@engine/indicators/BarQueue'
 import { math } from '@engine/indicators/math'
-import type { Indicator } from '@engine/indicators/types'
-import type { ChartBar, Datafeed } from '@engine/types'
 import { FillViewPrimitive, type FillPoint } from '@engine/views/FillView'
-import {
-  LineSeries,
-  type IChartApi,
-  type ISeriesApi,
-  type LineData,
-  type SeriesType,
-  type WhitespaceData
-} from 'lightweight-charts'
+import { LineSeries } from 'lightweight-charts'
+import type { ChartBar, Datafeed, SeriesMap, Indicator } from '@engine/types'
+import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
 
 export class BollingerBands implements Indicator {
   #chart: IChartApi
@@ -80,13 +74,16 @@ export class BollingerBands implements Indicator {
       } else {
         for (const bar of ev.data) {
           this.#queue.push(bar)
-          const bb = this.#createBar(bar)
 
-          this.#series.upper.update({ time: bb.time, value: bb.upper })
-          this.#series.middle.update({ time: bb.time, value: bb.middle })
-          this.#series.lower.update({ time: bb.time, value: bb.lower })
+          if (this.#queue.isFull()) {
+            const bb = this.#createBar(bar)
 
-          this.#fill.update(bb)
+            this.#series.upper.update({ time: bb.time, value: bb.upper })
+            this.#series.middle.update({ time: bb.time, value: bb.middle })
+            this.#series.lower.update({ time: bb.time, value: bb.lower })
+
+            this.#fill.update(bb)
+          }
         }
       }
     })
@@ -100,6 +97,34 @@ export class BollingerBands implements Indicator {
     if (this.#subscriptionId !== undefined) {
       this.#datafeed.unsubscribe(this.#subscriptionId)
     }
+  }
+
+  getLegend(seriesData: SeriesMap) {
+    const uData = seriesData.get(this.#series.upper)
+    const mData = seriesData.get(this.#series.middle)
+    const lData = seriesData.get(this.#series.lower)
+
+    if (uData && mData && lData) {
+      return {
+        key: 'BB',
+        data: [
+          {
+            value: formatPrice((mData as LineData<Time>).value),
+            color: '#FFAB40'
+          },
+          {
+            value: formatPrice((lData as LineData<Time>).value),
+            color: '#2962FF'
+          },
+          {
+            value: formatPrice((uData as LineData<Time>).value),
+            color: '#2962FF'
+          }
+        ]
+      }
+    }
+
+    return undefined
   }
 
   #createBar(bar: ChartBar) {
