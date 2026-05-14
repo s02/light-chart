@@ -36,6 +36,7 @@ export class LineSeriesOverlay extends AbstractSeriesOverlay<LineData<Time>> {
   getLegend(data: LineData<Time>) {
     return {
       key: 'line-series',
+      paneIndex: 0,
       data: [
         {
           value: formatPrice(data.value),

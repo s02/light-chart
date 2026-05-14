@@ -66,6 +66,7 @@ export class HollowCandleSeriesOverlay extends AbstractSeriesOverlay {
 
     return {
       key: 'candlestick-series',
+      paneIndex: 0,
       data: [
         {
           label: 'O',

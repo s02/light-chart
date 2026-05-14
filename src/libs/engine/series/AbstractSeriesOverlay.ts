@@ -1,5 +1,5 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
-import type { ChartSeriesLegend, Datafeed, DatafeedResult, SeriesOverlay, SeriesOverlayData } from '@engine/types'
+import type { Datafeed, DatafeedResult, SeriesLegend, SeriesOverlay, SeriesOverlayData } from '@engine/types'
 import type { IChartApi, ISeriesApi, SeriesDefinition, SeriesPartialOptionsMap, SeriesType } from 'lightweight-charts'
 
 type SeriesSettings = {
@@ -23,7 +23,7 @@ export abstract class AbstractSeriesOverlay<
     queueMicrotask(() => this.#init())
   }
 
-  abstract getLegend(data: TData): Omit<ChartSeriesLegend, 'id' | 'category'>
+  abstract getLegend(data: TData): SeriesLegend
 
   destroy() {
     this.chart.removeSeries(this.series)

@@ -6,7 +6,12 @@ export const CHART_PARAMS = {
   layout: {
     attributionLogo: false,
     background: { color: '#001B36' },
-    textColor: 'rgba(255, 255, 255, .5)'
+    textColor: 'rgba(255, 255, 255, .5)',
+    panes: {
+      separatorColor: '#303030',
+      separatorHoverColor: ' #30303040',
+      enableResize: true
+    }
   },
   grid: {
     vertLines: { color: 'rgba(255, 255, 255, .05)' },

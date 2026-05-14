@@ -2,26 +2,51 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 5px;
 }
 
 .chart-legend-name {
   color: #dbdbdb;
+  position: relative;
+
+  &:hover {
+    .chart-legend-menu {
+      display: flex;
+    }
+  }
+}
+
+.chart-legend-menu {
+  background-color: #1a1a1a;
+  align-items: center;
+  gap: 14px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid #3d3d3d;
+  position: absolute;
+  top: -2px;
+  inset-inline-start: -5px;
+  display: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.chart-legend-menu-icon {
+  display: flex;
+  align-items: center;
 }
 
 .chart-legend {
   display: flex;
   gap: 6px;
   font-size: 13px;
-  line-height: 1;
+  line-height: 18px;
   transition: opacity 200ms ease;
   cursor: default;
 
   &.main {
     padding-bottom: 4px;
-  }
-
-  &:hover:not(.main) {
-    cursor: pointer;
-    opacity: 0.8;
   }
 }

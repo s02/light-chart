@@ -5,7 +5,6 @@ import { ExpirationOverlay } from '@engine/overlays/ExpirationOverlay'
 import { OptionOverlay } from '@engine/overlays/OptionOverlay'
 import { PluginOverlay } from '@engine/overlays/PluginOverlay'
 import { seriesOverlayFactory } from '@engine/series/seriesOverlayFactory'
-import { INDICATOR_SCRIPTS } from '@engine/indicators'
 import type { IChartApi, MouseEventParams } from 'lightweight-charts'
 import type {
   ChartExpiration,
@@ -14,7 +13,8 @@ import type {
   Datafeed,
   SeriesId,
   SeriesOverlay,
-  IndicatorScript
+  IndicatorScript,
+  IndicatorOnPane
 } from '@engine/types'
 
 type Params = {
@@ -93,15 +93,14 @@ export class PlotEngine {
     this.#overlays.exp.setExpiration(expiration)
   }
 
-  addIndicator(key: IndicatorScript) {
-    const script = INDICATOR_SCRIPTS.find((s) => s.key === key)
-    if (!script) {
-      throw 'unknown indicator key'
-    }
-
-    this.#overlays.indicators.add(new script.indicator(this.#chart, this.#datafeed))
+  async addIndicator(key: IndicatorScript): Promise<IndicatorOnPane> {
+    const iop = await this.#overlays.indicators.add(key)
     this.#overlays.series.moveToTop()
-    return 8
+    return iop
+  }
+
+  removeIndicator(id: number) {
+    this.#overlays.indicators.remove(id)
   }
 
   destroy() {
@@ -121,7 +120,7 @@ export class PlotEngine {
 
     const series = seriesOverlay.getSeries()
     const pluginOverlay = new PluginOverlay(series, resolutionId)
-    const indicatorsOverlay = new IndicatorsOverlay()
+    const indicatorsOverlay = new IndicatorsOverlay(this.#chart, this.#datafeed)
 
     const expOverlay = new ExpirationOverlay(this.#chart, series, resolutionId)
     if (this.#expiration) {
@@ -134,9 +133,9 @@ export class PlotEngine {
     }
 
     return {
+      indicators: indicatorsOverlay,
       plugin: pluginOverlay,
       exp: expOverlay,
-      indicators: indicatorsOverlay,
       opt: optOverlay,
       series: seriesOverlay
     }

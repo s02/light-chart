@@ -41,6 +41,7 @@ export class HeikinAshiSeriesOverlay extends AbstractSeriesOverlay {
 
     return {
       key: 'heikin-series',
+      paneIndex: 0,
       data: [
         {
           label: 'O',

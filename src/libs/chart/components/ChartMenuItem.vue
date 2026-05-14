@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ active?: boolean }>()
+defineProps<{ active?: boolean; narrow?: boolean }>()
 </script>
 
 <template>

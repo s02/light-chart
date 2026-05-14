@@ -7,8 +7,8 @@ type IndicatorSettings = {
 }
 
 type EngineCallbacks = {
-  addIndicator: (name: IndicatorScript) => number
-  //deleteIndicator: (id: number) => void
+  addIndicator: (name: IndicatorScript) => Promise<number>
+  removeIndicator: (id: number) => void
   //updateIndicator: (id: number, settings: unknown) => void
 }
 
@@ -38,12 +38,12 @@ export const useChart = () => {
     engine = callbacks
   }
 
-  const addIndicator = (key: IndicatorScript) => {
+  const addIndicator = async (key: IndicatorScript) => {
     if (!engine) {
       throw `Engine should be registered.`
     }
 
-    const id = engine.addIndicator(key)
+    const id = await engine.addIndicator(key)
 
     state.indicators.push({
       key,
@@ -51,9 +51,18 @@ export const useChart = () => {
     })
   }
 
+  const removeIndicator = (id: number) => {
+    if (!engine) {
+      throw `Engine should be registered.`
+    }
+
+    engine.removeIndicator(id)
+  }
+
   return {
     state,
     registerEngine,
-    addIndicator
+    addIndicator,
+    removeIndicator
   }
 }

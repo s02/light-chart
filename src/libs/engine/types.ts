@@ -55,10 +55,9 @@ export type Datafeed = {
 
 export type ResolutionId = keyof typeof RESOLUTION_SETTINGS
 
-export type ChartSeriesLegend = {
-  category: 'main' | 'indicators'
-  id: number
+export type SeriesLegend = {
   key: string
+  paneIndex: number
   data: {
     value: string
     color: string
@@ -66,13 +65,20 @@ export type ChartSeriesLegend = {
   }[]
 }
 
+export type ChartSeriesLegend = {
+  category: 'main' | 'indicators'
+  id: number
+} & SeriesLegend
+
 export type Indicator = {
   apply: () => Promise<void>
   remove: () => Promise<void> | void
-  getLegend: (seriesData: SeriesMap) => Omit<ChartSeriesLegend, 'category' | 'id'> | undefined
+  getLegend: (seriesData: SeriesMap) => SeriesLegend | undefined
 }
 
 export type IndicatorScript = (typeof INDICATOR_SCRIPTS)[number]['key']
+
+export type IndicatorOnPane = { id: number; paneIndex: number; el: HTMLElement }
 
 export type SeriesOverlayData = BarData<Time> | LineData<Time> | HistogramData<Time> | CustomData<Time>
 

@@ -23,6 +23,7 @@ export class BarSeriesOverlay extends AbstractSeriesOverlay {
 
     return {
       key: 'candlestick-series',
+      paneIndex: 0,
       data: [
         {
           label: 'O',

@@ -12,12 +12,14 @@ export class SimpleMovingAverage implements Indicator {
   #subscriptionId?: number
   #length = 20
   #queue: BarQueue
+  #paneIndex: number
 
-  constructor(chart: IChartApi, datafeed: Datafeed) {
+  constructor(chart: IChartApi, datafeed: Datafeed, paneIndex: number = 0) {
     this.#chart = chart
     this.#datafeed = datafeed
-    this.#series = this.#chart.addSeries(LineSeries, { lineWidth: 1, color: 'green' })
     this.#queue = new BarQueue(this.#length)
+    this.#paneIndex = paneIndex
+    this.#series = this.#chart.addSeries(LineSeries, { lineWidth: 1, color: 'green' }, this.#paneIndex)
   }
 
   async apply() {
@@ -71,6 +73,7 @@ export class SimpleMovingAverage implements Indicator {
     if (data) {
       return {
         key: 'SMA',
+        paneIndex: this.#paneIndex,
         data: [
           {
             value: formatPrice((data as LineData<Time>).value),

@@ -12,6 +12,7 @@ export class BollingerBands implements Indicator {
   #subscriptionId?: number
   #queue: BarQueue
   #fill = new FillViewPrimitive()
+  #paneIndex: number
 
   #props = {
     length: 20,
@@ -24,15 +25,16 @@ export class BollingerBands implements Indicator {
     lower: ISeriesApi<SeriesType>
   }
 
-  constructor(chart: IChartApi, datafeed: Datafeed) {
+  constructor(chart: IChartApi, datafeed: Datafeed, paneIndex = 0) {
     this.#datafeed = datafeed
     this.#chart = chart
     this.#queue = new BarQueue(this.#props.length)
+    this.#paneIndex = paneIndex
 
     this.#series = {
-      upper: this.#chart.addSeries(LineSeries, { lineWidth: 1, color: '#2962FF' }),
-      middle: this.#chart.addSeries(LineSeries, { lineWidth: 1, color: '#FFAB40' }),
-      lower: this.#chart.addSeries(LineSeries, { lineWidth: 1, color: '#2962FF' })
+      upper: this.#chart.addSeries(LineSeries, { lineWidth: 1, color: '#2962FF' }, this.#paneIndex),
+      middle: this.#chart.addSeries(LineSeries, { lineWidth: 1, color: '#FFAB40' }, this.#paneIndex),
+      lower: this.#chart.addSeries(LineSeries, { lineWidth: 1, color: '#2962FF' }, this.#paneIndex)
     }
 
     this.#series.upper.attachPrimitive(this.#fill)
@@ -107,6 +109,7 @@ export class BollingerBands implements Indicator {
     if (uData && mData && lData) {
       return {
         key: 'BB',
+        paneIndex: this.#paneIndex,
         data: [
           {
             value: formatPrice((mData as LineData<Time>).value),

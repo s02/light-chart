@@ -34,6 +34,7 @@ export class AreaSeriesOverlay extends AbstractSeriesOverlay {
   getLegend(data: LineData<Time>) {
     return {
       key: 'area-series',
+      paneIndex: 0,
       data: [
         {
           value: formatPrice(data.value),

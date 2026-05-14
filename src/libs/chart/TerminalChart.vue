@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, h, onMounted, onUnmounted, ref, render, watch } from 'vue'
 import { PlotEngine } from '@engine/PlotEngine'
 import ChartHeader from '@chart/components/ChartHeader.vue'
 import ChartAside from '@chart/components/ChartAside.vue'
 import { useChart } from '@chart/useChart'
 import ModalContainer from '@chart/ModalContainer.vue'
 import ChartLegend from '@chart/components/ChartLegend.vue'
+import PaneLegend from '@chart/components/PaneLegend.vue'
 import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
 import type { ChartSeriesLegend, AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
 import type { IndicatorScript } from '@engine/types'
@@ -27,6 +28,7 @@ let pe: PlotEngine | null = null
 let unsub: () => void
 const chartRef = ref<HTMLElement | null>(null)
 const legends = ref<ChartSeriesLegend[]>([])
+const mainPaneLegends = computed(() => legends.value.filter((legend) => legend.paneIndex === 0))
 
 onMounted(() => {
   if (!chartRef.value) {
@@ -47,12 +49,25 @@ onMounted(() => {
   }
 
   registerEngine({
-    addIndicator: (key: IndicatorScript) => {
+    addIndicator: async (key: IndicatorScript) => {
       if (!pe) {
-        throw `engine isn't defined`
+        throw `Engine isn't defined`
       }
 
-      return pe.addIndicator(key)
+      const t = await pe.addIndicator(key)
+
+      if (t.paneIndex > 0 && t.el) {
+        render(h(PaneLegend, { paneIndex: t.paneIndex, subscribeToLegends: pe.subscribeToLegends.bind(pe) }), t.el)
+      }
+
+      return t.id
+    },
+    removeIndicator: (id: number) => {
+      if (!pe) {
+        throw `Engine isn't defined`
+      }
+
+      pe.removeIndicator(id)
     }
   })
 
@@ -122,7 +137,7 @@ watch(
     </div>
     <div class="t-chart-wrapper">
       <div class="t-chart-legends">
-        <ChartLegend :legends="legends" />
+        <ChartLegend :legends="mainPaneLegends" />
       </div>
       <div ref="chartRef" class="t-chart-plot"></div>
     </div>

@@ -20,7 +20,7 @@ const formatSeconds = (seconds: number) => {
   return h > 0 ? `${h}:${time}` : time
 }
 
-const PRICE_LABEL_HEIGHT = 16
+const PRICE_LABEL_HEIGHT = 18
 
 class CountdownAxisView implements ISeriesPrimitiveAxisView {
   #source: CloseBarCountdownPlugin

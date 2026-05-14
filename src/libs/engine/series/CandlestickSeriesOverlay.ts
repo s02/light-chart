@@ -26,6 +26,7 @@ export class CandlestickSeriesOverlay extends AbstractSeriesOverlay {
     const color = getBarColor(bar)
     return {
       category: 'main',
+      paneIndex: 0,
       key: 'candlestick-series',
       data: [
         {
