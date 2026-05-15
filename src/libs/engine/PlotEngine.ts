@@ -17,6 +17,11 @@ import type {
   IndicatorOnPane,
   IndicatorParams
 } from '@engine/types'
+import { PointsCollector } from '@engine/drawings/PointsCollector'
+import { HorizontalLine } from '@engine/drawings/HorizontalLine/HorizontalLine'
+import { DrawingsOverlay } from '@engine/overlays/DrawingsOverlay'
+import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
+import { verticalLine } from '@engine/primitives/vertical-line'
 
 type Params = {
   datafeed: Datafeed
@@ -29,6 +34,7 @@ type Overlays = {
   exp: ExpirationOverlay
   series: SeriesOverlay
   indicators: IndicatorsOverlay
+  drawings: DrawingsOverlay
 }
 
 export class PlotEngine {
@@ -44,6 +50,22 @@ export class PlotEngine {
     this.#datafeed = params.datafeed
     this.#seriesId = params.seriesId || 'candlestick'
     this.#overlays = this.#createOverlays()
+
+    /* const pc = new PointsCollector(this.#chart, this.#overlays.series.getSeries(), 2)
+    const tl: TrendLine = new TrendLine()
+    this.#overlays.drawings.add(tl)
+    pc.subscribe((params) => {
+      console.log('anchors', params)
+      tl.setAnchors(params.points)
+    }) */
+
+    const pc = new PointsCollector(this.#chart, this.#overlays.series.getSeries(), 1)
+    const vl = new HorizontalLine()
+    this.#overlays.drawings.add(vl)
+    pc.subscribe((params) => {
+      console.log('anchors', params)
+      vl.setAnchors(params.points)
+    })
   }
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
@@ -130,6 +152,7 @@ export class PlotEngine {
     const series = seriesOverlay.getSeries()
     const pluginOverlay = new PluginOverlay(series, resolutionId)
     const indicatorsOverlay = new IndicatorsOverlay(this.#chart, this.#datafeed)
+    const drawingsOverlay = new DrawingsOverlay(this.#chart, series)
 
     const expOverlay = new ExpirationOverlay(this.#chart, series, resolutionId)
     if (this.#expiration) {
@@ -146,7 +169,8 @@ export class PlotEngine {
       plugin: pluginOverlay,
       exp: expOverlay,
       opt: optOverlay,
-      series: seriesOverlay
+      series: seriesOverlay,
+      drawings: drawingsOverlay
     }
   }
 }

@@ -26,10 +26,12 @@ const apply = () => {
     <div class="ind-settings-body ch-scroll">
       <div class="ind-settings-group">
         <div v-for="el in schema.inputs" :key="el.key">
+          <label for="">{{ el.label }}</label>
           <div v-if="el.type === 'number'"><input v-model="params[el.key]" type="number" /></div>
         </div>
 
         <div v-for="el in schema.style" :key="el.key">
+          <label for="">{{ el.label }}</label>
           <div v-if="el.type === 'color'"><input v-model="params[el.key]" type="text" /></div>
         </div>
       </div>
