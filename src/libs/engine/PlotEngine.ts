@@ -14,7 +14,8 @@ import type {
   SeriesId,
   SeriesOverlay,
   IndicatorScript,
-  IndicatorOnPane
+  IndicatorOnPane,
+  IndicatorParams
 } from '@engine/types'
 
 type Params = {
@@ -101,6 +102,14 @@ export class PlotEngine {
 
   removeIndicator(id: number) {
     this.#overlays.indicators.remove(id)
+  }
+
+  getIndicatorSchema(id: number) {
+    return this.#overlays.indicators.getSchema(id)
+  }
+
+  updateIndicator(id: number, params: IndicatorParams) {
+    this.#overlays.indicators.updateParams(id, params)
   }
 
   destroy() {

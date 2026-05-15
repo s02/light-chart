@@ -2,7 +2,7 @@
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 
 const emit = defineEmits<{
-  (e: 'action', name: 'remove' | 'settings'): void
+  (e: 'action', name: 'remove' | 'edit'): void
 }>()
 </script>
 
@@ -16,7 +16,7 @@ const emit = defineEmits<{
       </svg>
       Remove</ChartMenuItem
     >
-    <ChartMenuItem class="indicators-legend-menu-item" @click="emit('action', 'settings')">
+    <ChartMenuItem class="indicators-legend-menu-item" @click="emit('action', 'edit')">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="currentColor">
         <path fill-rule="evenodd" d="M18 14a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-1 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
         <path

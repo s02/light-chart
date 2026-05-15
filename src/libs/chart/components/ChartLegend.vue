@@ -10,7 +10,7 @@ defineProps<{ legends: ChartSeriesLegend[] }>()
 
 const btnMenu = shallowRef<HTMLElement | null>(null)
 const { close: closeMenu, open, key: menuKey } = provideChartMenu('indicators-menu', btnMenu)
-const { removeIndicator } = useChart()
+const { removeIndicator, editIndicator } = useChart()
 
 const id = ref<number | null>(null)
 
@@ -21,8 +21,16 @@ const openMenu = (target: HTMLElement, currentId: number) => {
 }
 
 const handleMenuAction = (name: string) => {
-  if (name === 'remove' && id.value) {
+  if (!id.value) {
+    return
+  }
+
+  if (name === 'remove') {
     removeIndicator(id.value)
+  }
+
+  if (name === 'edit') {
+    editIndicator(id.value)
   }
 
   closeMenu()

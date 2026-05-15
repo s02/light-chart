@@ -74,6 +74,12 @@ export type Indicator = {
   apply: () => Promise<void>
   remove: () => Promise<void> | void
   getLegend: (seriesData: SeriesMap) => SeriesLegend | undefined
+  update: (params: IndicatorParams) => void
+  getSchema: () => {
+    ikey: string
+    schema: IndicatorSchema
+    params: IndicatorParams
+  }
 }
 
 export type IndicatorScript = (typeof INDICATOR_SCRIPTS)[number]['key']
@@ -92,3 +98,33 @@ export interface SeriesOverlay<TData extends SeriesOverlayData = SeriesOverlayDa
 }
 
 export type SeriesId = 'candlestick' | 'area' | 'bar' | 'line' | 'heikin' | 'hollow'
+
+type IndicatorNumberParam = {
+  type: 'number'
+  key: string
+  label: string
+  default: number
+  min?: number
+  max?: number
+  step?: number
+}
+
+type IndicatorColorParam = {
+  type: 'color'
+  key: string
+  label: string
+  default: string
+}
+
+export type IndicatorParamDescriptor = IndicatorNumberParam | IndicatorColorParam
+
+export type IndicatorSchema = {
+  inputs: IndicatorParamDescriptor[]
+  style: IndicatorParamDescriptor[]
+}
+
+export type InferIndicatorValues<T extends readonly IndicatorParamDescriptor[]> = {
+  [D in T[number] as D['key']]: D['default']
+}
+
+export type IndicatorParams = Record<string, number | string>

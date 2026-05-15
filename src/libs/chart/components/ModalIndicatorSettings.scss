@@ -1,0 +1,40 @@
+.ind-settings {
+  background-color: #001020;
+  width: 380px;
+  color: #dbdbdb;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 100%;
+}
+
+.ind-settings-header {
+  display: flex;
+  align-items: center;
+  padding: 4px 20px;
+  justify-content: space-between;
+}
+
+.ind-settings-title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  overflow: hidde;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ind-settings-body {
+  border-top: 1px solid #747474;
+  padding-top: 16px;
+  overflow: scroll;
+}
+
+.ind-settings-close {
+  box-shadow: none;
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}

@@ -9,7 +9,7 @@ type IndicatorSettings = {
 type EngineCallbacks = {
   addIndicator: (name: IndicatorScript) => Promise<number>
   removeIndicator: (id: number) => void
-  //updateIndicator: (id: number, settings: unknown) => void
+  editIndicator: (id: number) => void
 }
 
 let engine: EngineCallbacks | null = null
@@ -59,10 +59,19 @@ export const useChart = () => {
     engine.removeIndicator(id)
   }
 
+  const editIndicator = (id: number) => {
+    if (!engine) {
+      throw `Engine should be registered.`
+    }
+
+    engine.editIndicator(id)
+  }
+
   return {
     state,
     registerEngine,
     addIndicator,
-    removeIndicator
+    removeIndicator,
+    editIndicator
   }
 }

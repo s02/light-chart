@@ -1,5 +1,13 @@
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
-import type { ChartSeriesLegend, SeriesMap, Indicator, IndicatorScript, Datafeed, IndicatorOnPane } from '@engine/types'
+import type {
+  ChartSeriesLegend,
+  SeriesMap,
+  Indicator,
+  IndicatorScript,
+  Datafeed,
+  IndicatorOnPane,
+  IndicatorParams
+} from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 
 export class IndicatorsOverlay {
@@ -29,7 +37,7 @@ export class IndicatorsOverlay {
   }
 
   add(key: IndicatorScript): Promise<IndicatorOnPane> {
-    const script = INDICATOR_SCRIPTS.find((s) => s.key === key)
+    const script = INDICATOR_SCRIPTS.find((s) => s.indicator.ikey === key)
     if (!script) {
       throw 'unknown indicator key'
     }
@@ -68,6 +76,24 @@ export class IndicatorsOverlay {
         }
       })
     })
+  }
+
+  getSchema(id: number) {
+    const el = this.#indicators.find((ind) => ind.id === id)
+    if (!el) {
+      throw 'Unknown indicator id'
+    }
+
+    return el.indicator.getSchema()
+  }
+
+  updateParams(id: number, params: IndicatorParams) {
+    const el = this.#indicators.find((ind) => ind.id === id)
+    if (!el) {
+      throw 'Unknown indicator id'
+    }
+
+    el.indicator.update(params)
   }
 
   remove(id: number) {

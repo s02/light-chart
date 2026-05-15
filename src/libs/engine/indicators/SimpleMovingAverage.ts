@@ -2,30 +2,71 @@ import { LineSeries } from 'lightweight-charts'
 import { BarQueue } from '@engine/indicators/BarQueue'
 import { math } from '@engine/indicators/math'
 import { formatPrice } from '@engine/helpers'
+import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
-import type { ChartBar, Datafeed, SeriesMap, Indicator } from '@engine/types'
+import type {
+  ChartBar,
+  Datafeed,
+  SeriesMap,
+  Indicator,
+  IndicatorSchema,
+  InferIndicatorValues,
+  IndicatorParams
+} from '@engine/types'
+import { indicatorDefaultValues } from '@engine/indicators'
+
+const SMA_SCHEMA = {
+  inputs: [{ type: 'number', key: 'length', label: 'Length', default: 20, min: 1 }],
+  style: [{ type: 'color', key: 'plot', label: 'Plot', default: '#2962FF' }]
+} as const satisfies IndicatorSchema
+
+type SMAParams = InferIndicatorValues<typeof SMA_SCHEMA.inputs> & InferIndicatorValues<typeof SMA_SCHEMA.style>
 
 export class SimpleMovingAverage implements Indicator {
+  static readonly ikey = 'sma'
+
   #chart: IChartApi
   #datafeed: Datafeed
-  #series: ISeriesApi<SeriesType>
+  #series: ISeriesApi<SeriesType> | undefined
   #subscriptionId?: number
-  #length = 20
   #queue: BarQueue
   #paneIndex: number
+  #params: SMAParams = {
+    ...indicatorDefaultValues(SMA_SCHEMA.inputs),
+    ...indicatorDefaultValues(SMA_SCHEMA.style)
+  }
 
   constructor(chart: IChartApi, datafeed: Datafeed, paneIndex: number = 0) {
     this.#chart = chart
     this.#datafeed = datafeed
-    this.#queue = new BarQueue(this.#length)
+    this.#queue = new BarQueue(this.#params.length)
     this.#paneIndex = paneIndex
-    this.#series = this.#chart.addSeries(LineSeries, { lineWidth: 1, color: 'green' }, this.#paneIndex)
+    this.#init()
+  }
+
+  getSchema() {
+    return {
+      ikey: SimpleMovingAverage.ikey,
+      schema: SMA_SCHEMA,
+      params: this.#params
+    }
+  }
+
+  update(params: IndicatorParams) {
+    this.#params = params as SMAParams
+    this.remove()
+    this.#init()
+    this.apply()
   }
 
   async apply() {
     this.#subscriptionId = await this.#datafeed.subscribe((ev) => {
+      if (!this.#series) {
+        return
+      }
+
       if (ev.type === 'set') {
-        this.#queue = new BarQueue(this.#length)
+        this.#queue = new BarQueue(this.#params.length)
         const result: (LineData | WhitespaceData)[] = []
         for (const bar of ev.data) {
           this.#queue.push(bar)
@@ -53,10 +94,21 @@ export class SimpleMovingAverage implements Indicator {
   }
 
   remove() {
-    this.#chart.removeSeries(this.#series)
+    if (this.#series) {
+      this.#chart.removeSeries(this.#series)
+    }
+
     if (this.#subscriptionId !== undefined) {
       this.#datafeed.unsubscribe(this.#subscriptionId)
     }
+  }
+
+  #init() {
+    this.#series = this.#chart.addSeries(
+      LineSeries,
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.plot },
+      this.#paneIndex
+    )
   }
 
   #createBar(bar: ChartBar) {
@@ -68,11 +120,15 @@ export class SimpleMovingAverage implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    if (!this.#series) {
+      return
+    }
+
     const data = seriesData.get(this.#series)
 
     if (data) {
       return {
-        key: 'SMA',
+        key: SimpleMovingAverage.ikey.toUpperCase(),
         paneIndex: this.#paneIndex,
         data: [
           {
@@ -83,6 +139,6 @@ export class SimpleMovingAverage implements Indicator {
       }
     }
 
-    return undefined
+    return
   }
 }

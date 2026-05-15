@@ -19,10 +19,10 @@ const emit = defineEmits<{
       <div class="ind-list-group">Script Name</div>
       <div
         v-for="script in INDICATOR_SCRIPTS"
-        :key="script.key"
+        :key="script.indicator.ikey"
         class="ind-list-item"
-        @click="emit('close', script.key)">
-        {{ i18n.translate(`indicator-${script.key}`) }}
+        @click="emit('close', script.indicator.ikey)">
+        {{ i18n.translate(`indicator-${script.indicator.ikey}`) }}
       </div>
     </div>
   </div>

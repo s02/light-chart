@@ -8,8 +8,16 @@ import ModalContainer from '@chart/ModalContainer.vue'
 import ChartLegend from '@chart/components/ChartLegend.vue'
 import PaneLegend from '@chart/components/PaneLegend.vue'
 import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
-import type { ChartSeriesLegend, AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
+import {
+  type ChartSeriesLegend,
+  type AssetSymbol,
+  type ChartExpiration,
+  type ChartOption,
+  IndicatorParams
+} from '@engine/types'
 import type { IndicatorScript } from '@engine/types'
+import { useModal } from '@chart/composables/useModal'
+import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
@@ -20,6 +28,8 @@ const props = defineProps<{
 }>()
 
 const { state, registerEngine } = useChart()
+const { open: openModal } = useModal()
+
 state.assetSymbol = props.assetSymbol
 state.resolutionId = props.defaultConfig.resolutionId
 state.seriesId = props.defaultConfig.seriesId
@@ -68,6 +78,17 @@ onMounted(() => {
       }
 
       pe.removeIndicator(id)
+    },
+    editIndicator: async (id: number) => {
+      if (!pe) {
+        throw `Engine isn't defined`
+      }
+
+      const schema = pe.getIndicatorSchema(id)
+      const params = await openModal<IndicatorParams | undefined>(ModalIndicatorSettings, { props: schema })
+      if (params) {
+        pe.updateIndicator(id, params)
+      }
     }
   })
 
