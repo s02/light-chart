@@ -3,7 +3,7 @@ import { BarQueue } from '@engine/indicators/BarQueue'
 import { math } from '@engine/indicators/math'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { LineSeries } from 'lightweight-charts'
-import { indicatorDefaultValues } from '@engine/indicators'
+import { indicatorDefaultValues, type IndicatorOptions } from '@engine/indicators'
 import type {
   ChartBar,
   Datafeed,
@@ -37,7 +37,7 @@ export class BollingerBands implements Indicator {
 
   #chart: IChartApi
   #datafeed: Datafeed
-  #subscriptionId?: number
+  #subscriptionId?: string
   #queue: BarQueue
   #fill = new BollingerBandsFill()
   #paneIndex: number
@@ -49,11 +49,15 @@ export class BollingerBands implements Indicator {
     lower: ISeriesApi<SeriesType>
   }
 
-  constructor(chart: IChartApi, datafeed: Datafeed, paneIndex = 0) {
+  constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     this.#datafeed = datafeed
     this.#chart = chart
     this.#queue = new BarQueue(this.#params.length)
-    this.#paneIndex = paneIndex
+    this.#paneIndex = options.paneIndex || 0
+    this.#params = (options && (options.params as BBParams)) || {
+      ...indicatorDefaultValues(BB_SCHEMA.inputs),
+      ...indicatorDefaultValues(BB_SCHEMA.style)
+    }
 
     this.#series = {
       upper: this.#chart.addSeries(
@@ -77,8 +81,10 @@ export class BollingerBands implements Indicator {
   }
 
   setDatafeed(datafeed: Datafeed) {
+    if (this.#subscriptionId) {
+      this.#datafeed.unsubscribe(this.#subscriptionId)
+    }
     this.#datafeed = datafeed
-    this.remove()
     this.apply()
   }
 
@@ -90,9 +96,16 @@ export class BollingerBands implements Indicator {
     }
   }
 
-  update(params: IndicatorParams) {
+  setParams(params: IndicatorParams) {
     this.#params = params as BBParams
-    this.remove()
+
+    this.#series.upper.applyOptions({ color: this.#params.upperColor })
+    this.#series.middle.applyOptions({ color: this.#params.middleColor })
+    this.#series.lower.applyOptions({ color: this.#params.lowerColor })
+
+    if (this.#subscriptionId) {
+      this.#datafeed.unsubscribe(this.#subscriptionId)
+    }
     this.apply()
   }
 

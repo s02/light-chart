@@ -28,8 +28,7 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
     indicator: BollingerBands
   },
   {
-    indicator: SimpleMovingAverage,
-    separatePane: true
+    indicator: SimpleMovingAverage
   }
   /* {
     key: 'supertrend'

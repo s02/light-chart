@@ -68,6 +68,7 @@ export class IndicatorsOverlay {
 
           if (!div) {
             reject('No div element found to attach indicator')
+            clearInterval(iv)
             return
           }
 

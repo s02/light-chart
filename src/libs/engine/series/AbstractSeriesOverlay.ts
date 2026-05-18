@@ -22,6 +22,7 @@ export abstract class AbstractSeriesOverlay<
   private chart: IChartApi
   private datafeedSubscriptionId: string | null = null
   private rangeChangeHandler = this.#rangeChangeHandler.bind(this)
+  private destroyed = false
 
   constructor(chart: IChartApi, datafeed: Datafeed, settings: SeriesSettings) {
     this.chart = chart
@@ -33,12 +34,14 @@ export abstract class AbstractSeriesOverlay<
   abstract getLegend(data: TData): SeriesLegend
 
   destroy() {
+    this.destroyed = true
+    this.chart.removeSeries(this.series)
+
     if (!this.datafeedSubscriptionId) {
       return
     }
 
     this.datafeed.unsubscribe(this.datafeedSubscriptionId)
-    this.chart.removeSeries(this.series)
     this.chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.rangeChangeHandler)
   }
 
@@ -69,7 +72,17 @@ export abstract class AbstractSeriesOverlay<
   }
 
   async #init() {
+    if (this.destroyed) {
+      return
+    }
+
     this.datafeedSubscriptionId = await this.datafeed.subscribe((ev) => this.transformData(ev), 'series')
+
+    if (this.destroyed) {
+      this.datafeed.unsubscribe(this.datafeedSubscriptionId)
+      return
+    }
+
     this.chart.timeScale().subscribeVisibleLogicalRangeChange(this.rangeChangeHandler)
   }
 

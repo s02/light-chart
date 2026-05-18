@@ -141,7 +141,7 @@ export class SimpleMovingAverage implements Indicator {
         data: [
           {
             value: formatPrice((data as LineData<Time>).value),
-            color: 'green'
+            color: this.#params.plot
           }
         ]
       }
