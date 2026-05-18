@@ -1,4 +1,4 @@
-import { CloseBarCountdownPlugin } from '@engine/plugins/CloseBarCountdownPlugin'
+import { CloseBarCountdownPlugin } from '@engine/plugins'
 import type { ResolutionId } from '@engine/types'
 import type { ISeriesApi, ISeriesPrimitive, SeriesType, Time } from 'lightweight-charts'
 

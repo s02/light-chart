@@ -1,7 +1,8 @@
-import { Drawing } from '@engine/drawings/Drawing'
+import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { HorizontalLinePaneView } from '@engine/drawings/HorizontalLine/HorizontalLinePaneView'
+import type { Point } from 'lightweight-charts'
 
-export class HorizontalLine extends Drawing {
+export class HorizontalLine extends BaseDrawing {
   static readonly ikey = 'horizontal-line'
   static readonly points = 1
 
@@ -13,5 +14,9 @@ export class HorizontalLine extends Drawing {
     }
 
     return []
+  }
+
+  override checkTap(point: Point): boolean {
+    throw new Error('Method not implemented.')
   }
 }

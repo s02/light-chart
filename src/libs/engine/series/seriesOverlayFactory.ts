@@ -4,7 +4,8 @@ import { CandlestickSeriesOverlay } from '@engine/series/CandlestickSeriesOverla
 import { HeikinAshiSeriesOverlay } from '@engine/series/HeikinAshiSeriesOverlay'
 import { HollowCandleSeriesOverlay } from '@engine/series/HollowCandleSeriesOverlay'
 import { LineSeriesOverlay } from '@engine/series/LineSeriesOverlay'
-import type { Datafeed, SeriesId } from '@engine/types'
+import type { SeriesId } from '@engine/series/types'
+import type { Datafeed } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 
 declare function assertNever(val: never): void

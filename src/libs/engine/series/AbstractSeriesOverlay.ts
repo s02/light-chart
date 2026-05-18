@@ -1,5 +1,6 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
-import type { Datafeed, DatafeedResult, SeriesLegend, SeriesOverlay, SeriesOverlayData } from '@engine/types'
+import type { SeriesOverlay, SeriesOverlayData } from '@engine/series/types'
+import type { Datafeed } from '@engine/types'
 import type {
   IChartApi,
   ISeriesApi,
@@ -21,7 +22,6 @@ export abstract class AbstractSeriesOverlay<
   private datafeed: Datafeed
   private chart: IChartApi
   private datafeedSubscriptionId: string | null = null
-  private rangeChangeHandler = this.#rangeChangeHandler.bind(this)
   private destroyed = false
 
   constructor(chart: IChartApi, datafeed: Datafeed, settings: SeriesSettings) {
@@ -42,7 +42,7 @@ export abstract class AbstractSeriesOverlay<
     }
 
     this.datafeed.unsubscribe(this.datafeedSubscriptionId)
-    this.chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.rangeChangeHandler)
+    this.chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
   }
 
   setDatafeed(datafeed: Datafeed) {
@@ -50,7 +50,7 @@ export abstract class AbstractSeriesOverlay<
       this.datafeed.unsubscribe(this.datafeedSubscriptionId)
     }
 
-    this.chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.rangeChangeHandler)
+    this.chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
     this.datafeed = datafeed
     queueMicrotask(() => this.#init())
   }
@@ -83,10 +83,10 @@ export abstract class AbstractSeriesOverlay<
       return
     }
 
-    this.chart.timeScale().subscribeVisibleLogicalRangeChange(this.rangeChangeHandler)
+    this.chart.timeScale().subscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
   }
 
-  #rangeChangeHandler(range: LogicalRange | null) {
+  #rangeChangeHandler = (range: LogicalRange | null) => {
     if (!range) {
       return
     }

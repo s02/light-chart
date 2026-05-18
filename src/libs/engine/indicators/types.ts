@@ -1,0 +1,38 @@
+import type { IndicatorSchema } from '@engine/indicators/schema'
+import type { SeriesLegend, SeriesOverlayData } from '@engine/series/types'
+import type { Datafeed } from '@engine/types'
+import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
+
+export type IndicatorName = 'bb' | 'sma'
+
+interface IndicatorConstructor {
+  new (chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions): Indicator
+  readonly ikey: IndicatorName
+}
+
+export type IndicatorParams = Record<string, number | string>
+
+export type SeriesMap = Map<ISeriesApi<SeriesType, Time>, SeriesOverlayData>
+
+export type IndicatorOptions = {
+  params?: IndicatorParams
+  paneIndex?: number
+}
+
+export type IndicatorScript = {
+  indicator: IndicatorConstructor
+  separatePane?: boolean
+}
+
+export type Indicator = {
+  apply: () => Promise<void>
+  remove: () => Promise<void> | void
+  setParams: (params: IndicatorParams) => void
+  setDatafeed: (datafeed: Datafeed) => void
+  getLegend: (seriesData: SeriesMap) => SeriesLegend | undefined
+  getSchema: () => {
+    ikey: IndicatorName
+    schema: IndicatorSchema
+    params: IndicatorParams
+  }
+}

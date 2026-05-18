@@ -1,12 +1,13 @@
-import { DRAWINGS, type DrawingName } from '@engine/drawings'
-import type { Drawing } from '@engine/drawings/Drawing'
+import { DRAWINGS } from '@engine/drawings'
 import { PointsCollector } from '@engine/drawings/PointsCollector'
 import type { IChartApi, ISeriesApi, Point, SeriesType } from 'lightweight-charts'
+import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
+import type { DrawingName } from '@engine/drawings/module'
 
 export class DrawingsOverlay {
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>
-  #drawings: { id: number; drawing: Drawing }[] = []
+  #drawings: { id: number; drawing: BaseDrawing }[] = []
   #id = 10
   #chartElement: HTMLDivElement
   #clickHandler: (params: PointerEvent) => void

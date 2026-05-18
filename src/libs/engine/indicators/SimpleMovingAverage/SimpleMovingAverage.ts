@@ -3,17 +3,11 @@ import { BarQueue } from '@engine/indicators/BarQueue'
 import { math } from '@engine/indicators/math'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
+import { indicatorDefaultValues } from '@engine/indicators/schema'
+import type { IndicatorSchema, InferIndicatorValues } from '@engine/indicators/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
-import type {
-  ChartBar,
-  Datafeed,
-  SeriesMap,
-  Indicator,
-  IndicatorSchema,
-  InferIndicatorValues,
-  IndicatorParams
-} from '@engine/types'
-import { indicatorDefaultValues, type IndicatorOptions } from '@engine/indicators'
+import type { ChartBar, Datafeed } from '@engine/types'
+import type { Indicator, IndicatorName, IndicatorOptions, IndicatorParams, SeriesMap } from '@engine/indicators/types'
 
 const SMA_SCHEMA = {
   inputs: [{ type: 'number', key: 'length', label: 'Length', default: 20, min: 1 }],
@@ -23,7 +17,7 @@ const SMA_SCHEMA = {
 type SMAParams = InferIndicatorValues<typeof SMA_SCHEMA.inputs> & InferIndicatorValues<typeof SMA_SCHEMA.style>
 
 export class SimpleMovingAverage implements Indicator {
-  static readonly ikey = 'sma'
+  static readonly ikey: IndicatorName = 'sma'
 
   #chart: IChartApi
   #datafeed: Datafeed

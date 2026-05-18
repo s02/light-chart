@@ -1,4 +1,5 @@
-import type { BarPrice, Coordinate, Logical, Point, Time } from 'lightweight-charts'
+import type { Drawing } from '@engine/drawings/Drawing'
+import type { Point, Time } from 'lightweight-charts'
 
 export type Anchor = {
   time: Time
@@ -7,13 +8,15 @@ export type Anchor = {
 
 export type DrawingViewport = {
   anchorToPoint: (a: Anchor) => Point | null
-  priceScale: {
-    coordinateToPrice: (x: Coordinate) => BarPrice | null
-    priceToCoordinate: (p: number) => Coordinate | null
-  }
-  timeScale: {
-    coordinateToTime: (x: Coordinate) => Time | null
-    timeToCoordinate: (time: Time) => Coordinate | null
-    logicalToCoordinate: (l: Logical) => Coordinate | null
-  }
 }
+
+interface DrawingConstructor {
+  new (): Drawing
+  readonly ikey: DrawingName
+  readonly points: number
+  readonly hitThreashold: number
+}
+
+export type DrawingGroup = 'lines'
+export type DrawingName = 'trend-line' | 'horizontal-line'
+export type DrawingScript = { group: DrawingGroup; drawing: DrawingConstructor }

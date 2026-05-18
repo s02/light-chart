@@ -3,19 +3,13 @@ import { BarQueue } from '@engine/indicators/BarQueue'
 import { math } from '@engine/indicators/math'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { LineSeries } from 'lightweight-charts'
-import { indicatorDefaultValues, type IndicatorOptions } from '@engine/indicators'
-import type {
-  ChartBar,
-  Datafeed,
-  SeriesMap,
-  Indicator,
-  IndicatorSchema,
-  InferIndicatorValues,
-  IndicatorParams
-} from '@engine/types'
-import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
 import { BollingerBandsFill } from '@engine/indicators/BollingerBands/BollingerBandsFill'
+import { indicatorDefaultValues } from '@engine/indicators/schema'
+import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
 import type { FillPoint } from '@engine/indicators/BollingerBands/BollingerBandsFillRenderer'
+import type { IndicatorSchema, InferIndicatorValues } from '@engine/indicators/schema'
+import type { Indicator, IndicatorName, IndicatorOptions, IndicatorParams, SeriesMap } from '@engine/indicators/types'
+import type { ChartBar, Datafeed } from '@engine/types'
 
 const BB_SCHEMA = {
   inputs: [
@@ -33,7 +27,7 @@ const BB_SCHEMA = {
 type BBParams = InferIndicatorValues<typeof BB_SCHEMA.inputs> & InferIndicatorValues<typeof BB_SCHEMA.style>
 
 export class BollingerBands implements Indicator {
-  static readonly ikey = 'bb'
+  static readonly ikey: IndicatorName = 'bb'
 
   #chart: IChartApi
   #datafeed: Datafeed

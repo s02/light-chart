@@ -6,19 +6,8 @@ import { OptionOverlay } from '@engine/overlays/OptionOverlay'
 import { PluginOverlay } from '@engine/overlays/PluginOverlay'
 import { seriesOverlayFactory } from '@engine/series/seriesOverlayFactory'
 import type { IChartApi, MouseEventParams } from 'lightweight-charts'
-import type {
-  ChartExpiration,
-  ChartOption,
-  ChartSeriesLegend,
-  Datafeed,
-  SeriesId,
-  SeriesOverlay,
-  IndicatorName,
-  IndicatorOnPane,
-  IndicatorParams
-} from '@engine/types'
-import { DrawingsOverlay } from '@engine/overlays/DrawingsOverlay'
-import type { DrawingName } from '@engine/drawings'
+import type { Datafeed } from '@engine/types'
+import type { DrawingsOverlay } from '@engine/drawings'
 
 type Params = {
   datafeed: Datafeed
@@ -31,7 +20,7 @@ type Overlays = {
   exp: ExpirationOverlay
   series: SeriesOverlay
   indicators: IndicatorsOverlay
-  //drawings: DrawingsOverlay
+  drawings: DrawingsOverlay
 }
 
 export class PlotEngine {
@@ -100,7 +89,7 @@ export class PlotEngine {
     this.#datafeed.destroy()
     this.#datafeed = datafeed
 
-    this.#overlays.series.setDatafeed(this.#datafeed)
+    this.#overlays.series.setDatafeed(datafeed)
     this.#overlays.indicators.setDatafeed(datafeed)
     this.#overlays.plugin.setResolutionId(datafeed.getResolutionId())
     this.#overlays.exp.setResolutionId(datafeed.getResolutionId())

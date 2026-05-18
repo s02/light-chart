@@ -1,9 +1,9 @@
-import { Drawing } from '@engine/drawings/Drawing'
+import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { geometry } from '@engine/drawings/geometry'
 import { TrendLinePaneView } from '@engine/drawings/TrendLine/TrendLinePaneView'
 import type { Point } from 'lightweight-charts'
 
-export class TrendLine extends Drawing {
+export class TrendLine extends BaseDrawing {
   static readonly ikey = 'trend-line'
   static readonly points = 2
 

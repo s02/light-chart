@@ -8,11 +8,11 @@ import ModalContainer from '@chart/ModalContainer.vue'
 import ChartLegend from '@chart/components/ChartLegend.vue'
 import PaneLegend from '@chart/components/PaneLegend.vue'
 import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
-import type { ChartSeriesLegend, AssetSymbol, ChartExpiration, ChartOption, IndicatorParams } from '@engine/types'
-import type { IndicatorScript } from '@engine/types'
+import type { AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
 import { useModal } from '@chart/composables/useModal'
 import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
-import type { DrawingName } from '@engine/drawings'
+import type { ChartSeriesLegend } from '@engine/series/types'
+import type { IndicatorName } from '@engine/module'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
@@ -60,7 +60,7 @@ onMounted(() => {
   }
 
   registerEngine({
-    addIndicator: async (key: IndicatorScript) => {
+    addIndicator: async (key: IndicatorName) => {
       checkEngine(pe)
 
       const t = await pe.addIndicator(key)

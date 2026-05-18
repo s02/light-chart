@@ -1,17 +1,9 @@
-import { Drawing } from '@engine/drawings/Drawing'
 import { HorizontalLine } from '@engine/drawings/HorizontalLine/HorizontalLine'
 import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
+import type { DrawingScript } from './types'
 
-interface DrawingConstructor {
-  new (): Drawing
-  readonly ikey: DrawingName
-  readonly points: number
-  readonly hitThreashold: number
-}
-
-export type DrawingGroup = 'lines'
-export type DrawingName = 'trend-line' | 'horizontal-line'
-export type DrawingScript = { group: DrawingGroup; drawing: DrawingConstructor }
+export type { DrawingGroup, DrawingName, DrawingScript } from './types'
+export { DrawingsOverlay } from './DrawingsOverlay'
 
 export const DRAWINGS: DrawingScript[] = [
   {

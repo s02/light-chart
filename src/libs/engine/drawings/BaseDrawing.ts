@@ -4,7 +4,6 @@ import type {
   IPrimitivePaneView,
   ISeriesApi,
   ISeriesPrimitive,
-  Logical,
   Point,
   SeriesAttachedParameter,
   SeriesType,
@@ -19,7 +18,7 @@ function assertSeries(series: ISeriesApi<SeriesType> | undefined): asserts serie
   if (!series) throw `Drawing: Series isn't defined`
 }
 
-export abstract class Drawing implements ISeriesPrimitive<Time> {
+export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
   static readonly hitThreashold = 5
   protected anchors: Anchor[] = []
   #requestUpdate: (() => void) | null = null
@@ -75,30 +74,6 @@ export abstract class Drawing implements ISeriesPrimitive<Time> {
         return {
           x,
           y
-        }
-      },
-      timeScale: {
-        coordinateToTime: (x: number) => {
-          assertChart(this.#chart)
-          return this.#chart.timeScale().coordinateToTime(x)
-        },
-        timeToCoordinate: (time: Time) => {
-          assertChart(this.#chart)
-          return this.#chart.timeScale().timeToCoordinate(time)
-        },
-        logicalToCoordinate: (logical: Logical) => {
-          assertChart(this.#chart)
-          return this.#chart.timeScale().logicalToCoordinate(logical)
-        }
-      },
-      priceScale: {
-        coordinateToPrice: (y: number) => {
-          assertSeries(this.#series)
-          return this.#series.coordinateToPrice(y)
-        },
-        priceToCoordinate: (price: number) => {
-          assertSeries(this.#series)
-          return this.#series.priceToCoordinate(price)
         }
       }
     }
