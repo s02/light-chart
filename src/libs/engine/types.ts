@@ -82,7 +82,7 @@ export type Indicator = {
   }
 }
 
-export type IndicatorScript = (typeof INDICATOR_SCRIPTS)[number]['key']
+export type IndicatorScript = (typeof INDICATOR_SCRIPTS)[number]['indicator']['ikey']
 
 export type IndicatorOnPane = { id: number; paneIndex: number; el: HTMLElement }
 

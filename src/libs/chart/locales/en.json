@@ -27,5 +27,8 @@
   "indicator-macd":"MACD",
   "indicator-stochastic":"Stochastic",
   "indicator-stochastic-rsi":"Stochastic RSI",
-  "indicator-sma": "SMA"
+  "indicator-sma": "SMA",
+  "draw-line-trend-line": "Trend Line",
+  "draw-line-vertical-line": "Vertical Line",
+  "draw-line-horizontal-line": "Horizontal Line"
 }

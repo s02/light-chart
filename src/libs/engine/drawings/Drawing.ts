@@ -5,6 +5,7 @@ import type {
   ISeriesApi,
   ISeriesPrimitive,
   Logical,
+  Point,
   SeriesAttachedParameter,
   SeriesType,
   Time
@@ -103,4 +104,5 @@ export abstract class Drawing implements ISeriesPrimitive<Time> {
   }
 
   abstract paneViews(): IPrimitivePaneView[]
+  abstract checkTap(point: Point): boolean
 }

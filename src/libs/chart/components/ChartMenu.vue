@@ -23,11 +23,13 @@ onKeyStroke('Escape', close)
 </script>
 
 <template>
-  <div ref="target" class="chart-menu" :style="menuResStyles">
-    <div v-if="isOpened" class="chart-menu-body">
-      <slot></slot>
+  <Teleport to="#app">
+    <div ref="target" class="chart-menu" :style="menuResStyles">
+      <div v-if="isOpened" class="chart-menu-body">
+        <slot></slot>
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style lang="scss" scoped>

@@ -1,3 +1,4 @@
+import type { DrawingName } from '@engine/drawings'
 import type { AssetSymbol, ResolutionId, SeriesId, IndicatorScript } from '@engine/types'
 import { reactive } from 'vue'
 
@@ -10,6 +11,7 @@ type EngineCallbacks = {
   addIndicator: (name: IndicatorScript) => Promise<number>
   removeIndicator: (id: number) => void
   editIndicator: (id: number) => void
+  startDrawing: (id: DrawingName) => Promise<number>
 }
 
 let engine: EngineCallbacks | null = null
@@ -34,14 +36,18 @@ const initialState = {
 const state = reactive<ChartState>(initialState)
 
 export const useChart = () => {
+  function checkEngine(engine: EngineCallbacks | null): asserts engine {
+    if (!engine) {
+      throw `Engine should be registered.`
+    }
+  }
+
   const registerEngine = (callbacks: EngineCallbacks) => {
     engine = callbacks
   }
 
   const addIndicator = async (key: IndicatorScript) => {
-    if (!engine) {
-      throw `Engine should be registered.`
-    }
+    checkEngine(engine)
 
     const id = await engine.addIndicator(key)
 
@@ -52,19 +58,18 @@ export const useChart = () => {
   }
 
   const removeIndicator = (id: number) => {
-    if (!engine) {
-      throw `Engine should be registered.`
-    }
-
+    checkEngine(engine)
     engine.removeIndicator(id)
   }
 
   const editIndicator = (id: number) => {
-    if (!engine) {
-      throw `Engine should be registered.`
-    }
-
+    checkEngine(engine)
     engine.editIndicator(id)
+  }
+
+  const startDrawing = (id: DrawingName) => {
+    checkEngine(engine)
+    return engine.startDrawing(id)
   }
 
   return {
@@ -72,6 +77,7 @@ export const useChart = () => {
     registerEngine,
     addIndicator,
     removeIndicator,
-    editIndicator
+    editIndicator,
+    startDrawing
   }
 }

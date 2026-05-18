@@ -18,6 +18,7 @@ import {
 import type { IndicatorScript } from '@engine/types'
 import { useModal } from '@chart/composables/useModal'
 import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
+import type { DrawingName } from '@engine/drawings'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
@@ -58,11 +59,15 @@ onMounted(() => {
     pe.setOptions(props.options)
   }
 
+  function checkEngine(engine: PlotEngine | null): asserts engine {
+    if (!engine) {
+      throw `Engine isn't defined.`
+    }
+  }
+
   registerEngine({
     addIndicator: async (key: IndicatorScript) => {
-      if (!pe) {
-        throw `Engine isn't defined`
-      }
+      checkEngine(pe)
 
       const t = await pe.addIndicator(key)
 
@@ -73,22 +78,21 @@ onMounted(() => {
       return t.id
     },
     removeIndicator: (id: number) => {
-      if (!pe) {
-        throw `Engine isn't defined`
-      }
-
+      checkEngine(pe)
       pe.removeIndicator(id)
     },
     editIndicator: async (id: number) => {
-      if (!pe) {
-        throw `Engine isn't defined`
-      }
+      checkEngine(pe)
 
       const schema = pe.getIndicatorSchema(id)
       const params = await openModal<IndicatorParams | undefined>(ModalIndicatorSettings, { props: schema })
       if (params) {
         pe.updateIndicator(id, params)
       }
+    },
+    startDrawing: (id: DrawingName) => {
+      checkEngine(pe)
+      return pe.addDrawing(id)
     }
   })
 
