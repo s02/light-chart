@@ -20,6 +20,7 @@ function assertSeries(series: ISeriesApi<SeriesType> | undefined): asserts serie
 }
 
 export abstract class Drawing implements ISeriesPrimitive<Time> {
+  static readonly hitThreashold = 5
   protected anchors: Anchor[] = []
   #requestUpdate: (() => void) | null = null
   #series: ISeriesApi<SeriesType> | undefined

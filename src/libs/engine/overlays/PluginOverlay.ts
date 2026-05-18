@@ -10,17 +10,37 @@ export class PluginOverlay {
   constructor(series: ISeriesApi<SeriesType>, resolutionId: ResolutionId) {
     this.#series = series
     this.#resolutionId = resolutionId
+    this.#plugins = this.#createPlugins()
+    this.#attach()
+  }
 
-    this.#plugins = [new CloseBarCountdownPlugin(this.#resolutionId)]
+  setResolutionId(resolutionId: ResolutionId) {
+    this.destroy()
+    this.#resolutionId = resolutionId
+    this.#plugins = this.#createPlugins()
+    this.#attach()
+  }
 
-    this.#plugins.forEach((plugin) => {
-      this.#series.attachPrimitive(plugin)
-    })
+  setSeries(series: ISeriesApi<SeriesType>) {
+    this.destroy()
+    this.#series = series
+
+    this.#attach()
   }
 
   destroy() {
     this.#plugins.forEach((plugin) => {
       this.#series.detachPrimitive(plugin)
     })
+  }
+
+  #attach() {
+    this.#plugins.forEach((plugin) => {
+      this.#series.attachPrimitive(plugin)
+    })
+  }
+
+  #createPlugins() {
+    return [new CloseBarCountdownPlugin(this.#resolutionId)]
   }
 }

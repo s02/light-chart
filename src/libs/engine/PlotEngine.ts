@@ -13,7 +13,7 @@ import type {
   Datafeed,
   SeriesId,
   SeriesOverlay,
-  IndicatorScript,
+  IndicatorName,
   IndicatorOnPane,
   IndicatorParams
 } from '@engine/types'
@@ -31,7 +31,7 @@ type Overlays = {
   exp: ExpirationOverlay
   series: SeriesOverlay
   indicators: IndicatorsOverlay
-  drawings: DrawingsOverlay
+  //drawings: DrawingsOverlay
 }
 
 export class PlotEngine {
@@ -39,14 +39,21 @@ export class PlotEngine {
   #datafeed: Datafeed
   #seriesId: SeriesId
   #overlays: Overlays
-  #expiration: ChartExpiration | null = null
-  #options: ChartOption[] = []
 
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
     this.#datafeed = params.datafeed
     this.#seriesId = params.seriesId || 'candlestick'
-    this.#overlays = this.#createOverlays()
+
+    const series = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
+
+    this.#overlays = {
+      series,
+      opt: new OptionOverlay(this.#chart, series.getSeries(), this.#datafeed.getResolutionId()),
+      exp: new ExpirationOverlay(this.#chart, series.getSeries(), this.#datafeed.getResolutionId()),
+      indicators: new IndicatorsOverlay(this.#chart, this.#datafeed),
+      plugin: new PluginOverlay(series.getSeries(), this.#datafeed.getResolutionId())
+    }
   }
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
@@ -76,32 +83,39 @@ export class PlotEngine {
   }
 
   subscribeToDrawings(cb: (id: number) => void) {
-    const handler = (ev: PointerEvent) => {}
+    //const handler = (ev: PointerEvent) => {}
   }
 
   setSeriesId(seriesId: SeriesId) {
-    this.#destroyOverlays()
     this.#seriesId = seriesId
-    this.#overlays = this.#createOverlays()
+    const series = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
+    this.#overlays.series.destroy()
+    this.#overlays.series = series
+    this.#overlays.plugin.setSeries(series.getSeries())
+    this.#overlays.exp.setSeries(series.getSeries())
+    this.#overlays.opt.setSeries(series.getSeries())
   }
 
   async setDatafeed(datafeed: Datafeed) {
-    this.#destroyOverlays()
+    this.#datafeed.destroy()
     this.#datafeed = datafeed
-    this.#overlays = this.#createOverlays()
+
+    this.#overlays.series.setDatafeed(this.#datafeed)
+    this.#overlays.indicators.setDatafeed(datafeed)
+    this.#overlays.plugin.setResolutionId(datafeed.getResolutionId())
+    this.#overlays.exp.setResolutionId(datafeed.getResolutionId())
+    this.#overlays.opt.setResolutionId(datafeed.getResolutionId())
   }
 
   setOptions(options: ChartOption[]) {
-    this.#options = options
     this.#overlays.opt.setOptions(options)
   }
 
   setExpiration(expiration: ChartExpiration) {
-    this.#expiration = expiration
     this.#overlays.exp.setExpiration(expiration)
   }
 
-  async addIndicator(key: IndicatorScript): Promise<IndicatorOnPane> {
+  async addIndicator(key: IndicatorName): Promise<IndicatorOnPane> {
     const iop = await this.#overlays.indicators.add(key)
     this.#overlays.series.moveToTop()
     return iop
@@ -120,46 +134,15 @@ export class PlotEngine {
   }
 
   addDrawing(key: DrawingName) {
-    return this.#overlays.drawings.add(key)
+    //return this.#overlays.drawings.add(key)
   }
 
   destroy() {
-    this.#destroyOverlays()
+    this.#overlays.plugin.destroy()
+    this.#overlays.indicators.destroy()
+    this.#overlays.exp.destroy()
+    this.#overlays.opt.destroy()
+    this.#overlays.series.destroy()
     this.#chart.remove()
-  }
-
-  #destroyOverlays() {
-    Object.keys(this.#overlays).forEach((key) => {
-      this.#overlays[key as keyof Overlays].destroy()
-    })
-  }
-
-  #createOverlays() {
-    const resolutionId = this.#datafeed.getResolutionId()
-    const seriesOverlay = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
-
-    const series = seriesOverlay.getSeries()
-    const pluginOverlay = new PluginOverlay(series, resolutionId)
-    const indicatorsOverlay = new IndicatorsOverlay(this.#chart, this.#datafeed)
-    const drawingsOverlay = new DrawingsOverlay(this.#chart, series)
-
-    const expOverlay = new ExpirationOverlay(this.#chart, series, resolutionId)
-    if (this.#expiration) {
-      expOverlay.setExpiration(this.#expiration)
-    }
-
-    const optOverlay = new OptionOverlay(this.#chart, series, resolutionId)
-    if (this.#options) {
-      optOverlay.setOptions(this.#options)
-    }
-
-    return {
-      indicators: indicatorsOverlay,
-      plugin: pluginOverlay,
-      exp: expOverlay,
-      opt: optOverlay,
-      series: seriesOverlay,
-      drawings: drawingsOverlay
-    }
   }
 }

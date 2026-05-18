@@ -6,7 +6,6 @@ import type { Point } from 'lightweight-charts'
 export class TrendLine extends Drawing {
   static readonly ikey = 'trend-line'
   static readonly points = 2
-  static readonly hitThreashold = 5
 
   override paneViews() {
     const viewport = this.getViewport()

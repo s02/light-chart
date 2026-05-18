@@ -1,6 +1,13 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
 import type { Datafeed, DatafeedResult, SeriesLegend, SeriesOverlay, SeriesOverlayData } from '@engine/types'
-import type { IChartApi, ISeriesApi, SeriesDefinition, SeriesPartialOptionsMap, SeriesType } from 'lightweight-charts'
+import type {
+  IChartApi,
+  ISeriesApi,
+  LogicalRange,
+  SeriesDefinition,
+  SeriesPartialOptionsMap,
+  SeriesType
+} from 'lightweight-charts'
 
 type SeriesSettings = {
   series: SeriesDefinition<SeriesType>
@@ -13,26 +20,36 @@ export abstract class AbstractSeriesOverlay<
   protected series: ISeriesApi<SeriesType>
   private datafeed: Datafeed
   private chart: IChartApi
-  private datafeedSubscriptionId: number | null = null
+  private datafeedSubscriptionId: string | null = null
+  private rangeChangeHandler = this.#rangeChangeHandler.bind(this)
 
   constructor(chart: IChartApi, datafeed: Datafeed, settings: SeriesSettings) {
     this.chart = chart
     this.datafeed = datafeed
     this.series = this.chart.addSeries(settings.series, settings.options)
-
     queueMicrotask(() => this.#init())
   }
 
   abstract getLegend(data: TData): SeriesLegend
 
   destroy() {
-    this.chart.removeSeries(this.series)
-
     if (!this.datafeedSubscriptionId) {
       return
     }
 
     this.datafeed.unsubscribe(this.datafeedSubscriptionId)
+    this.chart.removeSeries(this.series)
+    this.chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.rangeChangeHandler)
+  }
+
+  setDatafeed(datafeed: Datafeed) {
+    if (this.datafeedSubscriptionId) {
+      this.datafeed.unsubscribe(this.datafeedSubscriptionId)
+    }
+
+    this.chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.rangeChangeHandler)
+    this.datafeed = datafeed
+    queueMicrotask(() => this.#init())
   }
 
   getSeries() {
@@ -51,29 +68,19 @@ export abstract class AbstractSeriesOverlay<
     }
   }
 
-  #init() {
-    return this.#subscribeToDatafeed().then(() => {
-      this.chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
-        if (!range) {
-          return
-        }
-
-        if (range.from < 10) {
-          this.#requestCandles()
-        }
-      })
-    })
+  async #init() {
+    this.datafeedSubscriptionId = await this.datafeed.subscribe((ev) => this.transformData(ev), 'series')
+    this.chart.timeScale().subscribeVisibleLogicalRangeChange(this.rangeChangeHandler)
   }
 
-  #subscribeToDatafeed(): Promise<void> {
-    return new Promise((resolve) => {
-      this.datafeed
-        .subscribe((ev) => this.transformData(ev))
-        .then((id) => {
-          resolve()
-          this.datafeedSubscriptionId = id
-        })
-    })
+  #rangeChangeHandler(range: LogicalRange | null) {
+    if (!range) {
+      return
+    }
+
+    if (range.from < 10) {
+      this.#requestCandles()
+    }
   }
 
   #requestCandles() {

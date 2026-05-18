@@ -13,7 +13,7 @@ import type {
   InferIndicatorValues,
   IndicatorParams
 } from '@engine/types'
-import { indicatorDefaultValues } from '@engine/indicators'
+import { indicatorDefaultValues, type IndicatorOptions } from '@engine/indicators'
 
 const SMA_SCHEMA = {
   inputs: [{ type: 'number', key: 'length', label: 'Length', default: 20, min: 1 }],
@@ -27,21 +27,44 @@ export class SimpleMovingAverage implements Indicator {
 
   #chart: IChartApi
   #datafeed: Datafeed
-  #series: ISeriesApi<SeriesType> | undefined
-  #subscriptionId?: number
+  #series: ISeriesApi<SeriesType>
+  #subscriptionId?: string
   #queue: BarQueue
   #paneIndex: number
-  #params: SMAParams = {
-    ...indicatorDefaultValues(SMA_SCHEMA.inputs),
-    ...indicatorDefaultValues(SMA_SCHEMA.style)
-  }
+  #params: SMAParams
 
-  constructor(chart: IChartApi, datafeed: Datafeed, paneIndex: number = 0) {
+  constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     this.#chart = chart
     this.#datafeed = datafeed
+    this.#paneIndex = (options && options.paneIndex) || 0
+    this.#params = (options && (options.params as SMAParams)) || {
+      ...indicatorDefaultValues(SMA_SCHEMA.inputs),
+      ...indicatorDefaultValues(SMA_SCHEMA.style)
+    }
+
     this.#queue = new BarQueue(this.#params.length)
-    this.#paneIndex = paneIndex
-    this.#init()
+    this.#series = this.#chart.addSeries(
+      LineSeries,
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.plot },
+      this.#paneIndex
+    )
+  }
+
+  setParams(params: IndicatorParams) {
+    this.#params = params as SMAParams
+    this.#series.applyOptions({ color: this.#params.plot })
+    if (this.#subscriptionId) {
+      this.#datafeed.unsubscribe(this.#subscriptionId)
+    }
+    this.apply()
+  }
+
+  setDatafeed(datafeed: Datafeed) {
+    if (this.#subscriptionId) {
+      this.#datafeed.unsubscribe(this.#subscriptionId)
+    }
+    this.#datafeed = datafeed
+    this.apply()
   }
 
   getSchema() {
@@ -50,13 +73,6 @@ export class SimpleMovingAverage implements Indicator {
       schema: SMA_SCHEMA,
       params: this.#params
     }
-  }
-
-  update(params: IndicatorParams) {
-    this.#params = params as SMAParams
-    this.remove()
-    this.#init()
-    this.apply()
   }
 
   async apply() {
@@ -90,7 +106,7 @@ export class SimpleMovingAverage implements Indicator {
           }
         }
       }
-    })
+    }, 'sma')
   }
 
   remove() {
@@ -101,14 +117,6 @@ export class SimpleMovingAverage implements Indicator {
     if (this.#subscriptionId !== undefined) {
       this.#datafeed.unsubscribe(this.#subscriptionId)
     }
-  }
-
-  #init() {
-    this.#series = this.#chart.addSeries(
-      LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.plot },
-      this.#paneIndex
-    )
   }
 
   #createBar(bar: ChartBar) {

@@ -26,6 +26,16 @@ export class ExpirationOverlay {
     }
   }
 
+  setSeries(series: ISeriesApi<SeriesType>) {
+    this.#series = series
+    this.#redraw()
+  }
+
+  setResolutionId(resolutionId: ResolutionId) {
+    this.#resolutionId = resolutionId
+    this.#redraw()
+  }
+
   #redraw() {
     this.destroy()
     this.#shape = this.#createShape()

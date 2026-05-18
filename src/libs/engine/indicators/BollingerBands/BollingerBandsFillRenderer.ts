@@ -1,18 +1,9 @@
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
-import type {
-  IChartApi,
-  IPrimitivePaneRenderer,
-  IPrimitivePaneView,
-  ISeriesApi,
-  ISeriesPrimitive,
-  SeriesAttachedParameter,
-  SeriesType,
-  Time
-} from 'lightweight-charts'
+import type { IChartApi, IPrimitivePaneRenderer, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 
 export type FillPoint = { time: Time; upper: number; lower: number }
 
-class FillRenderer implements IPrimitivePaneRenderer {
+export class BollingerBandsFillRenderer implements IPrimitivePaneRenderer {
   #points: FillPoint[]
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>
@@ -53,57 +44,5 @@ class FillRenderer implements IPrimitivePaneRenderer {
       ctx.fillStyle = 'rgba(41, 98, 255, 0.05)'
       ctx.fill()
     })
-  }
-}
-
-class FillPaneView implements IPrimitivePaneView {
-  #primitive: FillViewPrimitive
-
-  constructor(primitive: FillViewPrimitive) {
-    this.#primitive = primitive
-  }
-
-  zOrder() {
-    return 'bottom' as const
-  }
-
-  renderer() {
-    const { chart, series, points } = this.#primitive
-    if (!chart || !series) return null
-    return new FillRenderer(points, chart, series)
-  }
-}
-
-export class FillViewPrimitive implements ISeriesPrimitive<Time> {
-  chart: IChartApi | null = null
-  series: ISeriesApi<SeriesType> | null = null
-  points: FillPoint[] = []
-
-  #view = new FillPaneView(this)
-
-  attached(param: SeriesAttachedParameter<Time>) {
-    this.chart = param.chart
-    this.series = param.series
-  }
-
-  detached() {
-    this.chart = null
-    this.series = null
-  }
-
-  set(points: FillPoint[]) {
-    this.points = points
-  }
-
-  update(point: FillPoint) {
-    if (this.points.length && this.points[this.points.length - 1].time === point.time) {
-      this.points[this.points.length - 1] = point
-    } else {
-      this.points.push(point)
-    }
-  }
-
-  paneViews() {
-    return [this.#view]
   }
 }

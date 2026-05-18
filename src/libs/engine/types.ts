@@ -48,8 +48,8 @@ export type Datafeed = {
   getResolutionId(): ResolutionId
   getBars(): ChartBar[]
   loadHistory({ minCandles }: { minCandles: number }): Promise<void>
-  unsubscribe: (id: number) => void
-  subscribe: (callback: DatafeedCallbackFn) => Promise<number>
+  unsubscribe: (id: string) => void
+  subscribe: (callback: DatafeedCallbackFn, prefix?: string) => Promise<string>
   destroy: () => void
 }
 
@@ -73,8 +73,9 @@ export type ChartSeriesLegend = {
 export type Indicator = {
   apply: () => Promise<void>
   remove: () => Promise<void> | void
+  setParams: (params: IndicatorParams) => void
+  setDatafeed: (datafeed: Datafeed) => void
   getLegend: (seriesData: SeriesMap) => SeriesLegend | undefined
-  update: (params: IndicatorParams) => void
   getSchema: () => {
     ikey: string
     schema: IndicatorSchema
@@ -82,7 +83,7 @@ export type Indicator = {
   }
 }
 
-export type IndicatorScript = (typeof INDICATOR_SCRIPTS)[number]['indicator']['ikey']
+export type IndicatorName = (typeof INDICATOR_SCRIPTS)[number]['indicator']['ikey']
 
 export type IndicatorOnPane = { id: number; paneIndex: number; el: HTMLElement }
 
@@ -95,6 +96,7 @@ export interface SeriesOverlay<TData extends SeriesOverlayData = SeriesOverlayDa
   getSeries(): ISeriesApi<SeriesType>
   getLegend(data: TData): Omit<ChartSeriesLegend, 'category' | 'id'>
   moveToTop(): void
+  setDatafeed: (datafeed: Datafeed) => void
 }
 
 export type SeriesId = 'candlestick' | 'area' | 'bar' | 'line' | 'heikin' | 'hollow'

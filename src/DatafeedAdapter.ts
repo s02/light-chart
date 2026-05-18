@@ -11,17 +11,20 @@ export class DatafeedAdapter implements Datafeed {
   #earliestDate?: Date
   #subscriptionId?: number
   #loadingBars = false
-  #callbacks: Map<number, DatafeedCallbackFn> = new Map()
+  #inited: Promise<void>
+  #callbacks: Map<string, DatafeedCallbackFn> = new Map()
   #nextCallbackId = 0
   #candlesHttpService: CandleHttpService
   #candleStoreService: CandleStoreService
 
   constructor(assetSymbol: AssetSymbol, resolution: ResolutionId, http: HttpTransport, ws: WsTransport) {
+    console.log('creating datafeed')
     this.#resolution = resolution
     this.#assetSymbol = assetSymbol
     this.#ws = ws
     this.#candlesHttpService = new CandleHttpService(resolution, assetSymbol, http)
     this.#candleStoreService = new CandleStoreService(resolution)
+    this.#inited = this.#initSubscription()
   }
 
   getAssetSymbol() {
@@ -32,30 +35,31 @@ export class DatafeedAdapter implements Datafeed {
     return this.#resolution
   }
 
-  unsubscribe(id: number) {
+  unsubscribe(id: string) {
     this.#callbacks.delete(id)
   }
 
   destroy() {
-    console.log('datafeed destroy', this.#subscriptionId)
     if (this.#subscriptionId) {
       this.#ws.unsubscribeFromQuotes(this.#assetSymbol.id, this.#subscriptionId)
     }
   }
 
-  async subscribe(callback: DatafeedCallbackFn): Promise<number> {
-    const id = ++this.#nextCallbackId
+  async subscribe(callback: DatafeedCallbackFn, prefix?: string): Promise<string> {
+    await this.#inited
+    ++this.#nextCallbackId
+
+    const id = (prefix || '') + this.#nextCallbackId.toString()
     this.#callbacks.set(id, callback)
+    callback({ type: 'set', data: this.#candleStoreService.getData() })
+    return id
+  }
 
-    if (this.#subscriptionId !== undefined) {
-      callback({ type: 'set', data: this.#candleStoreService.getData() })
-      return id
-    }
-
+  async #initSubscription(): Promise<void> {
     let firstQuoteReceived = false
     let dataLoaded = false
 
-    this.#subscriptionId = await this.#ws.subscribeToQuotes(this.#assetSymbol.id, async (quote) => {
+    const handleQuote = (quote: Quote, loaded: () => void) => {
       if (dataLoaded) {
         const data = this.#candleStoreService.updateWithQuote(quote)
         this.#fireCallbacks({ type: 'update', data })
@@ -66,17 +70,23 @@ export class DatafeedAdapter implements Datafeed {
       if (!firstQuoteReceived) {
         firstQuoteReceived = true
         this.#earliestDate = new Date(quote.timestamp * 1000)
-        await this.#loadBars()
-
-        this.#quotesBuffer.forEach((quote) => {
-          this.#candleStoreService.updateWithQuote(quote)
+        this.#loadBars().then(() => {
+          this.#quotesBuffer.forEach((quote) => {
+            this.#candleStoreService.updateWithQuote(quote)
+          })
+          dataLoaded = true
+          loaded()
         })
-        dataLoaded = true
-        this.#fireCallbacks({ type: 'set', data: this.#candleStoreService.getData() })
       }
-    })
+    }
 
-    return id
+    return new Promise<void>((resolve) => {
+      this.#ws
+        .subscribeToQuotes(this.#assetSymbol.id, (quote) => handleQuote(quote, resolve))
+        .then((subid) => {
+          this.#subscriptionId = subid
+        })
+    })
   }
 
   async loadHistory({ minCandles }: { minCandles: number }) {
@@ -86,6 +96,7 @@ export class DatafeedAdapter implements Datafeed {
 
     this.#loadingBars = true
     await this.#loadBars(minCandles)
+
     this.#fireCallbacks({ type: 'set', data: this.#candleStoreService.getData() })
     this.#loadingBars = false
   }

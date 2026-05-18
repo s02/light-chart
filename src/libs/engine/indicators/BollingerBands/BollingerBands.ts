@@ -1,7 +1,6 @@
 import { formatPrice } from '@engine/helpers'
 import { BarQueue } from '@engine/indicators/BarQueue'
 import { math } from '@engine/indicators/math'
-import { FillViewPrimitive, type FillPoint } from '@engine/views/FillView'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { LineSeries } from 'lightweight-charts'
 import { indicatorDefaultValues } from '@engine/indicators'
@@ -15,6 +14,8 @@ import type {
   IndicatorParams
 } from '@engine/types'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
+import { BollingerBandsFill } from '@engine/indicators/BollingerBands/BollingerBandsFill'
+import type { FillPoint } from '@engine/indicators/BollingerBands/BollingerBandsFillRenderer'
 
 const BB_SCHEMA = {
   inputs: [
@@ -38,7 +39,7 @@ export class BollingerBands implements Indicator {
   #datafeed: Datafeed
   #subscriptionId?: number
   #queue: BarQueue
-  #fill = new FillViewPrimitive()
+  #fill = new BollingerBandsFill()
   #paneIndex: number
   #params: BBParams = { ...indicatorDefaultValues(BB_SCHEMA.inputs), ...indicatorDefaultValues(BB_SCHEMA.style) }
 
@@ -75,6 +76,12 @@ export class BollingerBands implements Indicator {
     this.#series.upper.attachPrimitive(this.#fill)
   }
 
+  setDatafeed(datafeed: Datafeed) {
+    this.#datafeed = datafeed
+    this.remove()
+    this.apply()
+  }
+
   getSchema() {
     return {
       ikey: BollingerBands.ikey,
@@ -85,7 +92,6 @@ export class BollingerBands implements Indicator {
 
   update(params: IndicatorParams) {
     this.#params = params as BBParams
-    console.log(this.#params)
     this.remove()
     this.apply()
   }

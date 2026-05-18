@@ -3,10 +3,10 @@ import type {
   ChartSeriesLegend,
   SeriesMap,
   Indicator,
-  IndicatorScript,
   Datafeed,
   IndicatorOnPane,
-  IndicatorParams
+  IndicatorParams,
+  IndicatorName
 } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 
@@ -19,6 +19,13 @@ export class IndicatorsOverlay {
   constructor(chart: IChartApi, datafeed: Datafeed) {
     this.#chart = chart
     this.#datafeed = datafeed
+  }
+
+  setDatafeed(datafeed: Datafeed) {
+    this.#datafeed = datafeed
+    this.#indicators.forEach((el) => {
+      el.indicator.setDatafeed(datafeed)
+    })
   }
 
   getLegends(seriesData: SeriesMap) {
@@ -36,16 +43,13 @@ export class IndicatorsOverlay {
     return legends
   }
 
-  add(key: IndicatorScript): Promise<IndicatorOnPane> {
-    const script = INDICATOR_SCRIPTS.find((s) => s.indicator.ikey === key)
-    if (!script) {
-      throw 'unknown indicator key'
-    }
+  add(key: IndicatorName): Promise<IndicatorOnPane> {
+    const script = this.#findScript(key)
 
     const pane = script.separatePane ? this.#chart.addPane() : this.#chart.panes()[0]
     const id = this.#id++
 
-    const indicator = new script.indicator(this.#chart, this.#datafeed, pane.paneIndex())
+    const indicator = new script.indicator(this.#chart, this.#datafeed, { paneIndex: pane.paneIndex() })
 
     this.#indicators.push({
       id,
@@ -93,7 +97,7 @@ export class IndicatorsOverlay {
       throw 'Unknown indicator id'
     }
 
-    el.indicator.update(params)
+    el.indicator.setParams(params)
   }
 
   remove(id: number) {
@@ -111,5 +115,14 @@ export class IndicatorsOverlay {
       el.indicator.remove()
     })
     this.#indicators = []
+  }
+
+  #findScript(key: IndicatorName) {
+    const script = INDICATOR_SCRIPTS.find((s) => s.indicator.ikey === key)
+    if (!script) {
+      throw 'unknown indicator key'
+    }
+
+    return script
   }
 }

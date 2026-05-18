@@ -1,14 +1,24 @@
-import { BollingerBands } from '@engine/indicators/BollingerBands'
-import { SimpleMovingAverage } from '@engine/indicators/SimpleMovingAverage'
-import type { Datafeed, Indicator, IndicatorParamDescriptor, InferIndicatorValues } from '@engine/types'
+import { BollingerBands } from '@engine/indicators/BollingerBands/BollingerBands'
+import { SimpleMovingAverage } from '@engine/indicators/SimpleMovingAverage/SimpleMovingAverage'
+import type {
+  Datafeed,
+  Indicator,
+  IndicatorParamDescriptor,
+  IndicatorParams,
+  InferIndicatorValues
+} from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 
+export type IndicatorOptions = {
+  params?: IndicatorParams
+  paneIndex?: number
+}
 interface IndicatorConstructor {
-  new (chart: IChartApi, datafeed: Datafeed, paneIndex?: number): Indicator
+  new (chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions): Indicator
   readonly ikey: string
 }
 
-type IndicatorScript = {
+export type IndicatorScript = {
   indicator: IndicatorConstructor
   separatePane?: boolean
 }
@@ -18,7 +28,8 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
     indicator: BollingerBands
   },
   {
-    indicator: SimpleMovingAverage
+    indicator: SimpleMovingAverage,
+    separatePane: true
   }
   /* {
     key: 'supertrend'

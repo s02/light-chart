@@ -19,6 +19,16 @@ export class OptionOverlay {
     this.#shapes.forEach((shape) => this.#series.detachPrimitive(shape))
   }
 
+  setSeries(series: ISeriesApi<SeriesType>) {
+    this.#series = series
+    this.#redraw()
+  }
+
+  setResolutionId(resolutionId: ResolutionId) {
+    this.#resolutionId = resolutionId
+    this.#redraw()
+  }
+
   setOptions(options: ChartOption[]) {
     this.#options = options
     this.#redraw()

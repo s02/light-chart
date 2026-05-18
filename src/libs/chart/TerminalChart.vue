@@ -8,13 +8,7 @@ import ModalContainer from '@chart/ModalContainer.vue'
 import ChartLegend from '@chart/components/ChartLegend.vue'
 import PaneLegend from '@chart/components/PaneLegend.vue'
 import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
-import {
-  type ChartSeriesLegend,
-  type AssetSymbol,
-  type ChartExpiration,
-  type ChartOption,
-  IndicatorParams
-} from '@engine/types'
+import type { ChartSeriesLegend, AssetSymbol, ChartExpiration, ChartOption, IndicatorParams } from '@engine/types'
 import type { IndicatorScript } from '@engine/types'
 import { useModal } from '@chart/composables/useModal'
 import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
