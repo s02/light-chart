@@ -5,7 +5,7 @@ import type { ResolutionId } from '@engine/types'
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import { ExpirationLineModule } from '@engine/plugins/ExpirationLines/ExpirationLineModule'
 
-export class PluginOverlay extends BasePluginModule {
+export class PluginManager extends BasePluginModule {
   #chart: IChartApi
   readonly option: OptionModule
   readonly exp: ExpirationLineModule

@@ -12,7 +12,9 @@ import type {
 } from 'lightweight-charts'
 
 function assertSeries(series: ISeriesApi<SeriesType> | undefined): asserts series {
-  if (!series) throw `Drawing: Series isn't defined`
+  if (!series) {
+    throw new Error(`Drawing: Series isn't defined`)
+  }
 }
 
 export abstract class BaseDrawing implements ISeriesPrimitive<Time> {

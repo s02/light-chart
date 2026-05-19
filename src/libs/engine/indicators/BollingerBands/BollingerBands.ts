@@ -4,12 +4,13 @@ import { math } from '@engine/indicators/math'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { LineSeries } from 'lightweight-charts'
 import { BollingerBandsFill } from '@engine/indicators/BollingerBands/BollingerBandsFill'
-import { indicatorDefaultValues } from '@engine/indicators/schema'
+import { resolveParams } from '@engine/indicators/schema'
+import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
 import type { FillPoint } from '@engine/indicators/BollingerBands/BollingerBandsFillRenderer'
 import type { IndicatorSchema, InferIndicatorValues } from '@engine/indicators/schema'
 import type { Indicator, IndicatorName, IndicatorOptions, IndicatorParams, SeriesMap } from '@engine/indicators/types'
-import type { ChartBar, Datafeed } from '@engine/types'
+import type { ChartBar, Datafeed, DatafeedResult } from '@engine/types'
 
 const BB_SCHEMA = {
   inputs: [
@@ -26,16 +27,13 @@ const BB_SCHEMA = {
 
 type BBParams = InferIndicatorValues<typeof BB_SCHEMA.inputs> & InferIndicatorValues<typeof BB_SCHEMA.style>
 
-export class BollingerBands implements Indicator {
+export class BollingerBands extends AbstractIndicator implements Indicator {
   static readonly ikey: IndicatorName = 'bb'
 
   #chart: IChartApi
-  #datafeed: Datafeed
-  #subscriptionId?: string
   #queue: BarQueue
   #fill = new BollingerBandsFill()
-  #paneIndex: number
-  #params: BBParams = { ...indicatorDefaultValues(BB_SCHEMA.inputs), ...indicatorDefaultValues(BB_SCHEMA.style) }
+  #params: BBParams = resolveParams(BB_SCHEMA.inputs, BB_SCHEMA.style)
 
   #series: {
     upper: ISeriesApi<SeriesType>
@@ -44,42 +42,30 @@ export class BollingerBands implements Indicator {
   }
 
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
-    this.#datafeed = datafeed
+    super(datafeed, options.paneIndex)
     this.#chart = chart
+    this.#params = resolveParams(BB_SCHEMA.inputs, BB_SCHEMA.style, options.params)
     this.#queue = new BarQueue(this.#params.length)
-    this.#paneIndex = options.paneIndex || 0
-    this.#params = (options && (options.params as BBParams)) || {
-      ...indicatorDefaultValues(BB_SCHEMA.inputs),
-      ...indicatorDefaultValues(BB_SCHEMA.style)
-    }
 
     this.#series = {
       upper: this.#chart.addSeries(
         LineSeries,
         { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.upperColor },
-        this.#paneIndex
+        this.paneIndex
       ),
       middle: this.#chart.addSeries(
         LineSeries,
         { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.middleColor },
-        this.#paneIndex
+        this.paneIndex
       ),
       lower: this.#chart.addSeries(
         LineSeries,
         { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.lowerColor },
-        this.#paneIndex
+        this.paneIndex
       )
     }
 
     this.#series.upper.attachPrimitive(this.#fill)
-  }
-
-  setDatafeed(datafeed: Datafeed) {
-    if (this.#subscriptionId) {
-      this.#datafeed.unsubscribe(this.#subscriptionId)
-    }
-    this.#datafeed = datafeed
-    this.apply()
   }
 
   getSchema() {
@@ -91,77 +77,13 @@ export class BollingerBands implements Indicator {
   }
 
   setParams(params: IndicatorParams) {
-    this.#params = params as BBParams
+    this.#params = resolveParams(BB_SCHEMA.inputs, BB_SCHEMA.style, params)
 
     this.#series.upper.applyOptions({ color: this.#params.upperColor })
     this.#series.middle.applyOptions({ color: this.#params.middleColor })
     this.#series.lower.applyOptions({ color: this.#params.lowerColor })
 
-    if (this.#subscriptionId) {
-      this.#datafeed.unsubscribe(this.#subscriptionId)
-    }
-    this.apply()
-  }
-
-  async apply() {
-    this.#subscriptionId = await this.#datafeed.subscribe((ev) => {
-      if (ev.type === 'set') {
-        this.#queue = new BarQueue(this.#params.length)
-
-        const upper: (LineData | WhitespaceData)[] = []
-        const middle: (LineData | WhitespaceData)[] = []
-        const lower: (LineData | WhitespaceData)[] = []
-        const fill: FillPoint[] = []
-
-        for (const bar of ev.data) {
-          this.#queue.push(bar)
-
-          if (this.#queue.isFull()) {
-            const bb = this.#createBar(bar)
-
-            upper.push({ time: bb.time, value: bb.upper })
-            middle.push({ time: bb.time, value: bb.middle })
-            lower.push({ time: bb.time, value: bb.lower })
-
-            fill.push(bb)
-          } else {
-            upper.push({ time: bar.time })
-            middle.push({ time: bar.time })
-            lower.push({ time: bar.time })
-          }
-        }
-
-        this.#series.upper.setData(upper)
-        this.#series.middle.setData(middle)
-        this.#series.lower.setData(lower)
-
-        this.#fill.set(fill)
-      } else {
-        for (const bar of ev.data) {
-          this.#queue.push(bar)
-
-          if (this.#queue.isFull()) {
-            const bb = this.#createBar(bar)
-
-            this.#series.upper.update({ time: bb.time, value: bb.upper })
-            this.#series.middle.update({ time: bb.time, value: bb.middle })
-            this.#series.lower.update({ time: bb.time, value: bb.lower })
-
-            this.#fill.update(bb)
-          }
-        }
-      }
-    })
-  }
-
-  remove() {
-    this.#chart.removeSeries(this.#series.upper)
-    this.#chart.removeSeries(this.#series.middle)
-    this.#chart.removeSeries(this.#series.lower)
-
-    if (this.#subscriptionId !== undefined) {
-      this.#datafeed.unsubscribe(this.#subscriptionId)
-    }
+    this.reload()
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -172,7 +94,7 @@ export class BollingerBands implements Indicator {
     if (uData && mData && lData) {
       return {
         key: BollingerBands.ikey.toUpperCase(),
-        paneIndex: this.#paneIndex,
+        paneIndex: this.paneIndex,
         data: [
           {
             value: formatPrice((mData as LineData<Time>).value),
@@ -191,6 +113,61 @@ export class BollingerBands implements Indicator {
     }
 
     return undefined
+  }
+
+  protected onData(ev: DatafeedResult) {
+    if (ev.type === 'set') {
+      this.#queue = new BarQueue(this.#params.length)
+
+      const upper: (LineData | WhitespaceData)[] = []
+      const middle: (LineData | WhitespaceData)[] = []
+      const lower: (LineData | WhitespaceData)[] = []
+      const fill: FillPoint[] = []
+
+      for (const bar of ev.data) {
+        this.#queue.push(bar)
+
+        if (this.#queue.isFull()) {
+          const bb = this.#createBar(bar)
+
+          upper.push({ time: bb.time, value: bb.upper })
+          middle.push({ time: bb.time, value: bb.middle })
+          lower.push({ time: bb.time, value: bb.lower })
+
+          fill.push(bb)
+        } else {
+          upper.push({ time: bar.time })
+          middle.push({ time: bar.time })
+          lower.push({ time: bar.time })
+        }
+      }
+
+      this.#series.upper.setData(upper)
+      this.#series.middle.setData(middle)
+      this.#series.lower.setData(lower)
+
+      this.#fill.set(fill)
+    } else {
+      for (const bar of ev.data) {
+        this.#queue.push(bar)
+
+        if (this.#queue.isFull()) {
+          const bb = this.#createBar(bar)
+
+          this.#series.upper.update({ time: bb.time, value: bb.upper })
+          this.#series.middle.update({ time: bb.time, value: bb.middle })
+          this.#series.lower.update({ time: bb.time, value: bb.lower })
+
+          this.#fill.update(bb)
+        }
+      }
+    }
+  }
+
+  protected removeSeries() {
+    this.#chart.removeSeries(this.#series.upper)
+    this.#chart.removeSeries(this.#series.middle)
+    this.#chart.removeSeries(this.#series.lower)
   }
 
   #createBar(bar: ChartBar) {

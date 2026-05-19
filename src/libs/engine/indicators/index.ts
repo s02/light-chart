@@ -8,7 +8,7 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
   },
   {
     indicator: SimpleMovingAverage,
-    separatePane: true
+    separatePane: false
   }
   /* {
     key: 'supertrend'
@@ -30,6 +30,6 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
   } */
 ] as const
 
-export { IndicatorsOverlay } from './IndicatorsOverlay'
+export { IndicatorsManager } from './IndicatorsManager'
 export type { IndicatorName, IndicatorParams, IndicatorScript } from './types'
 export type { IndicatorSchema } from './schema'

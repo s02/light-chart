@@ -14,12 +14,16 @@ export abstract class BasePluginModule implements PluginModule {
   attach(series: ISeriesApi<SeriesType>) {
     this.series = series
     this.#plugins = this.createPlugins()
-    this.#plugins.forEach((plugin) => this.series!.attachPrimitive(plugin))
+    for (const plugin of this.#plugins) {
+      this.series.attachPrimitive(plugin)
+    }
   }
 
   detach() {
     if (this.series) {
-      this.#plugins.forEach((plugin) => this.series!.detachPrimitive(plugin))
+      for (const plugin of this.#plugins) {
+        this.series.detachPrimitive(plugin)
+      }
       this.#plugins = []
     }
   }

@@ -41,7 +41,7 @@ const handleMenuAction = (name: string) => {
   <div class="chart-legends">
     <div v-for="legend in legends" :key="legend.id" class="chart-legend" :class="legend.category">
       <div v-if="legend.category !== 'main'" class="chart-legend-name">
-        {{ legend.key }}
+        <span> {{ legend.key }}</span>
         <div class="chart-legend-menu" @click="openMenu($event.currentTarget as HTMLElement, legend.id)">
           <div class="chart-legend-name">{{ legend.key }}</div>
           <div class="chart-legend-menu-icon">

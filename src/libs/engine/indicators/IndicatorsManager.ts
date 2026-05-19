@@ -3,7 +3,7 @@ import type { Indicator, IndicatorName, IndicatorParams, SeriesMap } from './typ
 import type { Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 
-export class IndicatorsOverlay {
+export class IndicatorsManager {
   #chart: IChartApi
   #datafeed: Datafeed
   #indicators: { id: number; indicator: Indicator }[] = []
@@ -52,54 +52,35 @@ export class IndicatorsOverlay {
     indicator.apply()
 
     return new Promise((resolve, reject) => {
-      let el: HTMLElement | null
-
-      const iv = setInterval(() => {
-        el = pane.getHTMLElement()
-        if (el) {
-          const div = el.querySelector('div')
-
-          if (!div) {
-            reject('No div element found to attach indicator')
-            clearInterval(iv)
-            return
-          }
-
-          resolve({
-            id,
-            paneIndex: pane.paneIndex(),
-            el: div
-          })
-          clearInterval(iv)
+      const observer = new MutationObserver(() => {
+        const el = pane.getHTMLElement()
+        const div = el ? el.querySelector('div') : null
+        if (div) {
+          observer.disconnect()
+          resolve({ id, paneIndex: pane.paneIndex(), el: div })
         }
       })
+      observer.observe(this.#chart.chartElement(), { childList: true, subtree: true })
+
+      setTimeout(() => {
+        observer.disconnect()
+        reject(new Error('Pane element not found'))
+      }, 3000)
     })
   }
 
   getSchema(id: number) {
-    const el = this.#indicators.find((ind) => ind.id === id)
-    if (!el) {
-      throw 'Unknown indicator id'
-    }
-
+    const el = this.#findIndicator(id)
     return el.indicator.getSchema()
   }
 
   updateParams(id: number, params: IndicatorParams) {
-    const el = this.#indicators.find((ind) => ind.id === id)
-    if (!el) {
-      throw 'Unknown indicator id'
-    }
-
+    const el = this.#findIndicator(id)
     el.indicator.setParams(params)
   }
 
   remove(id: number) {
-    const el = this.#indicators.find((ind) => ind.id === id)
-    if (!el) {
-      throw 'Unknown indicator id'
-    }
-
+    const el = this.#findIndicator(id)
     el.indicator.remove()
     this.#indicators = this.#indicators.filter((ind) => ind.id !== id)
   }
@@ -114,9 +95,18 @@ export class IndicatorsOverlay {
   #findScript(key: IndicatorName) {
     const script = INDICATOR_SCRIPTS.find((s) => s.indicator.ikey === key)
     if (!script) {
-      throw 'unknown indicator key'
+      throw new Error(`unknown indicator key: ${key}`)
     }
 
     return script
+  }
+
+  #findIndicator(id: number) {
+    const el = this.#indicators.find((ind) => ind.id === id)
+    if (!el) {
+      throw new Error(`Unknown indicator id: ${id}`)
+    }
+
+    return el
   }
 }

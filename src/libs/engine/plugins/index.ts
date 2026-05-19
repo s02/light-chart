@@ -1,1 +1,1 @@
-export { PluginOverlay } from '@engine/plugins/PluginOverlay'
+export { PluginManager } from '@engine/plugins/PluginManager'

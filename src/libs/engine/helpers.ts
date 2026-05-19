@@ -59,4 +59,4 @@ export const formatPrice = (price: number) => {
 }
 
 export const getBarColor = (bar: BarData<Time>) =>
-  (bar.color ?? bar.close >= bar.open) ? CANDLE_COLORS.up : CANDLE_COLORS.down
+  bar.color ?? (bar.close >= bar.open ? CANDLE_COLORS.up : CANDLE_COLORS.down)

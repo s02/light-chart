@@ -24,7 +24,7 @@ export class DrawingsManager {
   add(name: DrawingName): Promise<number> {
     const script = DRAWINGS.find((d) => d.drawing.ikey === name)
     if (!script) {
-      throw 'unknown drawing key'
+      throw new Error(`unknown drawing key: ${name}`)
     }
 
     const drawing = new script.drawing(this.#chart)

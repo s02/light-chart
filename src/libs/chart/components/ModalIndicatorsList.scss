@@ -28,7 +28,8 @@
 .ind-list-body {
   border-top: 1px solid #747474;
   padding-top: 16px;
-  overflow: scroll;
+  overflow: auto;
+  padding-bottom: 8px;
 }
 
 .ind-list-close {

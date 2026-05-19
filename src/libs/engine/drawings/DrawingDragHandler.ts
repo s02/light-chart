@@ -63,6 +63,7 @@ export class DrawingDragHandler {
       if (anchorIndex !== null || isTapped) {
         e.stopPropagation()
         this.#start(d, point, anchorIndex)
+        break
       }
     }
   }

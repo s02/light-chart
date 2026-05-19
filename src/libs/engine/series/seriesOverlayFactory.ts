@@ -4,28 +4,24 @@ import { CandlestickSeriesOverlay } from '@engine/series/CandlestickSeriesOverla
 import { HeikinAshiSeriesOverlay } from '@engine/series/HeikinAshiSeriesOverlay'
 import { HollowCandleSeriesOverlay } from '@engine/series/HollowCandleSeriesOverlay'
 import { LineSeriesOverlay } from '@engine/series/LineSeriesOverlay'
-import type { SeriesId } from '@engine/series/types'
+import type { SeriesId, SeriesOverlay } from '@engine/series/types'
 import type { Datafeed } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 
-declare function assertNever(val: never): void
+const SERIES_REGISTRY: Record<SeriesId, new (chasr: IChartApi, datafeed: Datafeed) => SeriesOverlay> = {
+  candlestick: CandlestickSeriesOverlay,
+  area: AreaSeriesOverlay,
+  bar: BarSeriesOverlay,
+  line: LineSeriesOverlay,
+  heikin: HeikinAshiSeriesOverlay,
+  hollow: HollowCandleSeriesOverlay
+}
 
 export const seriesOverlayFactory = (seriesId: SeriesId, chart: IChartApi, datafeed: Datafeed) => {
-  if (seriesId === 'candlestick') {
-    return new CandlestickSeriesOverlay(chart, datafeed)
-  } else if (seriesId === 'area') {
-    return new AreaSeriesOverlay(chart, datafeed)
-  } else if (seriesId === 'bar') {
-    return new BarSeriesOverlay(chart, datafeed)
-  } else if (seriesId === 'line') {
-    return new LineSeriesOverlay(chart, datafeed)
-  } else if (seriesId === 'heikin') {
-    return new HeikinAshiSeriesOverlay(chart, datafeed)
-  } else if (seriesId === 'hollow') {
-    return new HollowCandleSeriesOverlay(chart, datafeed)
-  } else {
-    assertNever(seriesId)
+  const Overlay = SERIES_REGISTRY[seriesId]
+  if (Overlay) {
+    return new Overlay(chart, datafeed)
   }
 
-  throw `Overlay with this SeriesId doesn't exist`
+  throw new Error(`Unhandled SeriesId: ${String(seriesId)}`)
 }

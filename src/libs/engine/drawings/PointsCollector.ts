@@ -1,5 +1,5 @@
 import type { Anchor } from '@engine/drawings/types'
-import type { IChartApi, ISeriesApi, Point, SeriesType, Time } from 'lightweight-charts'
+import type { IChartApi, ISeriesApi, Point, SeriesType } from 'lightweight-charts'
 
 type PointsCollectingStatus = 'pending' | 'done'
 
@@ -23,7 +23,7 @@ export class PointsCollector {
 
   subscribe(handler: PointsHandler) {
     if (this.#handler) {
-      throw 'Points Collector: already subscribed'
+      throw new Error('Points Collector: already subscribed')
     }
 
     this.#handler = handler
