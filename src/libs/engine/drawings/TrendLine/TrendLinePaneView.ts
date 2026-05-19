@@ -4,11 +4,13 @@ import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-ch
 
 export class TrendLinePaneView implements IPrimitivePaneView {
   #anchors: Anchor[]
+  #withDots: boolean
   #viewport: DrawingViewport
 
-  constructor(viewport: DrawingViewport, anchors: Anchor[]) {
+  constructor(viewport: DrawingViewport, anchors: Anchor[], withDots: boolean) {
     this.#anchors = anchors
     this.#viewport = viewport
+    this.#withDots = withDots
   }
 
   zOrder(): PrimitivePaneViewZOrder {
@@ -27,7 +29,7 @@ export class TrendLinePaneView implements IPrimitivePaneView {
         return null
       }
 
-      return new TrendLineRenderer(p1, p2)
+      return new TrendLineRenderer(p1, p2, this.#withDots)
     }
 
     return null

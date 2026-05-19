@@ -1,6 +1,8 @@
 import { DRAWINGS } from '@engine/drawings'
 import { PointsCollector } from './PointsCollector'
-import type { IChartApi, ISeriesApi, Point, SeriesType } from 'lightweight-charts'
+import { DrawingDragHandler } from '@engine/drawings/DrawingDragHandler'
+import { DrawingSelectHandler } from '@engine/drawings/DrawingSelectHandler'
+import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { BaseDrawing } from './BaseDrawing'
 import type { DrawingName } from './types'
 
@@ -9,15 +11,14 @@ export class DrawingsOverlay {
   #series: ISeriesApi<SeriesType>
   #drawings: { id: number; drawing: BaseDrawing }[] = []
   #id = 10
-  #chartElement: HTMLDivElement
-  #dragging: { drawing: BaseDrawing; initialPoint: Point; anchorIndex?: number } | null = null
+  #dragHandler: DrawingDragHandler
+  #selectHandler: DrawingSelectHandler
 
   constructor(chart: IChartApi, series: ISeriesApi<SeriesType>) {
     this.#chart = chart
     this.#series = series
-    this.#chartElement = this.#chart.chartElement()
-    this.#chartElement.addEventListener('click', this.#clickHandler)
-    this.#chartElement.addEventListener('mousedown', this.#mousedownHandler, { capture: true })
+    this.#dragHandler = new DrawingDragHandler(this.#chart, () => this.#drawings.map((el) => el.drawing))
+    this.#selectHandler = new DrawingSelectHandler(this.#chart, () => this.#drawings)
   }
 
   add(name: DrawingName): Promise<number> {
@@ -32,6 +33,7 @@ export class DrawingsOverlay {
     return new Promise((resolve) => {
       const pc = new PointsCollector(this.#chart, this.#series, script.drawing.points)
       pc.subscribe((params) => {
+        drawing.setAnchorsVisible(true)
         drawing.setAnchors(params.points)
         if (params.status === 'done') {
           const id = this.#id++
@@ -50,70 +52,10 @@ export class DrawingsOverlay {
   }
 
   destroy() {
-    this.#chartElement.removeEventListener('click', this.#clickHandler)
-    this.#chartElement.removeEventListener('mousedown', this.#mousedownHandler, { capture: true })
-    window.removeEventListener('mousemove', this.#mousemoveHandler)
-    window.removeEventListener('mouseup', this.#mouseupHandler)
-  }
-
-  #startDragging(drawing: BaseDrawing, initialPoint: Point, anchorIndex?: number) {
-    drawing.startDrag()
-    this.#dragging = { drawing, initialPoint, anchorIndex }
-    window.addEventListener('mousemove', this.#mousemoveHandler)
-    window.addEventListener('mouseup', this.#mouseupHandler)
-  }
-
-  #mousedownHandler = (e: MouseEvent) => {
-    const { layerX: x, layerY: y } = e
-
-    const point = { x, y } as Point
-
-    for (const el of this.#drawings) {
-      const isTapped = el.drawing.checkTap(point)
-      const anchorIndex = el.drawing.checkAnchor(point)
-      if (anchorIndex !== null) {
-        e.stopPropagation()
-        this.#startDragging(el.drawing, point, anchorIndex)
-        return
-      } else if (isTapped) {
-        e.stopPropagation()
-        this.#startDragging(el.drawing, point)
-        return
-      }
-    }
-  }
-
-  #mousemoveHandler = (e: MouseEvent) => {
-    if (!this.#dragging) {
-      return
-    }
-
-    e.stopPropagation()
-
-    const { layerX: x, layerY: y } = e
-    const point = { x, y } as Point
-
-    const dx = point.x - this.#dragging.initialPoint.x
-    const dy = point.y - this.#dragging.initialPoint.y
-
-    this.#dragging.drawing.drag(dx, dy, this.#dragging.anchorIndex)
-  }
-
-  #mouseupHandler = () => {
-    if (this.#dragging) {
-      this.#dragging.drawing.stopDrag()
-      this.#dragging = null
-    }
-
-    window.removeEventListener('mousemove', this.#mousemoveHandler)
-    window.removeEventListener('mouseup', this.#mouseupHandler)
-  }
-
-  #clickHandler = ({ layerX: x, layerY: y }: MouseEvent) => {
     this.#drawings.forEach((el) => {
-      if (el.drawing.checkTap({ x, y } as Point)) {
-        this.select(el.id)
-      }
+      el.drawing.detach()
     })
+    this.#selectHandler.destroy()
+    this.#dragHandler.destroy()
   }
 }

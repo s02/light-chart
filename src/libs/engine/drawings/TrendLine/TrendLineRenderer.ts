@@ -6,17 +6,22 @@ import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 export class TrendLineRenderer implements IPrimitivePaneRenderer {
   #p1: Point
   #p2: Point
+  #withDots: boolean
 
-  constructor(p1: Point, p2: Point) {
+  constructor(p1: Point, p2: Point, withDots: boolean) {
     this.#p1 = p1
     this.#p2 = p2
+    this.#withDots = withDots
   }
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
-      circle(scope, this.#p1, { radius: 3, fill: 'green' })
       line(scope, this.#p1, this.#p2, { width: 2, color: 'green' })
-      circle(scope, this.#p2, { radius: 3, fill: 'green' })
+
+      if (this.#withDots) {
+        circle(scope, this.#p1, { radius: 5, color: 'green', width: 2, fill: '#001B36' })
+        circle(scope, this.#p2, { radius: 5, color: 'green', width: 2, fill: '#001B36' })
+      }
     })
   }
 }

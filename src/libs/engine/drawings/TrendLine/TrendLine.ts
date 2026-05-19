@@ -10,7 +10,7 @@ export class TrendLine extends BaseDrawing {
   override paneViews() {
     const viewport = this.getViewport()
     if (viewport) {
-      return [new TrendLinePaneView(viewport, this.anchors)]
+      return [new TrendLinePaneView(viewport, this.anchors, this.anchorsVisible)]
     }
 
     return []

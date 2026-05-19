@@ -20,22 +20,43 @@ function assertSeries(series: ISeriesApi<SeriesType> | undefined): asserts serie
 }
 
 export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
-  static readonly hitThreashold = 5
+  static readonly hitThreashold = 10
+
+  protected anchorsVisible = false
   protected anchors: Anchor[] = []
+
   #requestUpdate: (() => void) | null = null
   #series: ISeriesApi<SeriesType> | undefined
   #chart: IChartApi | undefined
   #draggingAnchors: Anchor[] | null = null
+  #selected = false
+
+  setSelected(val: boolean) {
+    this.#selected = val
+    this.setAnchorsVisible(val)
+  }
+
+  setAnchorsVisible(val: boolean) {
+    if (this.#selected) {
+      return
+    }
+
+    const prev = this.anchorsVisible
+    this.anchorsVisible = val
+    if (this.#requestUpdate && this.anchorsVisible !== prev) {
+      this.#requestUpdate()
+    }
+  }
 
   startDrag() {
     if (this.#draggingAnchors) {
       return
     }
-
+    this.setSelected(true)
     this.#draggingAnchors = [...this.anchors]
   }
 
-  drag(dx: number, dy: number, anchorIndex?: number) {
+  drag(dx: number, dy: number, anchorIndex: number | null) {
     const viewport = this.getViewport()
     if (!viewport || !this.#draggingAnchors) {
       return
@@ -44,7 +65,7 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
     const anchors: Anchor[] = []
 
     for (let i = 0; i < this.#draggingAnchors.length; i++) {
-      if (anchorIndex !== undefined && anchorIndex !== i) {
+      if (anchorIndex !== null && anchorIndex !== i) {
         anchors.push(this.#draggingAnchors[i])
         continue
       }
@@ -71,42 +92,8 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
     this.#draggingAnchors = null
   }
 
-  getAnchors(): Anchor[] {
-    return this.anchors
-  }
-
   setAnchors(anchors: Anchor[]) {
     this.anchors = anchors
-    if (this.#requestUpdate) {
-      this.#requestUpdate()
-    }
-  }
-
-  updateAnchor(anchor: Anchor, i: number) {
-    this.anchors[i] = anchor
-    if (this.#requestUpdate) {
-      this.#requestUpdate()
-    }
-  }
-
-  move({ x, y }: { x: number; y: number }) {
-    const viewport = this.getViewport()
-    if (!viewport) {
-      return
-    }
-
-    this.anchors = this.anchors.map((anchor) => {
-      const point = viewport.anchorToPoint(anchor)
-      if (point) {
-        const nextAnchor = viewport.pointToAnchor({ x: point.x + x, y: point.y + y } as Point)
-        if (nextAnchor) {
-          return nextAnchor
-        }
-      }
-
-      return anchor
-    })
-
     if (this.#requestUpdate) {
       this.#requestUpdate()
     }
@@ -134,7 +121,7 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
     this.#series.attachPrimitive(this)
   }
 
-  getViewport(): DrawingViewport | null {
+  protected getViewport(): DrawingViewport | null {
     if (!this.#series || !this.#chart) {
       return null
     }
@@ -175,9 +162,6 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
     }
   }
 
-  abstract paneViews(): IPrimitivePaneView[]
-  abstract checkTap(point: Point): boolean
-
   checkAnchor(point: Point) {
     const viewport = this.getViewport()
     if (!viewport) {
@@ -193,4 +177,7 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
 
     return null
   }
+
+  abstract paneViews(): IPrimitivePaneView[]
+  abstract checkTap(point: Point): boolean
 }
