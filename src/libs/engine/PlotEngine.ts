@@ -1,9 +1,9 @@
 import { createChart } from 'lightweight-charts'
-import { CHART_PARAMS } from './constants'
+import { CHART_PARAMS, RESOLUTION_SETTINGS } from './constants'
 import { IndicatorsManager } from '@engine/indicators'
 import { seriesOverlayFactory } from '@engine/series'
 import { PluginManager } from '@engine/plugins'
-import type { IChartApi, MouseEventParams } from 'lightweight-charts'
+import type { IChartApi, LogicalRange, MouseEventParams } from 'lightweight-charts'
 import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
 import type { IndicatorName, IndicatorParams } from '@engine/indicators'
@@ -33,6 +33,8 @@ export class PlotEngine {
     this.#drawingsManager = new DrawingsManager(this.#chart, this.#seriesOverlay.getSeries())
     this.#pluginManager = new PluginManager(this.#chart, this.#datafeed.getResolutionId())
     this.#pluginManager.attach(this.#seriesOverlay.getSeries())
+
+    this.#chart.timeScale().subscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
   }
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
@@ -118,6 +120,25 @@ export class PlotEngine {
     this.#pluginManager.detach()
     this.#indicatorsManager.destroy()
     this.#seriesOverlay.destroy()
+    this.#chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
     this.#chart.remove()
+  }
+
+  #rangeChangeHandler = (range: LogicalRange | null) => {
+    if (!range || range.from >= 10) {
+      return
+    }
+
+    const timeRange = this.#chart.timeScale().getVisibleRange()
+
+    if (!timeRange?.from || !timeRange?.to) {
+      return
+    }
+
+    const resolution = RESOLUTION_SETTINGS[this.#datafeed.getResolutionId()]
+    const diff = (timeRange.to as number) - (timeRange.from as number)
+    const candlesCount = Math.round(diff / resolution.seconds)
+
+    this.#datafeed.loadHistory({ minCandles: candlesCount })
   }
 }
