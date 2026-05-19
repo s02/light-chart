@@ -1,5 +1,5 @@
-import { TrendLineRenderer } from '@engine/drawings/TrendLine/TrendLineRenderer'
-import type { Anchor, DrawingViewport } from '@engine/drawings/types'
+import { TrendLineRenderer } from './TrendLineRenderer'
+import type { Anchor, DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 
 export class TrendLinePaneView implements IPrimitivePaneView {

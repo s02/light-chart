@@ -1,4 +1,5 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
+import type { SeriesLegend } from '@engine/series'
 import type { UTCTimestamp } from 'lightweight-charts'
 export type { UTCTimestamp } from 'lightweight-charts'
 
@@ -45,3 +46,12 @@ export type Datafeed = {
 export type ResolutionId = keyof typeof RESOLUTION_SETTINGS
 
 export type IndicatorOnPane = { id: number; paneIndex: number; el: HTMLElement }
+
+export type ChartSeriesLegend = {
+  category: 'main' | 'indicators'
+  id: number
+} & SeriesLegend
+
+export type { IndicatorName, IndicatorScript, IndicatorParams, IndicatorSchema } from '@engine/indicators'
+export type { DrawingName } from '@engine/drawings'
+export type { SeriesId } from '@engine/series'

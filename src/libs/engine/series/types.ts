@@ -3,15 +3,10 @@ import type { BarData, CustomData, HistogramData, ISeriesApi, LineData, SeriesTy
 
 export type SeriesOverlayData = BarData<Time> | LineData<Time> | HistogramData<Time> | CustomData<Time>
 
-export type ChartSeriesLegend = {
-  category: 'main' | 'indicators'
-  id: number
-} & SeriesLegend
-
 export interface SeriesOverlay<TData extends SeriesOverlayData = SeriesOverlayData> {
   destroy(): void
   getSeries(): ISeriesApi<SeriesType>
-  getLegend(data: TData): Omit<ChartSeriesLegend, 'category' | 'id'>
+  getLegend(data: TData): SeriesLegend
   moveToTop(): void
   setDatafeed: (datafeed: Datafeed) => void
 }

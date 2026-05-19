@@ -1,13 +1,6 @@
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
-import type {
-  ChartSeriesLegend,
-  SeriesMap,
-  Indicator,
-  Datafeed,
-  IndicatorOnPane,
-  IndicatorParams,
-  IndicatorName
-} from '@engine/types'
+import type { Indicator, IndicatorName, IndicatorParams, SeriesMap } from './types'
+import type { Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 
 export class IndicatorsOverlay {

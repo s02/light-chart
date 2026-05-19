@@ -1,33 +1,26 @@
 import { createChart } from 'lightweight-charts'
 import { CHART_PARAMS } from './constants'
-import { IndicatorsOverlay } from '@engine/overlays/IndicatorsOverlay'
-import { ExpirationOverlay } from '@engine/overlays/ExpirationOverlay'
-import { OptionOverlay } from '@engine/overlays/OptionOverlay'
-import { PluginOverlay } from '@engine/overlays/PluginOverlay'
-import { seriesOverlayFactory } from '@engine/series/seriesOverlayFactory'
+import { IndicatorsOverlay } from '@engine/indicators'
+import { seriesOverlayFactory } from '@engine/series'
+import { PluginOverlay } from '@engine/plugins'
 import type { IChartApi, MouseEventParams } from 'lightweight-charts'
-import type { Datafeed } from '@engine/types'
-import type { DrawingsOverlay } from '@engine/drawings'
+import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
+import type { SeriesId, SeriesOverlay } from '@engine/series'
+import type { IndicatorName, IndicatorParams } from '@engine/indicators'
+import type { DrawingName } from '@engine/drawings'
 
 type Params = {
   datafeed: Datafeed
   seriesId?: SeriesId
 }
 
-type Overlays = {
-  plugin: PluginOverlay
-  opt: OptionOverlay
-  exp: ExpirationOverlay
-  series: SeriesOverlay
-  indicators: IndicatorsOverlay
-  drawings: DrawingsOverlay
-}
-
 export class PlotEngine {
   #chart: IChartApi
   #datafeed: Datafeed
   #seriesId: SeriesId
-  #overlays: Overlays
+  #plugins: PluginOverlay
+  #series: SeriesOverlay
+  #indicators: IndicatorsOverlay
 
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
@@ -35,31 +28,27 @@ export class PlotEngine {
     this.#seriesId = params.seriesId || 'candlestick'
 
     const series = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
-
-    this.#overlays = {
-      series,
-      opt: new OptionOverlay(this.#chart, series.getSeries(), this.#datafeed.getResolutionId()),
-      exp: new ExpirationOverlay(this.#chart, series.getSeries(), this.#datafeed.getResolutionId()),
-      indicators: new IndicatorsOverlay(this.#chart, this.#datafeed),
-      plugin: new PluginOverlay(series.getSeries(), this.#datafeed.getResolutionId())
-    }
+    this.#series = series
+    this.#indicators = new IndicatorsOverlay(this.#chart, this.#datafeed)
+    this.#plugins = new PluginOverlay(this.#chart, this.#datafeed.getResolutionId())
+    this.#plugins.attach(this.#series.getSeries())
   }
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
     const handler = (params: MouseEventParams) => {
       const result: ChartSeriesLegend[] = []
-      const series = this.#overlays.series.getSeries()
+      const series = this.#series.getSeries()
       const data = params.seriesData.get(series)
 
       if (data) {
         result.push({
           category: 'main',
           id: -1,
-          ...this.#overlays.series.getLegend(data)
+          ...this.#series.getLegend(data)
         })
       }
 
-      const legends = this.#overlays.indicators.getLegends(params.seriesData)
+      const legends = this.#indicators.getLegends(params.seriesData)
       result.push(...legends)
 
       if (result.length) {
@@ -71,67 +60,63 @@ export class PlotEngine {
     return () => this.#chart.unsubscribeCrosshairMove(handler)
   }
 
-  subscribeToDrawings(cb: (id: number) => void) {
+  subscribeToDrawings(_cb: (id: number) => void) {
     //const handler = (ev: PointerEvent) => {}
   }
 
   setSeriesId(seriesId: SeriesId) {
     this.#seriesId = seriesId
     const series = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
-    this.#overlays.series.destroy()
-    this.#overlays.series = series
-    this.#overlays.plugin.setSeries(series.getSeries())
-    this.#overlays.exp.setSeries(series.getSeries())
-    this.#overlays.opt.setSeries(series.getSeries())
+    this.#series.destroy()
+    this.#series = series
+
+    this.#plugins.setSeries(series.getSeries())
   }
 
   async setDatafeed(datafeed: Datafeed) {
     this.#datafeed.destroy()
     this.#datafeed = datafeed
 
-    this.#overlays.series.setDatafeed(datafeed)
-    this.#overlays.indicators.setDatafeed(datafeed)
-    this.#overlays.plugin.setResolutionId(datafeed.getResolutionId())
-    this.#overlays.exp.setResolutionId(datafeed.getResolutionId())
-    this.#overlays.opt.setResolutionId(datafeed.getResolutionId())
+    this.#series.setDatafeed(datafeed)
+    this.#indicators.setDatafeed(datafeed)
+    this.#plugins.setResolution(datafeed.getResolutionId())
   }
 
   setOptions(options: ChartOption[]) {
-    this.#overlays.opt.setOptions(options)
+    this.#plugins.option.setOptions(options)
   }
 
   setExpiration(expiration: ChartExpiration) {
-    this.#overlays.exp.setExpiration(expiration)
+    this.#plugins.exp.setExpiration(expiration)
   }
 
   async addIndicator(key: IndicatorName): Promise<IndicatorOnPane> {
-    const iop = await this.#overlays.indicators.add(key)
-    this.#overlays.series.moveToTop()
+    const iop = await this.#indicators.add(key)
+    this.#series.moveToTop()
     return iop
   }
 
   removeIndicator(id: number) {
-    this.#overlays.indicators.remove(id)
+    this.#indicators.remove(id)
   }
 
   getIndicatorSchema(id: number) {
-    return this.#overlays.indicators.getSchema(id)
+    return this.#indicators.getSchema(id)
   }
 
   updateIndicator(id: number, params: IndicatorParams) {
-    this.#overlays.indicators.updateParams(id, params)
+    this.#indicators.updateParams(id, params)
   }
 
-  addDrawing(key: DrawingName) {
+  addDrawing(_key: DrawingName) {
+    return Promise.resolve(5)
     //return this.#overlays.drawings.add(key)
   }
 
   destroy() {
-    this.#overlays.plugin.destroy()
-    this.#overlays.indicators.destroy()
-    this.#overlays.exp.destroy()
-    this.#overlays.opt.destroy()
-    this.#overlays.series.destroy()
+    this.#plugins.detach()
+    this.#indicators.destroy()
+    this.#series.destroy()
     this.#chart.remove()
   }
 }

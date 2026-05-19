@@ -7,12 +7,11 @@ import { useChart } from '@chart/useChart'
 import ModalContainer from '@chart/ModalContainer.vue'
 import ChartLegend from '@chart/components/ChartLegend.vue'
 import PaneLegend from '@chart/components/PaneLegend.vue'
-import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
-import type { AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
 import { useModal } from '@chart/composables/useModal'
 import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
-import type { ChartSeriesLegend } from '@engine/series/types'
-import type { IndicatorName } from '@engine/module'
+import type { ChartSeriesLegend, DrawingName, IndicatorParams } from '@engine/types'
+import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
+import type { AssetSymbol, ChartExpiration, ChartOption, IndicatorName } from '@engine/types'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol

@@ -1,4 +1,4 @@
-import type { Drawing } from '@engine/drawings/Drawing'
+import type { BaseDrawing } from './BaseDrawing'
 import type { Point, Time } from 'lightweight-charts'
 
 export type Anchor = {
@@ -11,7 +11,7 @@ export type DrawingViewport = {
 }
 
 interface DrawingConstructor {
-  new (): Drawing
+  new (): BaseDrawing
   readonly ikey: DrawingName
   readonly points: number
   readonly hitThreashold: number

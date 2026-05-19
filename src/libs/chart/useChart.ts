@@ -1,14 +1,13 @@
-import type { DrawingName } from '@engine/drawings'
-import type { AssetSymbol, ResolutionId, SeriesId, IndicatorScript } from '@engine/types'
+import type { AssetSymbol, ResolutionId, SeriesId, DrawingName, IndicatorName } from '@engine/types'
 import { reactive } from 'vue'
 
 type IndicatorSettings = {
-  key: IndicatorScript
+  key: IndicatorName
   id?: number
 }
 
 type EngineCallbacks = {
-  addIndicator: (name: IndicatorScript) => Promise<number>
+  addIndicator: (key: IndicatorName) => Promise<number>
   removeIndicator: (id: number) => void
   editIndicator: (id: number) => void
   startDrawing: (id: DrawingName) => Promise<number>
@@ -46,7 +45,7 @@ export const useChart = () => {
     engine = callbacks
   }
 
-  const addIndicator = async (key: IndicatorScript) => {
+  const addIndicator = async (key: IndicatorName) => {
     checkEngine(engine)
 
     const id = await engine.addIndicator(key)

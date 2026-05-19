@@ -1,6 +1,6 @@
 import { getBarLogical } from '@engine/helpers'
-import type { OptionPlugin } from '@engine/plugins/OptionPlugin/OptionPlugin'
-import { OptionPluginRenderer } from '@engine/plugins/OptionPlugin/OptionPluginRenderer'
+import { OptionPluginRenderer } from './OptionPluginRenderer'
+import type { OptionPlugin } from './OptionPlugin'
 import type { ChartOption } from '@engine/types'
 import type { IPrimitivePaneView, Point } from 'lightweight-charts'
 

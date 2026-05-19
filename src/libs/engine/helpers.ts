@@ -1,7 +1,7 @@
 import { CANDLE_COLORS, RESOLUTION_SETTINGS } from './constants'
+import { SERIES_DEFAULTS } from '@engine/series'
 import type { BarData, DataItem, ITimeScaleApi, Logical, Time, UTCTimestamp } from 'lightweight-charts'
 import type { ResolutionId } from '@engine/types'
-import { SERIES_DEFAULTS } from '@engine/series/constants'
 
 export const getBarOpenTime = (barTime: UTCTimestamp, resolutionId: ResolutionId): UTCTimestamp => {
   const interval = RESOLUTION_SETTINGS[resolutionId].seconds

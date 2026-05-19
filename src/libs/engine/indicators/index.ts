@@ -1,6 +1,10 @@
-import { BollingerBands } from '@engine/indicators/BollingerBands/BollingerBands'
-import { SimpleMovingAverage } from '@engine/indicators/SimpleMovingAverage/SimpleMovingAverage'
-import type { IndicatorScript } from '@engine/indicators/types'
+import { BollingerBands } from './BollingerBands/BollingerBands'
+import { SimpleMovingAverage } from './SimpleMovingAverage/SimpleMovingAverage'
+import type { IndicatorScript } from './types'
+
+export { IndicatorsOverlay } from './IndicatorsOverlay'
+export type { IndicatorName, IndicatorParams, IndicatorScript } from './types'
+export type { IndicatorSchema } from './schema'
 
 export const INDICATOR_SCRIPTS: IndicatorScript[] = [
   {

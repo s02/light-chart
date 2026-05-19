@@ -1,5 +1,5 @@
 import { getBarPrice, getBarTime } from '@engine/helpers'
-
+import { OptionPluginPaneView } from './OptionPluginPaneView'
 import type {
   IChartApi,
   ISeriesApi,
@@ -9,7 +9,6 @@ import type {
   Time
 } from 'lightweight-charts'
 import type { ChartOption, ResolutionId } from '@engine/types'
-import { OptionPluginPaneView } from '@engine/plugins/OptionPlugin/OptionPluginPaneView'
 
 export class OptionPlugin implements ISeriesPrimitive<Time> {
   #chart: IChartApi

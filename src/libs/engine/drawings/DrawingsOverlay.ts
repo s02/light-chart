@@ -1,8 +1,8 @@
 import { DRAWINGS } from '@engine/drawings'
-import { PointsCollector } from '@engine/drawings/PointsCollector'
+import { PointsCollector } from './PointsCollector'
 import type { IChartApi, ISeriesApi, Point, SeriesType } from 'lightweight-charts'
-import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
-import type { DrawingName } from '@engine/drawings/module'
+import type { BaseDrawing } from './BaseDrawing'
+import type { DrawingName } from './types'
 
 export class DrawingsOverlay {
   #chart: IChartApi
@@ -10,14 +10,11 @@ export class DrawingsOverlay {
   #drawings: { id: number; drawing: BaseDrawing }[] = []
   #id = 10
   #chartElement: HTMLDivElement
-  #clickHandler: (params: PointerEvent) => void
 
   constructor(chart: IChartApi, series: ISeriesApi<SeriesType>) {
     this.#chart = chart
     this.#series = series
     this.#chartElement = this.#chart.chartElement()
-
-    this.#clickHandler = this.#click.bind(this)
     this.#chartElement.addEventListener('click', this.#clickHandler)
   }
 
@@ -54,7 +51,7 @@ export class DrawingsOverlay {
     this.#chartElement.removeEventListener('click', this.#clickHandler)
   }
 
-  #click({ layerX: x, layerY: y }: PointerEvent) {
+  #clickHandler = ({ layerX: x, layerY: y }: MouseEvent) => {
     this.#drawings.forEach((el) => {
       el.drawing.checkTap({ x, y } as Point)
     })

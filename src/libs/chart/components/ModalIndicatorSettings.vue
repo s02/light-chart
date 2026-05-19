@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import { i18n } from '@chart/i18n'
-import type { IndicatorParams, IndicatorSchema } from '@engine/types'
 import { ref } from 'vue'
+import type { IndicatorParams, IndicatorSchema } from '@engine/types'
 
 const emit = defineEmits<{
   (e: 'close', result?: IndicatorParams): void

@@ -1,6 +1,6 @@
 import { RESOLUTION_SETTINGS } from '@engine/constants'
-import type { SeriesOverlay, SeriesOverlayData } from '@engine/series/types'
-import type { Datafeed } from '@engine/types'
+import type { SeriesLegend, SeriesOverlay, SeriesOverlayData } from '@engine/series'
+import type { Datafeed, DatafeedResult } from '@engine/types'
 import type {
   IChartApi,
   ISeriesApi,

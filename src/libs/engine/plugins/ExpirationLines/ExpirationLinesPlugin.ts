@@ -1,3 +1,4 @@
+import { CloseLineView, LockLineView } from './ExpirationPluginPaneView'
 import type {
   IChartApi,
   ISeriesApi,
@@ -8,7 +9,6 @@ import type {
   UTCTimestamp
 } from 'lightweight-charts'
 import type { ChartExpiration, ResolutionId } from '@engine/types'
-import { CloseLineView, LockLineView } from '@engine/plugins/ExpirationLinesPlugin/ExpirationPluginPaneView'
 
 const LOCK_ALLOWED_RESOLUTIONS: ResolutionId[] = ['1S', '5S', '10S', '15S', '30S']
 const CLOSE_ALLOWED_RESOLUTIONS: ResolutionId[] = ['1S', '5S', '10S', '15S', '30S', '1']

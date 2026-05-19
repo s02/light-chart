@@ -1,6 +1,6 @@
 import { getBarLogical } from '@engine/helpers'
-import { CloseLineRenderer, LockLineRenderer } from '@engine/plugins/ExpirationLinesPlugin/ExpirationPluginRenderer'
-import type { ExpirationPlugin } from '@engine/plugins/ExpirationLinesPlugin/ExpirationPlugin'
+import { CloseLineRenderer, LockLineRenderer } from './ExpirationPluginRenderer'
+import type { ExpirationLinesPlugin } from './ExpirationLinesPlugin'
 import type { Coordinate, IPrimitivePaneRenderer, IPrimitivePaneView, UTCTimestamp } from 'lightweight-charts'
 
 interface PaneView extends IPrimitivePaneView {
@@ -9,10 +9,10 @@ interface PaneView extends IPrimitivePaneView {
 
 export class CloseLineView implements IPrimitivePaneView, PaneView {
   protected time: UTCTimestamp
-  protected source: ExpirationPlugin
+  protected source: ExpirationLinesPlugin
   protected x: Coordinate | null = null
 
-  constructor(source: ExpirationPlugin, time: UTCTimestamp) {
+  constructor(source: ExpirationLinesPlugin, time: UTCTimestamp) {
     this.source = source
     this.time = time
   }

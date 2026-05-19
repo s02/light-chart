@@ -1,5 +1,5 @@
-import { HorizontalLine } from '@engine/drawings/HorizontalLine/HorizontalLine'
-import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
+import { HorizontalLine } from './HorizontalLine/HorizontalLine'
+import { TrendLine } from './TrendLine/TrendLine'
 import type { DrawingScript } from './types'
 
 export type { DrawingGroup, DrawingName, DrawingScript } from './types'

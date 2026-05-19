@@ -1,6 +1,6 @@
-import { BaseDrawing } from '@engine/drawings/BaseDrawing'
-import { geometry } from '@engine/drawings/geometry'
-import { TrendLinePaneView } from '@engine/drawings/TrendLine/TrendLinePaneView'
+import { BaseDrawing } from '../BaseDrawing'
+import { geometry } from '../geometry'
+import { TrendLinePaneView } from './TrendLinePaneView'
 import type { Point } from 'lightweight-charts'
 
 export class TrendLine extends BaseDrawing {
