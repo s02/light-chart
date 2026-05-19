@@ -1,5 +1,5 @@
 import type { Anchor } from '@engine/drawings/types'
-import type { Coordinate, IChartApi, ISeriesApi, Point, SeriesType, Time } from 'lightweight-charts'
+import type { IChartApi, ISeriesApi, Point, SeriesType, Time } from 'lightweight-charts'
 
 type PointsCollectingStatus = 'pending' | 'done'
 
@@ -26,45 +26,57 @@ export class PointsCollector {
       throw 'Points Collector: already subscribed'
     }
 
-    const handleMouseMove = (ev: MouseEvent) => {
-      const x: Coordinate = ev.layerX as Coordinate
-      const y: Coordinate = ev.layerY as Coordinate
-
-      this.#currentPoint = {
-        x,
-        y,
-        price: this.#series.coordinateToPrice(y) as number,
-        time: this.#chart.timeScale().coordinateToTime(x) as Time
-      }
-
-      if (this.#points.length && this.#handler) {
-        this.#points[this.#points.length - 1] = this.#currentPoint
-        this.#handler({ status: 'pending', points: this.#points })
-      }
-    }
-
-    const handleClick = () => {
-      if (!this.#currentPoint || !this.#handler) {
-        return
-      }
-
-      if (!this.#points.length) {
-        this.#points.push(this.#currentPoint)
-      }
-
-      const status = this.#points.length === this.#limit ? 'done' : 'pending'
-      this.#handler({ status, points: this.#points })
-
-      if (status === 'done') {
-        this.#el.removeEventListener('mousemove', handleMouseMove)
-        this.#el.removeEventListener('click', handleClick)
-      } else {
-        this.#points.push(this.#currentPoint)
-      }
-    }
-
     this.#handler = handler
-    this.#el.addEventListener('mousemove', handleMouseMove)
-    this.#el.addEventListener('click', handleClick)
+    this.#el.addEventListener('mousemove', this.#mousemoveHandler)
+    this.#el.addEventListener('click', this.#clickHandler)
+  }
+
+  #mousemoveHandler = (e: MouseEvent) => {
+    const rect = this.#el.getBoundingClientRect()
+    const { width, height } = this.#chart.paneSize()
+
+    const point = {
+      x: Math.max(0, Math.min(width, e.clientX - rect.left)),
+      y: Math.max(0, Math.min(height, e.clientY - rect.top))
+    } as Point
+
+    const time = this.#chart.timeScale().coordinateToTime(point.x)
+    const price = this.#series.coordinateToPrice(point.y)
+
+    if (!time || !price) {
+      return
+    }
+
+    this.#currentPoint = {
+      x: point.x,
+      y: point.y,
+      price: price as number,
+      time
+    }
+
+    if (this.#points.length && this.#handler) {
+      this.#points[this.#points.length - 1] = this.#currentPoint
+      this.#handler({ status: 'pending', points: this.#points })
+    }
+  }
+
+  #clickHandler = () => {
+    if (!this.#currentPoint || !this.#handler) {
+      return
+    }
+
+    if (!this.#points.length) {
+      this.#points.push(this.#currentPoint)
+    }
+
+    const status = this.#points.length === this.#limit ? 'done' : 'pending'
+    this.#handler({ status, points: this.#points })
+
+    if (status === 'done') {
+      this.#el.removeEventListener('mousemove', this.#mousemoveHandler)
+      this.#el.removeEventListener('click', this.#clickHandler)
+    } else {
+      this.#points.push(this.#currentPoint)
+    }
   }
 }

@@ -73,6 +73,7 @@ export class PlotEngine {
     this.#series = series
 
     this.#plugins.setSeries(series.getSeries())
+    this.#drawings.setSeries(series.getSeries())
   }
 
   async setDatafeed(datafeed: Datafeed) {

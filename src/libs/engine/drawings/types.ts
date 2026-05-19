@@ -1,5 +1,5 @@
 import type { BaseDrawing } from './BaseDrawing'
-import type { Point, Time } from 'lightweight-charts'
+import type { IChartApi, Point, Time } from 'lightweight-charts'
 
 export type Anchor = {
   time: Time
@@ -12,7 +12,7 @@ export type DrawingViewport = {
 }
 
 interface DrawingConstructor {
-  new (): BaseDrawing
+  new (chart: IChartApi): BaseDrawing
   readonly ikey: DrawingName
   readonly points: number
   readonly hitThreashold: number

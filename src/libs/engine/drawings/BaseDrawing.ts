@@ -11,10 +11,6 @@ import type {
   Time
 } from 'lightweight-charts'
 
-function assertChart(chart: IChartApi | undefined): asserts chart {
-  if (!chart) throw `Drawing: Chart isn't defined`
-}
-
 function assertSeries(series: ISeriesApi<SeriesType> | undefined): asserts series {
   if (!series) throw `Drawing: Series isn't defined`
 }
@@ -27,9 +23,13 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
 
   #requestUpdate: (() => void) | null = null
   #series: ISeriesApi<SeriesType> | undefined
-  #chart: IChartApi | undefined
+  #chart: IChartApi
   #draggingAnchors: Anchor[] | null = null
   #selected = false
+
+  constructor(chart: IChartApi) {
+    this.#chart = chart
+  }
 
   setSelected(val: boolean) {
     this.#selected = val
@@ -109,15 +109,10 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
       this.#series.detachPrimitive(this)
       this.#series = undefined
     }
-
-    if (this.#chart) {
-      this.#chart = undefined
-    }
   }
 
-  attach(series: ISeriesApi<SeriesType>, chart: IChartApi) {
+  attach(series: ISeriesApi<SeriesType>) {
     this.#series = series
-    this.#chart = chart
     this.#series.attachPrimitive(this)
   }
 
@@ -128,7 +123,6 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
 
     return {
       pointToAnchor: (point: Point) => {
-        assertChart(this.#chart)
         assertSeries(this.#series)
 
         const time = this.#chart.timeScale().coordinateToTime(point.x)
@@ -144,7 +138,6 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
         }
       },
       anchorToPoint: (anchor: Anchor) => {
-        assertChart(this.#chart)
         assertSeries(this.#series)
 
         const x = this.#chart.timeScale().timeToCoordinate(anchor.time)

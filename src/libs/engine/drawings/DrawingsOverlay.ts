@@ -27,8 +27,8 @@ export class DrawingsOverlay {
       throw 'unknown drawing key'
     }
 
-    const drawing = new script.drawing()
-    drawing.attach(this.#series, this.#chart)
+    const drawing = new script.drawing(this.#chart)
+    drawing.attach(this.#series)
 
     return new Promise((resolve) => {
       const pc = new PointsCollector(this.#chart, this.#series, script.drawing.points)
@@ -44,6 +44,14 @@ export class DrawingsOverlay {
           resolve(id)
         }
       })
+    })
+  }
+
+  setSeries(series: ISeriesApi<SeriesType>) {
+    this.#series = series
+    this.#drawings.forEach((el) => {
+      el.drawing.detach()
+      el.drawing.attach(series)
     })
   }
 
