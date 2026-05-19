@@ -1,5 +1,11 @@
 import type { Point } from 'lightweight-charts'
 
+const distance = (point1: Point, point2: Point) => {
+  const dx = point2.x - point1.x
+  const dy = point2.y - point1.y
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
 const distanceToLineSegment = (point: Point, lineStart: Point, lineEnd: Point) => {
   const dx = lineEnd.x - lineStart.x
   const dy = lineEnd.y - lineStart.y
@@ -23,5 +29,6 @@ const distanceToLineSegment = (point: Point, lineStart: Point, lineEnd: Point) =
 }
 
 export const geometry = {
-  distanceToLineSegment
+  distanceToLineSegment,
+  distance
 }

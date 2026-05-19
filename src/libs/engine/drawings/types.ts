@@ -8,6 +8,7 @@ export type Anchor = {
 
 export type DrawingViewport = {
   anchorToPoint: (a: Anchor) => Point | null
+  pointToAnchor: (p: Point) => Anchor | null
 }
 
 interface DrawingConstructor {

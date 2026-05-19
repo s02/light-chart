@@ -7,7 +7,7 @@ import type { IChartApi, MouseEventParams } from 'lightweight-charts'
 import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
 import type { IndicatorName, IndicatorParams } from '@engine/indicators'
-import type { DrawingName } from '@engine/drawings'
+import { DrawingsOverlay, type DrawingName } from '@engine/drawings'
 
 type Params = {
   datafeed: Datafeed
@@ -21,6 +21,7 @@ export class PlotEngine {
   #plugins: PluginOverlay
   #series: SeriesOverlay
   #indicators: IndicatorsOverlay
+  #drawings: DrawingsOverlay
 
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
@@ -30,6 +31,7 @@ export class PlotEngine {
     const series = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
     this.#series = series
     this.#indicators = new IndicatorsOverlay(this.#chart, this.#datafeed)
+    this.#drawings = new DrawingsOverlay(this.#chart, this.#series.getSeries())
     this.#plugins = new PluginOverlay(this.#chart, this.#datafeed.getResolutionId())
     this.#plugins.attach(this.#series.getSeries())
   }
@@ -108,9 +110,8 @@ export class PlotEngine {
     this.#indicators.updateParams(id, params)
   }
 
-  addDrawing(_key: DrawingName) {
-    return Promise.resolve(5)
-    //return this.#overlays.drawings.add(key)
+  addDrawing(key: DrawingName) {
+    return this.#drawings.add(key)
   }
 
   destroy() {

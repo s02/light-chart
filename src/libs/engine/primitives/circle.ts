@@ -1,18 +1,30 @@
 import type { BitmapCoordinatesRenderingScope } from 'fancy-canvas'
-import type { Coordinate } from 'lightweight-charts'
+import type { Point } from 'lightweight-charts'
 
 type Params = {
   radius: number
-  color: string
+  color?: string
+  fill?: string
+  width?: number
 }
 
-export const circle = (scope: BitmapCoordinatesRenderingScope, x: Coordinate, y: Coordinate, params: Params) => {
+export const circle = (scope: BitmapCoordinatesRenderingScope, p: Point, params: Params) => {
   const ctx = scope.context
   const hpr = scope.horizontalPixelRatio
   const vpr = scope.verticalPixelRatio
 
   ctx.beginPath()
-  ctx.arc(x * hpr, y * vpr, params.radius * hpr, 0, Math.PI * params.radius * hpr)
-  ctx.fillStyle = params.color
-  ctx.fill()
+  ctx.arc(p.x * hpr, p.y * vpr, params.radius * hpr, 0, Math.PI * params.radius * hpr)
+
+  ctx.lineWidth = (params.width ?? 1) * hpr
+
+  if (params.color) {
+    ctx.strokeStyle = params.color
+    ctx.stroke()
+  }
+
+  if (params.fill) {
+    ctx.fillStyle = params.fill
+    ctx.fill()
+  }
 }

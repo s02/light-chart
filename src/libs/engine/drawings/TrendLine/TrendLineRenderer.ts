@@ -1,3 +1,5 @@
+import { circle } from '@engine/primitives/circle'
+import { line } from '@engine/primitives/line'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 
@@ -12,16 +14,9 @@ export class TrendLineRenderer implements IPrimitivePaneRenderer {
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
-      const ctx = scope.context
-      const hpr = scope.horizontalPixelRatio
-      const vpr = scope.verticalPixelRatio
-
-      ctx.beginPath()
-      ctx.moveTo(this.#p1.x * hpr, this.#p1.y * vpr)
-      ctx.lineTo(this.#p2.x * hpr, this.#p2.y * vpr)
-      ctx.strokeStyle = 'blue'
-      ctx.lineWidth = 3
-      ctx.stroke()
+      circle(scope, this.#p1, { radius: 3, fill: 'green' })
+      line(scope, this.#p1, this.#p2, { width: 2, color: 'green' })
+      circle(scope, this.#p2, { radius: 3, fill: 'green' })
     })
   }
 }
