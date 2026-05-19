@@ -6,7 +6,7 @@ import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { BaseDrawing } from './BaseDrawing'
 import type { DrawingName } from './types'
 
-export class DrawingsOverlay {
+export class DrawingsManager {
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>
   #drawings: { id: number; drawing: BaseDrawing }[] = []

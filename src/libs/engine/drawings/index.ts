@@ -1,9 +1,6 @@
-import { HorizontalLine } from './HorizontalLine/HorizontalLine'
-import { TrendLine } from './TrendLine/TrendLine'
-import type { DrawingScript } from './types'
-
-export type { DrawingGroup, DrawingName, DrawingScript } from './types'
-export { DrawingsOverlay } from './DrawingsOverlay'
+import { HorizontalLine } from '@engine/drawings/HorizontalLine/HorizontalLine'
+import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
+import type { DrawingScript } from '@engine/drawings/types'
 
 export const DRAWINGS: DrawingScript[] = [
   {
@@ -15,3 +12,6 @@ export const DRAWINGS: DrawingScript[] = [
     drawing: HorizontalLine
   }
 ]
+
+export { DrawingsManager } from '@engine/drawings/DrawingsManager'
+export type { DrawingGroup, DrawingName, DrawingScript } from '@engine/drawings/types'

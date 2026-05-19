@@ -7,7 +7,7 @@ import type { IChartApi, MouseEventParams } from 'lightweight-charts'
 import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
 import type { IndicatorName, IndicatorParams } from '@engine/indicators'
-import { DrawingsOverlay, type DrawingName } from '@engine/drawings'
+import { DrawingsManager, type DrawingName } from '@engine/drawings'
 
 type Params = {
   datafeed: Datafeed
@@ -19,9 +19,9 @@ export class PlotEngine {
   #datafeed: Datafeed
   #seriesId: SeriesId
   #plugins: PluginOverlay
-  #series: SeriesOverlay
+  #seriesOverlay: SeriesOverlay
   #indicators: IndicatorsOverlay
-  #drawings: DrawingsOverlay
+  #drawingsManager: DrawingsManager
 
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
@@ -29,24 +29,24 @@ export class PlotEngine {
     this.#seriesId = params.seriesId || 'candlestick'
 
     const series = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
-    this.#series = series
+    this.#seriesOverlay = series
     this.#indicators = new IndicatorsOverlay(this.#chart, this.#datafeed)
-    this.#drawings = new DrawingsOverlay(this.#chart, this.#series.getSeries())
+    this.#drawingsManager = new DrawingsManager(this.#chart, this.#seriesOverlay.getSeries())
     this.#plugins = new PluginOverlay(this.#chart, this.#datafeed.getResolutionId())
-    this.#plugins.attach(this.#series.getSeries())
+    this.#plugins.attach(this.#seriesOverlay.getSeries())
   }
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
     const handler = (params: MouseEventParams) => {
       const result: ChartSeriesLegend[] = []
-      const series = this.#series.getSeries()
+      const series = this.#seriesOverlay.getSeries()
       const data = params.seriesData.get(series)
 
       if (data) {
         result.push({
           category: 'main',
           id: -1,
-          ...this.#series.getLegend(data)
+          ...this.#seriesOverlay.getLegend(data)
         })
       }
 
@@ -69,18 +69,18 @@ export class PlotEngine {
   setSeriesId(seriesId: SeriesId) {
     this.#seriesId = seriesId
     const series = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
-    this.#series.destroy()
-    this.#series = series
+    this.#seriesOverlay.destroy()
+    this.#seriesOverlay = series
 
     this.#plugins.setSeries(series.getSeries())
-    this.#drawings.setSeries(series.getSeries())
+    this.#drawingsManager.setSeries(series.getSeries())
   }
 
   async setDatafeed(datafeed: Datafeed) {
     this.#datafeed.destroy()
     this.#datafeed = datafeed
 
-    this.#series.setDatafeed(datafeed)
+    this.#seriesOverlay.setDatafeed(datafeed)
     this.#indicators.setDatafeed(datafeed)
     this.#plugins.setResolution(datafeed.getResolutionId())
   }
@@ -95,7 +95,7 @@ export class PlotEngine {
 
   async addIndicator(key: IndicatorName): Promise<IndicatorOnPane> {
     const iop = await this.#indicators.add(key)
-    this.#series.moveToTop()
+    this.#seriesOverlay.moveToTop()
     return iop
   }
 
@@ -112,13 +112,13 @@ export class PlotEngine {
   }
 
   addDrawing(key: DrawingName) {
-    return this.#drawings.add(key)
+    return this.#drawingsManager.add(key)
   }
 
   destroy() {
     this.#plugins.detach()
     this.#indicators.destroy()
-    this.#series.destroy()
+    this.#seriesOverlay.destroy()
     this.#chart.remove()
   }
 }

@@ -2,10 +2,6 @@ import { BollingerBands } from './BollingerBands/BollingerBands'
 import { SimpleMovingAverage } from './SimpleMovingAverage/SimpleMovingAverage'
 import type { IndicatorScript } from './types'
 
-export { IndicatorsOverlay } from './IndicatorsOverlay'
-export type { IndicatorName, IndicatorParams, IndicatorScript } from './types'
-export type { IndicatorSchema } from './schema'
-
 export const INDICATOR_SCRIPTS: IndicatorScript[] = [
   {
     indicator: BollingerBands
@@ -33,3 +29,7 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
     key: 'stochastic-rsi'
   } */
 ] as const
+
+export { IndicatorsOverlay } from './IndicatorsOverlay'
+export type { IndicatorName, IndicatorParams, IndicatorScript } from './types'
+export type { IndicatorSchema } from './schema'
