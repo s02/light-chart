@@ -3,19 +3,19 @@ import { BarQueue } from '@engine/indicators/BarQueue'
 import { math } from '@engine/indicators/math'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
-import { resolveParams } from '@engine/indicators/schema'
+import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
-import type { IndicatorSchema, InferIndicatorValues } from '@engine/indicators/schema'
+import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
 import type { ChartBar, Datafeed, DatafeedResult } from '@engine/types'
-import type { Indicator, IndicatorName, IndicatorOptions, IndicatorParams, SeriesMap } from '@engine/indicators/types'
+import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 
 const SMA_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', label: 'Length', default: 20, min: 1 }],
-  style: [{ type: 'color', key: 'plot', label: 'Plot', default: '#2962FF' }]
-} as const satisfies IndicatorSchema
+  inputs: [{ type: 'number', key: 'length', default: 20, min: 1 }],
+  style: [{ type: 'color', key: 'plot', default: '#2962FF' }]
+} as const satisfies StudySchema
 
-type SMAParams = InferIndicatorValues<typeof SMA_SCHEMA.inputs> & InferIndicatorValues<typeof SMA_SCHEMA.style>
+type SMAParams = InferStudyValues<typeof SMA_SCHEMA.inputs> & InferStudyValues<typeof SMA_SCHEMA.style>
 
 export class SimpleMovingAverage extends AbstractIndicator implements Indicator {
   static readonly ikey: IndicatorName = 'sma'
@@ -25,10 +25,10 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   #queue: BarQueue
   #params: SMAParams
 
-  constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
+  constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
     super(datafeed, options?.paneIndex)
     this.#chart = chart
-    this.#params = resolveParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, options?.params)
 
     this.#queue = new BarQueue(this.#params.length)
     this.#series = this.#chart.addSeries(
@@ -38,8 +38,8 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
     )
   }
 
-  setParams(params: IndicatorParams) {
-    this.#params = resolveParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, params)
+  setParams(params: StudyParams) {
+    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, params)
     this.#series.applyOptions({ color: this.#params.plot })
     this.reload()
   }

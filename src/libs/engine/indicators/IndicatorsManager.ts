@@ -1,7 +1,8 @@
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
-import type { Indicator, IndicatorName, IndicatorParams, SeriesMap } from './types'
+import type { Indicator, IndicatorName, SeriesMap } from './types'
 import type { Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
+import type { StudyParams } from '@engine/schema'
 
 export class IndicatorsManager {
   #chart: IChartApi
@@ -52,17 +53,26 @@ export class IndicatorsManager {
     indicator.apply()
 
     return new Promise((resolve, reject) => {
+      if (!script.separatePane) {
+        resolve({ id })
+      }
+      let iv: number | null = null
+
       const observer = new MutationObserver(() => {
         const el = pane.getHTMLElement()
         const div = el ? el.querySelector('div') : null
         if (div) {
           observer.disconnect()
           resolve({ id, paneIndex: pane.paneIndex(), el: div })
+          if (iv) {
+            clearTimeout(iv)
+          }
         }
       })
+
       observer.observe(this.#chart.chartElement(), { childList: true, subtree: true })
 
-      setTimeout(() => {
+      iv = setTimeout(() => {
         observer.disconnect()
         reject(new Error('Pane element not found'))
       }, 3000)
@@ -74,7 +84,7 @@ export class IndicatorsManager {
     return el.indicator.getSchema()
   }
 
-  updateParams(id: number, params: IndicatorParams) {
+  updateParams(id: number, params: StudyParams) {
     const el = this.#findIndicator(id)
     el.indicator.setParams(params)
   }

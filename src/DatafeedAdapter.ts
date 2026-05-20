@@ -101,12 +101,12 @@ export class DatafeedAdapter implements Datafeed {
     this.#loadingBars = false
   }
 
-  #fireCallbacks(event: { type: 'set' | 'update'; data: ChartBar[] }) {
-    this.#callbacks.forEach((cb) => cb(event))
-  }
-
   getBars() {
     return this.#candleStoreService.getData()
+  }
+
+  #fireCallbacks(event: { type: 'set' | 'update'; data: ChartBar[] }) {
+    this.#callbacks.forEach((cb) => cb(event))
   }
 
   async #loadBars(countBack: number = 300) {

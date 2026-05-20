@@ -2,15 +2,15 @@
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import { i18n } from '@chart/i18n'
 import { ref } from 'vue'
-import type { IndicatorParams, IndicatorSchema } from '@engine/types'
+import type { StudyParams, StudySchema } from '@engine/schema'
 
 const emit = defineEmits<{
-  (e: 'close', result?: IndicatorParams): void
+  (e: 'close', result?: StudyParams): void
 }>()
 
-const props = defineProps<{ schema: IndicatorSchema; params: IndicatorParams; ikey: string }>()
+const props = defineProps<{ schema: StudySchema; params: StudyParams; ikey: string }>()
 
-const params = ref<IndicatorParams>(props.params)
+const params = ref<StudyParams>(props.params)
 
 const apply = () => {
   emit('close', params.value)
@@ -26,12 +26,12 @@ const apply = () => {
     <div class="ind-settings-body ch-scroll">
       <div class="ind-settings-group">
         <div v-for="el in schema.inputs" :key="el.key">
-          <label for="">{{ el.label }}</label>
+          <label for="">{{ el.key }}</label>
           <div v-if="el.type === 'number'"><input v-model="params[el.key]" type="number" /></div>
         </div>
 
         <div v-for="el in schema.style" :key="el.key">
-          <label for="">{{ el.label }}</label>
+          <label for="">{{ el.key }}</label>
           <div v-if="el.type === 'color'"><input v-model="params[el.key]" type="text" /></div>
         </div>
       </div>

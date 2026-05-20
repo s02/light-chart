@@ -9,9 +9,20 @@ import ChartLegend from '@chart/components/ChartLegend.vue'
 import PaneLegend from '@chart/components/PaneLegend.vue'
 import { useModal } from '@chart/composables/useModal'
 import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
-import type { ChartSeriesLegend, DrawingName, IndicatorParams } from '@engine/types'
+import DrawingSettings from '@chart/components/DrawingSettings.vue'
+import type {
+  ChartSeriesLegend,
+  DrawingName,
+  AssetSymbol,
+  ChartExpiration,
+  ChartOption,
+  IndicatorName
+} from '@engine/types'
 import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
-import type { AssetSymbol, ChartExpiration, ChartOption, IndicatorName } from '@engine/types'
+import type { StudyParams } from '@engine/schema'
+import { useEngine } from '@chart/composables/useEngine'
+import { useDrawingSettings } from '@chart/composables/useDrawingSettings'
+import type { DrawingSelectFn } from '@engine/drawings/types'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
@@ -21,8 +32,10 @@ const props = defineProps<{
   expiration?: ChartExpiration
 }>()
 
-const { state, registerEngine } = useChart()
+const { state } = useChart()
+const { registerEngine } = useEngine()
 const { open: openModal } = useModal()
+const { set: setSelectedDrawing } = useDrawingSettings()
 
 state.assetSymbol = props.assetSymbol
 state.resolutionId = props.defaultConfig.resolutionId
@@ -61,10 +74,9 @@ onMounted(() => {
   registerEngine({
     addIndicator: async (key: IndicatorName) => {
       checkEngine(pe)
-
       const t = await pe.addIndicator(key)
 
-      if (t.paneIndex > 0 && t.el) {
+      if (t.paneIndex && t.paneIndex > 0 && t.el) {
         render(h(PaneLegend, { paneIndex: t.paneIndex, subscribeToLegends: pe.subscribeToLegends.bind(pe) }), t.el)
       }
 
@@ -78,7 +90,7 @@ onMounted(() => {
       checkEngine(pe)
 
       const schema = pe.getIndicatorSchema(id)
-      const params = await openModal<IndicatorParams | undefined>(ModalIndicatorSettings, { props: schema })
+      const params = await openModal<StudyParams | undefined>(ModalIndicatorSettings, { props: schema })
       if (params) {
         pe.updateIndicator(id, params)
       }
@@ -86,11 +98,23 @@ onMounted(() => {
     startDrawing: (id: DrawingName) => {
       checkEngine(pe)
       return pe.addDrawing(id)
+    },
+    updateDrawing: (id: number, params: StudyParams) => {
+      checkEngine(pe)
+      pe.updateDrawing(id, params)
+    },
+    removeDrawing: (id: number) => {
+      checkEngine(pe)
+      pe.removeDrawing(id)
     }
   })
 
   unsub = pe.subscribeToLegends((l) => {
     legends.value = l
+  })
+
+  pe.subscribeToSelectDrawing((res: Parameters<DrawingSelectFn>[0]) => {
+    setSelectedDrawing(res)
   })
 })
 
@@ -112,8 +136,7 @@ watch(
     assetSymbol: props.assetSymbol,
     resolutionId: state.resolutionId,
     seriesId: state.seriesId,
-    expiration: props.expiration,
-    indicators: state.indicators
+    expiration: props.expiration
   }),
   (next, prev) => {
     if (!pe) {
@@ -157,6 +180,9 @@ watch(
       <div class="t-chart-legends">
         <ChartLegend :legends="mainPaneLegends" />
       </div>
+
+      <DrawingSettings class="t-chart-drawings" />
+
       <div ref="chartRef" class="t-chart-plot"></div>
     </div>
 

@@ -1,5 +1,6 @@
 import { geometry } from '@engine/drawings/geometry'
-import type { Anchor, DrawingViewport } from '@engine/drawings/types'
+import type { Anchor, DrawingSchema, DrawingViewport } from '@engine/drawings/types'
+import type { StudyParams } from '@engine/schema'
 import type {
   IChartApi,
   IPrimitivePaneView,
@@ -22,8 +23,8 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
 
   protected anchorsVisible = false
   protected anchors: Anchor[] = []
+  protected requestUpdate: (() => void) | null = null
 
-  #requestUpdate: (() => void) | null = null
   #series: ISeriesApi<SeriesType> | undefined
   #chart: IChartApi
   #draggingAnchors: Anchor[] | null = null
@@ -45,8 +46,8 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
 
     const prev = this.anchorsVisible
     this.anchorsVisible = val
-    if (this.#requestUpdate && this.anchorsVisible !== prev) {
-      this.#requestUpdate()
+    if (this.requestUpdate && this.anchorsVisible !== prev) {
+      this.requestUpdate()
     }
   }
 
@@ -96,14 +97,14 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
 
   setAnchors(anchors: Anchor[]) {
     this.anchors = anchors
-    if (this.#requestUpdate) {
-      this.#requestUpdate()
+    if (this.requestUpdate) {
+      this.requestUpdate()
     }
   }
 
   attached({ requestUpdate }: SeriesAttachedParameter<Time>) {
-    this.#requestUpdate = requestUpdate
-    this.#requestUpdate()
+    this.requestUpdate = requestUpdate
+    this.requestUpdate()
   }
 
   detach() {
@@ -175,4 +176,6 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
 
   abstract paneViews(): IPrimitivePaneView[]
   abstract checkTap(point: Point): boolean
+  abstract setParams(params: StudyParams): void
+  abstract getSchema(): DrawingSchema
 }

@@ -6,8 +6,10 @@ import { PluginManager } from '@engine/plugins'
 import type { IChartApi, LogicalRange, MouseEventParams } from 'lightweight-charts'
 import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
-import type { IndicatorName, IndicatorParams } from '@engine/indicators'
+import type { IndicatorName } from '@engine/indicators'
 import { DrawingsManager, type DrawingName } from '@engine/drawings'
+import type { DrawingSelectFn } from '@engine/drawings/types'
+import type { StudyParams } from '@engine/schema'
 
 type Params = {
   datafeed: Datafeed
@@ -63,8 +65,8 @@ export class PlotEngine {
     return () => this.#chart.unsubscribeCrosshairMove(handler)
   }
 
-  subscribeToDrawings(_cb: (id: number) => void) {
-    //const handler = (ev: PointerEvent) => {}
+  subscribeToSelectDrawing(cb: DrawingSelectFn) {
+    this.#drawingsManager.subscribe(cb)
   }
 
   setSeriesId(seriesId: SeriesId) {
@@ -108,12 +110,20 @@ export class PlotEngine {
     return this.#indicatorsManager.getSchema(id)
   }
 
-  updateIndicator(id: number, params: IndicatorParams) {
+  updateIndicator(id: number, params: StudyParams) {
     this.#indicatorsManager.updateParams(id, params)
   }
 
   addDrawing(key: DrawingName) {
     return this.#drawingsManager.add(key)
+  }
+
+  updateDrawing(id: number, params: StudyParams) {
+    this.#drawingsManager.updateParams(id, params)
+  }
+
+  removeDrawing(id: number) {
+    this.#drawingsManager.remove(id)
   }
 
   destroy() {

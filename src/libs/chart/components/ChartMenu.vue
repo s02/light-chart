@@ -4,10 +4,14 @@ import { useFloating, type Placement } from '@floating-ui/vue'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 
-const props = defineProps<{
-  menuKey: ChartMenuKey
-  placement?: Placement
-}>()
+const props = withDefaults(
+  defineProps<{
+    menuKey: ChartMenuKey
+    closeable?: boolean
+    placement?: Placement
+  }>(),
+  { closeable: true, placement: undefined }
+)
 
 const target = useTemplateRef('target')
 const { isOpened, close, btn } = injectChartMenu(props.menuKey)

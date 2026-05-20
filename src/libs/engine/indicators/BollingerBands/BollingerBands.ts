@@ -4,28 +4,28 @@ import { math } from '@engine/indicators/math'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { LineSeries } from 'lightweight-charts'
 import { BollingerBandsFill } from '@engine/indicators/BollingerBands/BollingerBandsFill'
-import { resolveParams } from '@engine/indicators/schema'
+import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
 import type { FillPoint } from '@engine/indicators/BollingerBands/BollingerBandsFillRenderer'
-import type { IndicatorSchema, InferIndicatorValues } from '@engine/indicators/schema'
-import type { Indicator, IndicatorName, IndicatorOptions, IndicatorParams, SeriesMap } from '@engine/indicators/types'
+import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
+import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed, DatafeedResult } from '@engine/types'
 
 const BB_SCHEMA = {
   inputs: [
-    { type: 'number', key: 'length', label: 'Length', default: 20, min: 1 },
-    { type: 'number', key: 'mul', label: 'Multiplier', default: 2, min: 0.1, step: 0.1 }
+    { type: 'number', key: 'length', default: 20, min: 1 },
+    { type: 'number', key: 'mul', default: 2, min: 0.1, step: 0.1 }
   ],
   style: [
-    { type: 'color', key: 'upperColor', label: 'Upper', default: '#2962FF' },
-    { type: 'color', key: 'middleColor', label: 'Middle', default: '#FFAB40' },
-    { type: 'color', key: 'lowerColor', label: 'Lower', default: '#2962FF' },
-    { type: 'color', key: 'fillColor', label: 'Fill', default: 'rgba(41,98,255,0.1)' }
+    { type: 'color', key: 'upperColor', default: '#2962FF' },
+    { type: 'color', key: 'middleColor', default: '#FFAB40' },
+    { type: 'color', key: 'lowerColor', default: '#2962FF' },
+    { type: 'color', key: 'fillColor', default: 'rgba(41,98,255,0.1)' }
   ]
-} as const satisfies IndicatorSchema
+} as const satisfies StudySchema
 
-type BBParams = InferIndicatorValues<typeof BB_SCHEMA.inputs> & InferIndicatorValues<typeof BB_SCHEMA.style>
+type BBParams = InferStudyValues<typeof BB_SCHEMA.inputs> & InferStudyValues<typeof BB_SCHEMA.style>
 
 export class BollingerBands extends AbstractIndicator implements Indicator {
   static readonly ikey: IndicatorName = 'bb'
@@ -33,7 +33,7 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
   #chart: IChartApi
   #queue: BarQueue
   #fill = new BollingerBandsFill()
-  #params: BBParams = resolveParams(BB_SCHEMA.inputs, BB_SCHEMA.style)
+  #params: BBParams = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style)
 
   #series: {
     upper: ISeriesApi<SeriesType>
@@ -44,7 +44,7 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveParams(BB_SCHEMA.inputs, BB_SCHEMA.style, options.params)
+    this.#params = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style, options.params)
     this.#queue = new BarQueue(this.#params.length)
 
     this.#series = {
@@ -76,8 +76,8 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
     }
   }
 
-  setParams(params: IndicatorParams) {
-    this.#params = resolveParams(BB_SCHEMA.inputs, BB_SCHEMA.style, params)
+  setParams(params: StudyParams) {
+    this.#params = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style, params)
 
     this.#series.upper.applyOptions({ color: this.#params.upperColor })
     this.#series.middle.applyOptions({ color: this.#params.middleColor })

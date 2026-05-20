@@ -5,8 +5,8 @@ import ChartMenu from '@chart/components/ChartMenu.vue'
 import { provideChartMenu } from '@chart/useChartMenu'
 import { ref, useTemplateRef } from 'vue'
 import LineIcon from '@chart/components/LineIcon.vue'
-import { useChart } from '@chart/useChart'
 import type { DrawingName } from '@engine/drawings'
+import { useEngine } from '@chart/composables/useEngine'
 
 const {
   close: closeLineMenu,
@@ -14,7 +14,7 @@ const {
   key: lineMenuKey
 } = provideChartMenu('line-menu', useTemplateRef('btnLineMenu'))
 
-const { startDrawing } = useChart()
+const { startDrawing } = useEngine()
 
 const line = ref<DrawingName>('trend-line')
 const initialized = ref<DrawingName | undefined>()

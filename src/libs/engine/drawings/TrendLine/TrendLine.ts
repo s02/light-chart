@@ -1,16 +1,47 @@
+import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 import { BaseDrawing } from '../BaseDrawing'
 import { geometry } from '../geometry'
 import { TrendLinePaneView } from './TrendLinePaneView'
-import type { Point } from 'lightweight-charts'
+import type { IChartApi, Point } from 'lightweight-charts'
+import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
+
+const TREND_LINE_SCHEMA = {
+  inputs: [{ type: 'number', key: 'width', default: 1, min: 1 }],
+  style: [{ type: 'color', key: 'color', default: '#2962FF' }]
+} as const satisfies StudySchema
+
+export type TrendLineParams = InferStudyValues<typeof TREND_LINE_SCHEMA.inputs> &
+  InferStudyValues<typeof TREND_LINE_SCHEMA.style>
 
 export class TrendLine extends BaseDrawing {
-  static readonly ikey = 'trend-line'
+  static readonly ikey: DrawingName = 'trend-line'
   static readonly points = 2
+  #params: TrendLineParams
+
+  constructor(chart: IChartApi, options?: DrawingOptions) {
+    super(chart)
+    this.#params = resolveStudyParams(TREND_LINE_SCHEMA.inputs, TREND_LINE_SCHEMA.style, options?.params)
+  }
+
+  override setParams(params: StudyParams) {
+    this.#params = resolveStudyParams(TREND_LINE_SCHEMA.inputs, TREND_LINE_SCHEMA.style, params)
+    if (this.requestUpdate) {
+      this.requestUpdate()
+    }
+  }
+
+  override getSchema() {
+    return {
+      ikey: TrendLine.ikey,
+      schema: TREND_LINE_SCHEMA,
+      params: this.#params
+    }
+  }
 
   override paneViews() {
     const viewport = this.getViewport()
     if (viewport) {
-      return [new TrendLinePaneView(viewport, this.anchors, this.anchorsVisible)]
+      return [new TrendLinePaneView(viewport, this.anchors, this.anchorsVisible, this.#params)]
     }
 
     return []

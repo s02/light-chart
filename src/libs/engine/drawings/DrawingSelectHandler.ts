@@ -1,15 +1,20 @@
-import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
+import type { DrawingElement } from '@engine/drawings/DrawingsManager'
+import type { DrawingSelectFn } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
+
+type GetElementsFn = () => DrawingElement[]
 
 export class DrawingSelectHandler {
   #el: HTMLDivElement
   #chart: IChartApi
-  #getElements: () => { id: number; drawing: BaseDrawing }[]
+  #getElements: GetElementsFn
+  #onSelect: DrawingSelectFn
 
-  constructor(chart: IChartApi, getElements: () => { id: number; drawing: BaseDrawing }[]) {
+  constructor(chart: IChartApi, getElements: GetElementsFn, onSelect: DrawingSelectFn) {
     this.#chart = chart
     this.#el = this.#chart.chartElement()
     this.#getElements = getElements
+    this.#onSelect = onSelect
     this.#el.addEventListener('click', this.#clickHandler)
     this.#el.addEventListener('mousemove', this.#mousemoveHandler)
   }
@@ -18,8 +23,9 @@ export class DrawingSelectHandler {
     this.#el.removeEventListener('click', this.#clickHandler)
   }
 
-  select(id: number) {
-    console.log('selected', id)
+  select(el: DrawingElement) {
+    el.drawing.setSelected(true)
+    this.#onSelect({ id: el.id, ds: el.drawing.getSchema() })
   }
 
   #mousemoveHandler = (e: MouseEvent) => {
@@ -40,8 +46,7 @@ export class DrawingSelectHandler {
   #clickHandler = ({ layerX: x, layerY: y }: MouseEvent) => {
     this.#getElements().forEach((el) => {
       if (el.drawing.checkTap({ x, y } as Point)) {
-        el.drawing.setSelected(true)
-        this.select(el.id)
+        this.select(el)
       } else {
         el.drawing.setSelected(false)
       }

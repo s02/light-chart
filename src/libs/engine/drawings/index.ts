@@ -14,4 +14,4 @@ export const DRAWINGS: DrawingScript[] = [
 ]
 
 export { DrawingsManager } from '@engine/drawings/DrawingsManager'
-export type { DrawingGroup, DrawingName, DrawingScript } from '@engine/drawings/types'
+export type { DrawingGroup, DrawingName, DrawingScript, DrawingSchema } from '@engine/drawings/types'

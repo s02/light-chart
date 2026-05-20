@@ -1,16 +1,19 @@
 import { TrendLineRenderer } from './TrendLineRenderer'
 import type { Anchor, DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
+import type { TrendLineParams } from '@engine/drawings/TrendLine/TrendLine'
 
 export class TrendLinePaneView implements IPrimitivePaneView {
   #anchors: Anchor[]
-  #withDots: boolean
+  #withAnchors: boolean
   #viewport: DrawingViewport
+  #params: TrendLineParams
 
-  constructor(viewport: DrawingViewport, anchors: Anchor[], withDots: boolean) {
+  constructor(viewport: DrawingViewport, anchors: Anchor[], withDots: boolean, params: TrendLineParams) {
     this.#anchors = anchors
     this.#viewport = viewport
-    this.#withDots = withDots
+    this.#withAnchors = withDots
+    this.#params = params
   }
 
   zOrder(): PrimitivePaneViewZOrder {
@@ -29,7 +32,7 @@ export class TrendLinePaneView implements IPrimitivePaneView {
         return null
       }
 
-      return new TrendLineRenderer(p1, p2, this.#withDots)
+      return new TrendLineRenderer(p1, p2, this.#withAnchors, this.#params)
     }
 
     return null

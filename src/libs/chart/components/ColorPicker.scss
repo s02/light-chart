@@ -1,0 +1,16 @@
+.color {
+  border-radius: 2px;
+  height: 15px;
+  width: 15px;
+  box-shadow: none;
+  border: none;
+  display: block;
+}
+
+.color-picker {
+  width: 228px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 15px 12px;
+  gap: 6px;
+}

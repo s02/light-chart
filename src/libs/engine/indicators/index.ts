@@ -31,5 +31,4 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
 ] as const
 
 export { IndicatorsManager } from './IndicatorsManager'
-export type { IndicatorName, IndicatorParams, IndicatorScript } from './types'
-export type { IndicatorSchema } from './schema'
+export type { IndicatorName, IndicatorScript } from './types'
