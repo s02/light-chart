@@ -6,7 +6,7 @@ type EngineCallbacks = {
   addIndicator: (key: IndicatorName) => Promise<number>
   removeIndicator: (id: number) => void
   editIndicator: (id: number) => void
-  startDrawing: (name: DrawingName) => Promise<number>
+  startDrawing: (name: DrawingName) => Promise<number> | undefined
   updateDrawing: (id: number, params: StudyParams) => void
   removeDrawing: (id: number) => void
 }

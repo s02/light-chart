@@ -30,5 +30,14 @@
   "indicator-sma": "SMA",
   "draw-line-trend-line": "Trend Line",
   "draw-line-vertical-line": "Vertical Line",
-  "draw-line-horizontal-line": "Horizontal Line"
+  "draw-line-horizontal-line": "Horizontal Line",
+  "tab-inputs": "Inputs",
+  "tab-style": "Style",
+  "ind-prop-length": "Length",
+  "ind-prop-mul": "Mult",
+  "ind-prop-upper": "Upper",
+  "ind-prop-middle": "Median",
+  "ind-prop-lower": "Lower",
+  "ind-prop-fill": "Background",
+  "ind-prop-color": "Color"
 }

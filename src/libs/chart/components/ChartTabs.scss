@@ -1,0 +1,38 @@
+.tabs-border {
+  background-color: #4a4a4a;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.tabs-items {
+  display: flex;
+  gap: 24px;
+}
+
+.tabs-item {
+  font-weight: 600;
+  line-height: 20px;
+  padding-bottom: 8px;
+  position: relative;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    height: 4px;
+    background-color: #dbdbdb;
+    border-radius: 2px;
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    display: none;
+  }
+
+  &.active {
+    cursor: default;
+
+    &::after {
+      display: block;
+    }
+  }
+}

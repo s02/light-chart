@@ -1,3 +1,4 @@
+import type { BBParams } from '@engine/indicators/BollingerBands/BollingerBands'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IChartApi, IPrimitivePaneRenderer, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 
@@ -7,11 +8,13 @@ export class BollingerBandsFillRenderer implements IPrimitivePaneRenderer {
   #points: FillPoint[]
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>
+  #params: BBParams
 
-  constructor(points: FillPoint[], chart: IChartApi, series: ISeriesApi<SeriesType>) {
+  constructor(points: FillPoint[], chart: IChartApi, series: ISeriesApi<SeriesType>, params: BBParams) {
     this.#points = points
     this.#chart = chart
     this.#series = series
+    this.#params = params
   }
 
   draw(target: CanvasRenderingTarget2D) {
@@ -41,7 +44,7 @@ export class BollingerBandsFillRenderer implements IPrimitivePaneRenderer {
       }
 
       ctx.closePath()
-      ctx.fillStyle = 'rgba(41, 98, 255, 0.05)'
+      ctx.fillStyle = this.#params.fill
       ctx.fill()
     })
   }

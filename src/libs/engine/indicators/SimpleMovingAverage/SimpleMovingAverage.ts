@@ -12,7 +12,7 @@ import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@eng
 
 const SMA_SCHEMA = {
   inputs: [{ type: 'number', key: 'length', default: 20, min: 1 }],
-  style: [{ type: 'color', key: 'plot', default: '#2962FF' }]
+  style: [{ type: 'color', key: 'color', default: '#2962FF' }]
 } as const satisfies StudySchema
 
 type SMAParams = InferStudyValues<typeof SMA_SCHEMA.inputs> & InferStudyValues<typeof SMA_SCHEMA.style>
@@ -33,14 +33,14 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
     this.#queue = new BarQueue(this.#params.length)
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.plot },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color },
       this.paneIndex
     )
   }
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.plot })
+    this.#series.applyOptions({ color: this.#params.color })
     this.reload()
   }
 
@@ -66,7 +66,7 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
         data: [
           {
             value: formatPrice((data as LineData<Time>).value),
-            color: this.#params.plot
+            color: this.#params.color
           }
         ]
       }

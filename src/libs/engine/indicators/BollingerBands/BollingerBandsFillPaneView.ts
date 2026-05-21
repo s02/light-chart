@@ -16,6 +16,6 @@ export class BollingerBandsFillPaneView implements IPrimitivePaneView {
   renderer() {
     const { chart, series, points } = this.#primitive
     if (!chart || !series) return null
-    return new BollingerBandsFillRenderer(points, chart, series)
+    return new BollingerBandsFillRenderer(points, chart, series, this.#primitive.params)
   }
 }

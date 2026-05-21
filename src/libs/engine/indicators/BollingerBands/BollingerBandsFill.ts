@@ -1,3 +1,4 @@
+import type { BBParams } from '@engine/indicators/BollingerBands/BollingerBands'
 import { BollingerBandsFillPaneView } from '@engine/indicators/BollingerBands/BollingerBandsFillPaneView'
 import type { FillPoint } from '@engine/indicators/BollingerBands/BollingerBandsFillRenderer'
 import type {
@@ -13,8 +14,17 @@ export class BollingerBandsFill implements ISeriesPrimitive<Time> {
   chart: IChartApi | null = null
   series: ISeriesApi<SeriesType> | null = null
   points: FillPoint[] = []
+  params: BBParams
+
+  constructor(params: BBParams) {
+    this.params = params
+  }
 
   #view = new BollingerBandsFillPaneView(this)
+
+  setParams(params: BBParams) {
+    this.params = params
+  }
 
   attached(param: SeriesAttachedParameter<Time>) {
     this.chart = param.chart

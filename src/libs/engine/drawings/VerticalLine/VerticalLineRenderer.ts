@@ -1,15 +1,15 @@
-import type { HorizontalLineParams } from '@engine/drawings/HorizontalLine/HorizontalLine'
 import { dot } from '@engine/primitives/dot'
 import { line } from '@engine/primitives/line'
+import type { VerticalLineParams } from '@engine/drawings/VerticalLine/VerticalLine'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 
-export class HorizontalLineRenderer implements IPrimitivePaneRenderer {
+export class VerticalLineRenderer implements IPrimitivePaneRenderer {
   #p: Point
   #withDots: boolean
-  #params: HorizontalLineParams
+  #params: VerticalLineParams
 
-  constructor(p: Point, withDots: boolean, params: HorizontalLineParams) {
+  constructor(p: Point, withDots: boolean, params: VerticalLineParams) {
     this.#p = p
     this.#withDots = withDots
     this.#params = params
@@ -17,7 +17,7 @@ export class HorizontalLineRenderer implements IPrimitivePaneRenderer {
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
-      line(scope, { x: 0, y: this.#p.y } as Point, { x: scope.bitmapSize.width, y: this.#p.y } as Point, {
+      line(scope, { x: this.#p.x, y: 0 } as Point, { x: this.#p.x, y: scope.bitmapSize.height } as Point, {
         width: this.#params.width,
         color: this.#params.color
       })

@@ -1,15 +1,15 @@
-import { HorizontalLineRenderer } from './HorizontalLineRenderer'
 import type { Anchor, DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
-import type { HorizontalLineParams } from '@engine/drawings/HorizontalLine/HorizontalLine'
+import { VerticalLineRenderer } from '@engine/drawings/VerticalLine/VerticalLineRenderer'
+import type { VerticalLineParams } from '@engine/drawings/VerticalLine/VerticalLine'
 
-export class HorizontalLinePaneView implements IPrimitivePaneView {
+export class VerticalLinePaneView implements IPrimitivePaneView {
   #viewport: DrawingViewport
   #anchor: Anchor
   #withDots: boolean
-  #params: HorizontalLineParams
+  #params: VerticalLineParams
 
-  constructor(viewport: DrawingViewport, anchor: Anchor, withDots: boolean, params: HorizontalLineParams) {
+  constructor(viewport: DrawingViewport, anchor: Anchor, withDots: boolean, params: VerticalLineParams) {
     this.#anchor = anchor
     this.#viewport = viewport
     this.#withDots = withDots
@@ -22,6 +22,6 @@ export class HorizontalLinePaneView implements IPrimitivePaneView {
 
   renderer() {
     const p = this.#viewport.anchorToPoint(this.#anchor)
-    return p ? new HorizontalLineRenderer(p, this.#withDots, this.#params) : null
+    return p ? new VerticalLineRenderer(p, this.#withDots, this.#params) : null
   }
 }

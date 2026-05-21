@@ -18,22 +18,22 @@ const BB_SCHEMA = {
     { type: 'number', key: 'mul', default: 2, min: 0.1, step: 0.1 }
   ],
   style: [
-    { type: 'color', key: 'upperColor', default: '#2962FF' },
-    { type: 'color', key: 'middleColor', default: '#FFAB40' },
-    { type: 'color', key: 'lowerColor', default: '#2962FF' },
-    { type: 'color', key: 'fillColor', default: 'rgba(41,98,255,0.1)' }
+    { type: 'color', key: 'upper', default: '#2962FF' },
+    { type: 'color', key: 'middle', default: '#FFAB40' },
+    { type: 'color', key: 'lower', default: '#2962FF' },
+    { type: 'color', key: 'fill', default: 'rgba(41,98,255,0.1)' }
   ]
 } as const satisfies StudySchema
 
-type BBParams = InferStudyValues<typeof BB_SCHEMA.inputs> & InferStudyValues<typeof BB_SCHEMA.style>
+export type BBParams = InferStudyValues<typeof BB_SCHEMA.inputs> & InferStudyValues<typeof BB_SCHEMA.style>
 
 export class BollingerBands extends AbstractIndicator implements Indicator {
   static readonly ikey: IndicatorName = 'bb'
 
   #chart: IChartApi
   #queue: BarQueue
-  #fill = new BollingerBandsFill()
   #params: BBParams = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style)
+  #fill = new BollingerBandsFill(this.#params)
 
   #series: {
     upper: ISeriesApi<SeriesType>
@@ -50,17 +50,17 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
     this.#series = {
       upper: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.upperColor },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.upper },
         this.paneIndex
       ),
       middle: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.middleColor },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.middle },
         this.paneIndex
       ),
       lower: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.lowerColor },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.lower },
         this.paneIndex
       )
     }
@@ -79,9 +79,10 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style, params)
 
-    this.#series.upper.applyOptions({ color: this.#params.upperColor })
-    this.#series.middle.applyOptions({ color: this.#params.middleColor })
-    this.#series.lower.applyOptions({ color: this.#params.lowerColor })
+    this.#series.upper.applyOptions({ color: this.#params.upper })
+    this.#series.middle.applyOptions({ color: this.#params.middle })
+    this.#series.lower.applyOptions({ color: this.#params.lower })
+    this.#fill.setParams(this.#params)
 
     this.reload()
   }
@@ -98,15 +99,15 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
         data: [
           {
             value: formatPrice((mData as LineData<Time>).value),
-            color: this.#params.middleColor
+            color: this.#params.middle
           },
           {
             value: formatPrice((lData as LineData<Time>).value),
-            color: this.#params.upperColor
+            color: this.#params.upper
           },
           {
             value: formatPrice((uData as LineData<Time>).value),
-            color: this.#params.lowerColor
+            color: this.#params.lower
           }
         ]
       }

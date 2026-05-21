@@ -22,7 +22,7 @@ interface DrawingConstructor {
 }
 
 export type DrawingGroup = 'lines'
-export type DrawingName = 'trend-line' | 'horizontal-line'
+export type DrawingName = 'trend-line' | 'horizontal-line' | 'vertical-line'
 export type DrawingScript = { group: DrawingGroup; drawing: DrawingConstructor }
 
 export type DrawingOptions = {

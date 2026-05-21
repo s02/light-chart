@@ -73,10 +73,15 @@ export class PointsCollector {
     this.#handler({ status, points: this.#points })
 
     if (status === 'done') {
-      this.#el.removeEventListener('mousemove', this.#mousemoveHandler)
-      this.#el.removeEventListener('click', this.#clickHandler)
+      this.destroy()
     } else {
       this.#points.push(this.#currentPoint)
     }
+  }
+
+  destroy() {
+    this.#el.removeEventListener('mousemove', this.#mousemoveHandler)
+    this.#el.removeEventListener('click', this.#clickHandler)
+    this.#handler = null
   }
 }

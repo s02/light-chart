@@ -5,14 +5,14 @@ import type { TrendLineParams } from '@engine/drawings/TrendLine/TrendLine'
 
 export class TrendLinePaneView implements IPrimitivePaneView {
   #anchors: Anchor[]
-  #withAnchors: boolean
+  #withDots: boolean
   #viewport: DrawingViewport
   #params: TrendLineParams
 
   constructor(viewport: DrawingViewport, anchors: Anchor[], withDots: boolean, params: TrendLineParams) {
     this.#anchors = anchors
     this.#viewport = viewport
-    this.#withAnchors = withDots
+    this.#withDots = withDots
     this.#params = params
   }
 
@@ -32,7 +32,7 @@ export class TrendLinePaneView implements IPrimitivePaneView {
         return null
       }
 
-      return new TrendLineRenderer(p1, p2, this.#withAnchors, this.#params)
+      return new TrendLineRenderer(p1, p2, this.#withDots, this.#params)
     }
 
     return null

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 const COLORS = [
   'rgb(255, 255, 255)',
   'rgb(219,219,219)',
@@ -24,16 +26,28 @@ const COLORS = [
 const emit = defineEmits<{
   (e: 'select', color: string): void
 }>()
+
+const opacity = ref<number>(100)
+
+const select = (color: string) => {
+  emit('select', color.replace(')', `,${opacity.value / 100})`))
+}
 </script>
 
 <template>
   <div class="color-picker">
-    <button
-      v-for="color of COLORS"
-      :key="color"
-      class="color"
-      :style="{ backgroundColor: color }"
-      @click="emit('select', color)"></button>
+    <div class="color-picker-colors">
+      <button
+        v-for="color of COLORS"
+        :key="color"
+        class="color"
+        :style="{ backgroundColor: color }"
+        @click="select(color)"></button>
+    </div>
+    <div class="color-picker-opacity">
+      <label>Opacity {{ opacity }}%</label>
+      <input v-model="opacity" type="range" min="0" max="100" />
+    </div>
   </div>
 </template>
 

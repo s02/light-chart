@@ -95,7 +95,7 @@ onMounted(() => {
         pe.updateIndicator(id, params)
       }
     },
-    startDrawing: (id: DrawingName) => {
+    startDrawing: async (id: DrawingName) => {
       checkEngine(pe)
       return pe.addDrawing(id)
     },

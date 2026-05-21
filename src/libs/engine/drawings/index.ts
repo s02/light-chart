@@ -1,5 +1,6 @@
 import { HorizontalLine } from '@engine/drawings/HorizontalLine/HorizontalLine'
 import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
+import { VerticalLine } from '@engine/drawings/VerticalLine/VerticalLine'
 import type { DrawingScript } from '@engine/drawings/types'
 
 export const DRAWINGS: DrawingScript[] = [
@@ -10,6 +11,10 @@ export const DRAWINGS: DrawingScript[] = [
   {
     group: 'lines',
     drawing: HorizontalLine
+  },
+  {
+    group: 'lines',
+    drawing: VerticalLine
   }
 ]
 

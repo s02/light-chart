@@ -19,6 +19,7 @@ export class DrawingsManager {
   #dragHandler: DrawingDragHandler
   #selectHandler: DrawingSelectHandler
   #subscribers: DrawingSelectFn[] = []
+  #pendingAdd?: { pc: PointsCollector; drawing: BaseDrawing; reject: (reason?: unknown) => void }
 
   constructor(chart: IChartApi, series: ISeriesApi<SeriesType>) {
     this.#chart = chart
@@ -28,6 +29,13 @@ export class DrawingsManager {
   }
 
   add(name: DrawingName): Promise<number> {
+    if (this.#pendingAdd) {
+      this.#pendingAdd.pc.destroy()
+      this.#pendingAdd.drawing.detach()
+      this.#pendingAdd.reject(new Error('cancelled'))
+      this.#pendingAdd = undefined
+    }
+
     const script = DRAWINGS.find((d) => d.drawing.ikey === name)
     if (!script) {
       throw new Error(`unknown drawing key: ${name}`)
@@ -36,19 +44,18 @@ export class DrawingsManager {
     const drawing = new script.drawing(this.#chart)
     drawing.attach(this.#series)
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const pc = new PointsCollector(this.#chart, this.#series, script.drawing.points)
+      this.#pendingAdd = { pc, drawing, reject }
       pc.subscribe((params) => {
         drawing.setAnchorsVisible(true)
         drawing.setAnchors(params.points)
         if (params.status === 'done') {
           const id = this.#id++
-          const el = {
-            id,
-            drawing
-          }
+          const el = { id, drawing }
           this.#drawings.push(el)
           this.#selectHandler.select(el)
+          this.#pendingAdd = undefined
           resolve(id)
         }
       })
