@@ -3,7 +3,7 @@ import type { SeriesLegend, SeriesOverlayData } from '@engine/series'
 import type { Datafeed } from '@engine/types'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 
-export type IndicatorName = 'bb' | 'sma'
+export type IndicatorName = 'bb' | 'sma' | 'macd'
 
 interface IndicatorConstructor {
   new (chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions): Indicator

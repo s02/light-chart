@@ -1,5 +1,6 @@
 import { BollingerBands } from './BollingerBands/BollingerBands'
 import { SimpleMovingAverage } from './SimpleMovingAverage/SimpleMovingAverage'
+import { MACD } from './MACD/MACD'
 import type { IndicatorScript } from './types'
 
 export const INDICATOR_SCRIPTS: IndicatorScript[] = [
@@ -7,8 +8,11 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
     indicator: BollingerBands
   },
   {
-    indicator: SimpleMovingAverage,
-    separatePane: false
+    indicator: SimpleMovingAverage
+  },
+  {
+    indicator: MACD,
+    separatePane: true
   }
   /* {
     key: 'supertrend'
@@ -18,9 +22,6 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
   },
   {
     key: 'rsi'
-  },
-  {
-    key: 'macd'
   },
   {
     key: 'stochastic'

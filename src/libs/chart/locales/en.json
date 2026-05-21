@@ -41,5 +41,12 @@
   "ind-prop-middle": "Median",
   "ind-prop-lower": "Lower",
   "ind-prop-fill": "Background",
-  "ind-prop-color": "Color"
+  "ind-prop-color": "Color",
+  "ind-prop-fast": "Fast Length",
+  "ind-prop-slow": "Slow Length",
+  "ind-prop-signal": "Signal Length",
+  "ind-prop-macdLine": "MACD",
+  "ind-prop-signalLine": "Signal",
+  "ind-prop-histUp": "Histogram Up",
+  "ind-prop-histDown": "Histogram Down"
 }
