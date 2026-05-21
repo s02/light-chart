@@ -1,3 +1,4 @@
+import { geometry } from '@engine/drawings/geometry'
 import type { BitmapCoordinatesRenderingScope } from 'fancy-canvas'
 import type { Point } from 'lightweight-charts'
 
@@ -6,6 +7,16 @@ type Params = {
   color?: string
   fill?: string
   width?: number
+}
+
+export const circlep = (
+  scope: BitmapCoordinatesRenderingScope,
+  p1: Point,
+  p2: Point,
+  params: Omit<Params, 'radius'>
+) => {
+  const radius = geometry.distance(p1, p2)
+  return circle(scope, p1, { ...params, radius })
 }
 
 export const circle = (scope: BitmapCoordinatesRenderingScope, p: Point, params: Params) => {

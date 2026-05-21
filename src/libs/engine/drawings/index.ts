@@ -1,3 +1,4 @@
+import { Circle } from '@engine/drawings/Circle/Circle'
 import { HorizontalLine } from '@engine/drawings/HorizontalLine/HorizontalLine'
 import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
 import { VerticalLine } from '@engine/drawings/VerticalLine/VerticalLine'
@@ -15,6 +16,10 @@ export const DRAWINGS: DrawingScript[] = [
   {
     group: 'lines',
     drawing: VerticalLine
+  },
+  {
+    group: 'lines',
+    drawing: Circle
   }
 ]
 
