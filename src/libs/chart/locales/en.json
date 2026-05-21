@@ -29,6 +29,7 @@
   "indicator-stochastic-rsi":"Stochastic RSI",
   "indicator-sma": "SMA",
   "draw-line-trend-line": "Trend Line",
+  "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
   "draw-line-horizontal-line": "Horizontal Line",
   "draw-line-circle": "Circle",
