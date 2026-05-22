@@ -48,5 +48,8 @@
   "ind-prop-macdLine": "MACD",
   "ind-prop-signalLine": "Signal",
   "ind-prop-histUp": "Histogram Up",
-  "ind-prop-histDown": "Histogram Down"
+  "ind-prop-histDown": "Histogram Down",
+  "ind-prop-factor": "Factor",
+  "ind-prop-bullish": "Bullish",
+  "ind-prop-bearish": "Bearish"
 }
