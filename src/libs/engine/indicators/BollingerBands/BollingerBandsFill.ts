@@ -5,9 +5,11 @@ import type {
   IChartApi,
   ISeriesApi,
   ISeriesPrimitive,
+  LineData,
   SeriesAttachedParameter,
   SeriesType,
-  Time
+  Time,
+  WhitespaceData
 } from 'lightweight-charts'
 
 export class BollingerBandsFill implements ISeriesPrimitive<Time> {
@@ -36,15 +38,19 @@ export class BollingerBandsFill implements ISeriesPrimitive<Time> {
     this.series = null
   }
 
-  set(points: FillPoint[]) {
-    this.points = points
-  }
+  set(upper: LineData<Time>[] | WhitespaceData<Time>[], lower: LineData<Time>[] | WhitespaceData<Time>[]) {
+    this.points = []
+    for (let i = 0; i < upper.length; i++) {
+      const u = upper[i]
+      const l = lower[i]
 
-  update(point: FillPoint) {
-    if (this.points.length && this.points[this.points.length - 1].time === point.time) {
-      this.points[this.points.length - 1] = point
-    } else {
-      this.points.push(point)
+      if ('value' in u && 'value' in l) {
+        this.points.push({
+          time: u.time,
+          upper: u.value,
+          lower: l.value
+        })
+      }
     }
   }
 

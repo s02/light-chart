@@ -1,21 +1,19 @@
 import { formatPrice } from '@engine/helpers'
-import { BarQueue } from '@engine/indicators/BarQueue'
-import { math } from '@engine/indicators/math'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { LineSeries } from 'lightweight-charts'
 import { BollingerBandsFill } from '@engine/indicators/BollingerBands/BollingerBandsFill'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
-import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
-import type { FillPoint } from '@engine/indicators/BollingerBands/BollingerBandsFillRenderer'
+import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
-import type { ChartBar, Datafeed, DatafeedResult } from '@engine/types'
+import type { ChartBar, Datafeed } from '@engine/types'
+import { getSourceSeries, ta } from 'oakscriptjs'
 
 const BB_SCHEMA = {
   inputs: [
     { type: 'number', key: 'length', default: 20, min: 1 },
-    { type: 'number', key: 'mul', default: 2, min: 0.1, step: 0.1 }
+    { type: 'number', key: 'mul', default: 2, min: 1, step: 1 }
   ],
   style: [
     { type: 'color', key: 'upper', default: '#2962FF' },
@@ -31,7 +29,6 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
   static readonly ikey: IndicatorName = 'bb'
 
   #chart: IChartApi
-  #queue: BarQueue
   #params: BBParams = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style)
   #fill = new BollingerBandsFill(this.#params)
 
@@ -45,22 +42,21 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
     super(datafeed, options.paneIndex)
     this.#chart = chart
     this.#params = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style, options.params)
-    this.#queue = new BarQueue(this.#params.length)
 
     this.#series = {
       upper: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.upper },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.upper, priceLineVisible: false },
         this.paneIndex
       ),
       middle: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.middle },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.middle, priceLineVisible: false },
         this.paneIndex
       ),
       lower: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.lower },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.lower, priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -83,8 +79,6 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
     this.#series.middle.applyOptions({ color: this.#params.middle })
     this.#series.lower.applyOptions({ color: this.#params.lower })
     this.#fill.setParams(this.#params)
-
-    this.reload()
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -102,12 +96,12 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
             color: this.#params.middle
           },
           {
-            value: formatPrice((lData as LineData<Time>).value),
-            color: this.#params.upper
-          },
-          {
             value: formatPrice((uData as LineData<Time>).value),
             color: this.#params.lower
+          },
+          {
+            value: formatPrice((lData as LineData<Time>).value),
+            color: this.#params.upper
           }
         ]
       }
@@ -116,53 +110,13 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
     return undefined
   }
 
-  protected onData(ev: DatafeedResult) {
-    if (ev.type === 'set') {
-      this.#queue = new BarQueue(this.#params.length)
+  protected onData(data: ChartBar[]) {
+    const pp = this.#calculate(data)
 
-      const upper: (LineData | WhitespaceData)[] = []
-      const middle: (LineData | WhitespaceData)[] = []
-      const lower: (LineData | WhitespaceData)[] = []
-      const fill: FillPoint[] = []
-
-      for (const bar of ev.data) {
-        this.#queue.push(bar)
-
-        if (this.#queue.isFull()) {
-          const bb = this.#createBar(bar)
-
-          upper.push({ time: bb.time, value: bb.upper })
-          middle.push({ time: bb.time, value: bb.middle })
-          lower.push({ time: bb.time, value: bb.lower })
-
-          fill.push(bb)
-        } else {
-          upper.push({ time: bar.time })
-          middle.push({ time: bar.time })
-          lower.push({ time: bar.time })
-        }
-      }
-
-      this.#series.upper.setData(upper)
-      this.#series.middle.setData(middle)
-      this.#series.lower.setData(lower)
-
-      this.#fill.set(fill)
-    } else {
-      for (const bar of ev.data) {
-        this.#queue.push(bar)
-
-        if (this.#queue.isFull()) {
-          const bb = this.#createBar(bar)
-
-          this.#series.upper.update({ time: bb.time, value: bb.upper })
-          this.#series.middle.update({ time: bb.time, value: bb.middle })
-          this.#series.lower.update({ time: bb.time, value: bb.lower })
-
-          this.#fill.update(bb)
-        }
-      }
-    }
+    this.#series.upper.setData(pp.upper)
+    this.#series.middle.setData(pp.middle)
+    this.#series.lower.setData(pp.lower)
+    this.#fill.set(pp.upper, pp.lower)
   }
 
   protected removeSeries() {
@@ -171,15 +125,29 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
     this.#chart.removeSeries(this.#series.lower)
   }
 
-  #createBar(bar: ChartBar) {
-    const mean = math.sma(this.#queue.map((bar) => bar.close))
-    const dev = math.stdev(this.#queue.map((bar) => bar.close)) * this.#params.mul
+  #calculate(bars: ChartBar[]) {
+    const source = getSourceSeries(bars, 'close')
+    const basis = ta.sma(source, this.#params.length)
+    const dev = ta.stdev(source, this.#params.length).mul(this.#params.mul)
+    const upper = basis.add(dev)
+    const lower = basis.sub(dev)
+
+    const toBar = (value: number, i: number) => {
+      const time = bars[i].time
+      return value
+        ? {
+            time,
+            value
+          }
+        : {
+            time
+          }
+    }
 
     return {
-      time: bar.time,
-      upper: mean + dev,
-      middle: mean,
-      lower: mean - dev
+      upper: upper.toArray().map(toBar),
+      middle: basis.toArray().map(toBar),
+      lower: lower.toArray().map(toBar)
     }
   }
 }

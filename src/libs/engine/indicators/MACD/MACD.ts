@@ -4,48 +4,10 @@ import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import { formatPrice } from '@engine/helpers'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
-import type {
-  IChartApi,
-  ISeriesApi,
-  LineData,
-  HistogramData,
-  SeriesType,
-  Time,
-  WhitespaceData
-} from 'lightweight-charts'
+import type { IChartApi, ISeriesApi, LineData, HistogramData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
-import type { ChartBar, Datafeed, DatafeedResult } from '@engine/types'
-
-class EmaState {
-  #length: number
-  #k: number
-  #buffer: number[] = []
-  #value: number | null = null
-
-  constructor(length: number) {
-    this.#length = length
-    this.#k = 2 / (length + 1)
-  }
-
-  update(price: number): number | null {
-    if (this.#value === null) {
-      this.#buffer.push(price)
-      if (this.#buffer.length === this.#length) {
-        this.#value = this.#buffer.reduce((a, b) => a + b, 0) / this.#buffer.length
-      }
-      return this.#value
-    }
-    this.#value = price * this.#k + this.#value * (1 - this.#k)
-    return this.#value
-  }
-
-  reset(length: number) {
-    this.#length = length
-    this.#k = 2 / (length + 1)
-    this.#buffer = []
-    this.#value = null
-  }
-}
+import type { ChartBar, Datafeed } from '@engine/types'
+import { getSourceSeries, ta } from 'oakscriptjs'
 
 const MACD_SCHEMA = {
   inputs: [
@@ -68,9 +30,6 @@ export class MACD extends AbstractIndicator implements Indicator {
 
   #chart: IChartApi
   #params: MACDParams
-  #fastEma: EmaState
-  #slowEma: EmaState
-  #signalEma: EmaState
 
   #series: {
     macd: ISeriesApi<SeriesType>
@@ -83,24 +42,20 @@ export class MACD extends AbstractIndicator implements Indicator {
     this.#chart = chart
     this.#params = resolveStudyParams(MACD_SCHEMA.inputs, MACD_SCHEMA.style, options?.params)
 
-    this.#fastEma = new EmaState(this.#params.fast)
-    this.#slowEma = new EmaState(this.#params.slow)
-    this.#signalEma = new EmaState(this.#params.signal)
-
     this.#series = {
+      hist: this.#chart.addSeries(
+        HistogramSeries,
+        { ...COMMON_SERIES_SETTINGS, color: this.#params.histUp, priceLineVisible: false },
+        this.paneIndex
+      ),
       macd: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.macdLine },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.macdLine, priceLineVisible: false },
         this.paneIndex
       ),
       signal: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.signalLine },
-        this.paneIndex
-      ),
-      hist: this.#chart.addSeries(
-        HistogramSeries,
-        { ...COMMON_SERIES_SETTINGS, color: this.#params.histUp },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.signalLine, priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -118,10 +73,6 @@ export class MACD extends AbstractIndicator implements Indicator {
     this.#params = resolveStudyParams(MACD_SCHEMA.inputs, MACD_SCHEMA.style, params)
     this.#series.macd.applyOptions({ color: this.#params.macdLine })
     this.#series.signal.applyOptions({ color: this.#params.signalLine })
-    this.#fastEma.reset(this.#params.fast)
-    this.#slowEma.reset(this.#params.slow)
-    this.#signalEma.reset(this.#params.signal)
-    this.reload()
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -135,68 +86,21 @@ export class MACD extends AbstractIndicator implements Indicator {
         key: MACD.ikey.toUpperCase(),
         paneIndex: this.paneIndex,
         data: [
+          { value: formatPrice(histValue), color: histValue >= 0 ? this.#params.histUp : this.#params.histDown },
           { value: formatPrice((macdData as LineData<Time>).value), color: this.#params.macdLine },
-          { value: formatPrice((signalData as LineData<Time>).value), color: this.#params.signalLine },
-          { value: formatPrice(histValue), color: histValue >= 0 ? this.#params.histUp : this.#params.histDown }
+          { value: formatPrice((signalData as LineData<Time>).value), color: this.#params.signalLine }
         ]
       }
     }
 
-    return undefined
+    return
   }
 
-  protected onData(ev: DatafeedResult) {
-    if (ev.type === 'set') {
-      this.#fastEma.reset(this.#params.fast)
-      this.#slowEma.reset(this.#params.slow)
-      this.#signalEma.reset(this.#params.signal)
-
-      const macdData: (LineData | WhitespaceData)[] = []
-      const signalData: (LineData | WhitespaceData)[] = []
-      const histData: (HistogramData | WhitespaceData)[] = []
-
-      for (const bar of ev.data) {
-        const point = this.#computeBar(bar)
-
-        if (point.macd !== null && point.signal !== null) {
-          macdData.push({ time: bar.time, value: point.macd })
-          signalData.push({ time: bar.time, value: point.signal })
-          histData.push({
-            time: bar.time,
-            value: point.hist,
-            color: point.hist >= 0 ? this.#params.histUp : this.#params.histDown
-          })
-        } else if (point.macd !== null) {
-          macdData.push({ time: bar.time, value: point.macd })
-          signalData.push({ time: bar.time })
-          histData.push({ time: bar.time })
-        } else {
-          macdData.push({ time: bar.time })
-          signalData.push({ time: bar.time })
-          histData.push({ time: bar.time })
-        }
-      }
-
-      this.#series.macd.setData(macdData)
-      this.#series.signal.setData(signalData)
-      this.#series.hist.setData(histData)
-    } else {
-      for (const bar of ev.data) {
-        const point = this.#computeBar(bar)
-
-        if (point.macd !== null) {
-          this.#series.macd.update({ time: bar.time, value: point.macd })
-        }
-        if (point.signal !== null) {
-          this.#series.signal.update({ time: bar.time, value: point.signal })
-          this.#series.hist.update({
-            time: bar.time,
-            value: point.hist,
-            color: point.hist >= 0 ? this.#params.histUp : this.#params.histDown
-          })
-        }
-      }
-    }
+  protected onData(data: ChartBar[]) {
+    const pp = this.#calculate(data)
+    this.#series.macd.setData(pp.macd)
+    this.#series.signal.setData(pp.signal)
+    this.#series.hist.setData(pp.hist)
   }
 
   protected removeSeries() {
@@ -205,21 +109,55 @@ export class MACD extends AbstractIndicator implements Indicator {
     this.#chart.removeSeries(this.#series.hist)
   }
 
-  #computeBar(bar: ChartBar) {
-    const fast = this.#fastEma.update(bar.close)
-    const slow = this.#slowEma.update(bar.close)
+  #calculate(bars: ChartBar[]) {
+    const source = getSourceSeries(bars, 'close')
 
-    if (fast === null || slow === null) {
-      return { macd: null, signal: null, hist: 0 }
+    const fastEMA = ta.ema(source, this.#params.fast)
+    const slowEMA = ta.ema(source, this.#params.slow)
+    const macdLine = fastEMA.sub(slowEMA)
+    const signalLine = ta.ema(macdLine, this.#params.signal)
+    const histogram = macdLine.sub(signalLine)
+
+    const histArr = histogram.toArray()
+    const hist = histArr.map((value, i) => {
+      const time = bars[i].time
+
+      if (!value) {
+        return {
+          time
+        }
+      }
+
+      const prev = i > 0 ? (histArr[i - 1] ?? NaN) : NaN
+      let color: string
+      if (value >= 0) {
+        color = prev < value ? '#26A69A' : '#B2DFDB'
+      } else {
+        color = prev < value ? '#FFCDD2' : '#FF5252'
+      }
+
+      return { time, value, color }
+    })
+
+    const toBar = (value: number, i: number) => {
+      const time = bars[i].time
+      return value
+        ? {
+            time,
+            value
+          }
+        : {
+            time
+          }
     }
 
-    const macd = fast - slow
-    const signal = this.#signalEma.update(macd)
+    const macd = macdLine.toArray().map(toBar)
+    const signal = signalLine.toArray().map(toBar)
 
-    if (signal === null) {
-      return { macd, signal: null, hist: 0 }
+    return {
+      macd,
+      signal,
+      hist
     }
-
-    return { macd, signal, hist: macd - signal }
   }
 }

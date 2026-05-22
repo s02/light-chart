@@ -1,7 +1,14 @@
 import { CandleHttpService } from './CandleHttpService'
 import { CandleStoreService } from './CandleStoreService'
 import type { HttpTransport, Quote, WsTransport } from './transport/types'
-import type { AssetSymbol, ChartBar, Datafeed, DatafeedCallbackFn, ResolutionId } from '@chart/types'
+import type {
+  AssetSymbol,
+  ChartBar,
+  Datafeed,
+  DatafeedCallbackFn,
+  DatafeedDataCallbackFn,
+  ResolutionId
+} from '@chart/types'
 
 export class DatafeedAdapter implements Datafeed {
   #ws: WsTransport
@@ -13,12 +20,12 @@ export class DatafeedAdapter implements Datafeed {
   #loadingBars = false
   #inited: Promise<void>
   #callbacks: Map<string, DatafeedCallbackFn> = new Map()
+  #dataCallbacks: Map<string, DatafeedDataCallbackFn> = new Map()
   #nextCallbackId = 0
   #candlesHttpService: CandleHttpService
   #candleStoreService: CandleStoreService
 
   constructor(assetSymbol: AssetSymbol, resolution: ResolutionId, http: HttpTransport, ws: WsTransport) {
-    console.log('creating datafeed')
     this.#resolution = resolution
     this.#assetSymbol = assetSymbol
     this.#ws = ws
@@ -43,6 +50,16 @@ export class DatafeedAdapter implements Datafeed {
     if (this.#subscriptionId) {
       this.#ws.unsubscribeFromQuotes(this.#assetSymbol.id, this.#subscriptionId)
     }
+  }
+
+  async subscribeForData(callback: DatafeedDataCallbackFn) {
+    await this.#inited
+    ++this.#nextCallbackId
+
+    const id = this.#nextCallbackId.toString()
+    this.#dataCallbacks.set(id, callback)
+    callback(this.#candleStoreService.getData())
+    return id
   }
 
   async subscribe(callback: DatafeedCallbackFn, prefix?: string): Promise<string> {
@@ -107,6 +124,7 @@ export class DatafeedAdapter implements Datafeed {
 
   #fireCallbacks(event: { type: 'set' | 'update'; data: ChartBar[] }) {
     this.#callbacks.forEach((cb) => cb(event))
+    this.#dataCallbacks.forEach((cb) => cb(this.#candleStoreService.getData()))
   }
 
   async #loadBars(countBack: number = 300) {

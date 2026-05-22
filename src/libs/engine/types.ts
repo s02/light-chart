@@ -30,6 +30,7 @@ export type ChartBar = {
 }
 
 export type DatafeedResult = { type: 'set' | 'update'; data: ChartBar[] }
+export type DatafeedDataCallbackFn = (data: ChartBar[]) => void
 
 export type DatafeedCallbackFn = (result: DatafeedResult) => void
 
@@ -40,6 +41,7 @@ export type Datafeed = {
   loadHistory({ minCandles }: { minCandles: number }): Promise<void>
   unsubscribe: (id: string) => void
   subscribe: (callback: DatafeedCallbackFn, prefix?: string) => Promise<string>
+  subscribeForData: (callback: DatafeedDataCallbackFn) => Promise<string>
   destroy: () => void
 }
 

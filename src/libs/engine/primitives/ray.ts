@@ -6,7 +6,7 @@ type Params = {
   color: string
 }
 
-function extendToEdge(p1: Point, p2: Point, canvasW: number, canvasH: number): Point {
+function extendToEdge(p1: Point, p2: Point, canvasW: number, canvasH: number) {
   const dx = p2.x - p1.x
   const dy = p2.y - p1.y
 
@@ -20,7 +20,7 @@ function extendToEdge(p1: Point, p2: Point, canvasW: number, canvasH: number): P
   if (dy > 0) t = Math.min(t, (canvasH - p1.y) / dy)
   else if (dy < 0) t = Math.min(t, -p1.y / dy)
 
-  return { x: p1.x + t * dx, y: p1.y + t * dy }
+  return { x: p1.x + t * dx, y: p1.y + t * dy } as Point
 }
 
 export const ray = (scope: BitmapCoordinatesRenderingScope, p1: Point, p2: Point, params: Params) => {

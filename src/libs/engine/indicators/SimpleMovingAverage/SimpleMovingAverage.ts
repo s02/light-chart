@@ -1,17 +1,16 @@
 import { LineSeries } from 'lightweight-charts'
-import { BarQueue } from '@engine/indicators/BarQueue'
-import { math } from '@engine/indicators/math'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
-import type { IChartApi, ISeriesApi, LineData, SeriesType, Time, WhitespaceData } from 'lightweight-charts'
-import type { ChartBar, Datafeed, DatafeedResult } from '@engine/types'
+import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
+import type { ChartBar, Datafeed } from '@engine/types'
 import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
+import { getSourceSeries, ta } from 'oakscriptjs'
 
 const SMA_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', default: 20, min: 1 }],
+  inputs: [{ type: 'number', key: 'length', default: 9, min: 1 }],
   style: [{ type: 'color', key: 'color', default: '#2962FF' }]
 } as const satisfies StudySchema
 
@@ -22,7 +21,6 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
 
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>
-  #queue: BarQueue
   #params: SMAParams
 
   constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
@@ -30,10 +28,9 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
     this.#chart = chart
     this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, options?.params)
 
-    this.#queue = new BarQueue(this.#params.length)
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -41,7 +38,6 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, params)
     this.#series.applyOptions({ color: this.#params.color })
-    this.reload()
   }
 
   getSchema() {
@@ -75,36 +71,13 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
     return
   }
 
-  protected onData(ev: DatafeedResult) {
+  protected onData(data: ChartBar[]) {
     if (!this.#series) {
       return
     }
 
-    if (ev.type === 'set') {
-      this.#queue = new BarQueue(this.#params.length)
-      const result: (LineData | WhitespaceData)[] = []
-      for (const bar of ev.data) {
-        this.#queue.push(bar)
-
-        if (this.#queue.isFull()) {
-          result.push(this.#createBar(bar))
-        } else {
-          result.push({
-            time: bar.time
-          })
-        }
-      }
-
-      this.#series.setData(result)
-    } else {
-      for (const bar of ev.data) {
-        this.#queue.push(bar)
-
-        if (this.#queue.isFull()) {
-          this.#series.update(this.#createBar(bar))
-        }
-      }
-    }
+    const pp = this.#calculate(data)
+    this.#series.setData(pp)
   }
 
   protected removeSeries() {
@@ -113,11 +86,22 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
     }
   }
 
-  #createBar(bar: ChartBar) {
-    const mean = math.sma(this.#queue.map((bar) => bar.close))
-    return {
-      time: bar.time,
-      value: mean
+  #calculate(bars: ChartBar[]) {
+    const source = getSourceSeries(bars, 'close')
+    const smaResult = ta.sma(source, this.#params.length)
+
+    const toBar = (value: number, i: number) => {
+      const time = bars[i].time
+      return value
+        ? {
+            time,
+            value
+          }
+        : {
+            time
+          }
     }
+
+    return smaResult.toArray().map(toBar)
   }
 }

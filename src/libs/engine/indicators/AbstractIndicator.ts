@@ -1,4 +1,4 @@
-import type { Datafeed, DatafeedResult } from '@engine/types'
+import type { Datafeed, DatafeedDataCallbackFn } from '@engine/types'
 
 export abstract class AbstractIndicator {
   #subscriptionId?: string
@@ -10,22 +10,17 @@ export abstract class AbstractIndicator {
     this.paneIndex = paneIndex
   }
 
-  protected abstract onData(ev: DatafeedResult): void
+  protected abstract onData(ev: Parameters<DatafeedDataCallbackFn>[0]): void
   protected abstract removeSeries(): void
 
   async apply() {
-    this.#subscriptionId = await this.#datafeed.subscribe((ev) => this.onData(ev))
-  }
-
-  protected reload() {
-    if (this.#subscriptionId) {
-      this.#datafeed.unsubscribe(this.#subscriptionId)
-    }
-    this.apply()
+    this.#subscriptionId = await this.#datafeed.subscribeForData((ev) => this.onData(ev))
   }
 
   setDatafeed(datafeed: Datafeed) {
-    if (this.#subscriptionId) this.#datafeed.unsubscribe(this.#subscriptionId)
+    if (this.#subscriptionId) {
+      this.#datafeed.unsubscribe(this.#subscriptionId)
+    }
     this.#datafeed = datafeed
     this.apply()
   }
