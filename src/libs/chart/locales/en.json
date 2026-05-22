@@ -28,6 +28,7 @@
   "indicator-stochastic":"Stochastic",
   "indicator-stochastic-rsi":"Stochastic RSI",
   "indicator-sma": "SMA",
+  "indicator-sar": "Parabolic SAR",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
@@ -51,5 +52,13 @@
   "ind-prop-histDown": "Histogram Down",
   "ind-prop-factor": "Factor",
   "ind-prop-bullish": "Bullish",
-  "ind-prop-bearish": "Bearish"
+  "ind-prop-bearish": "Bearish",
+  "ind-prop-start": "Start",
+  "ind-prop-inc": "Increment",
+  "ind-prop-max": "Max",
+  "ind-prop-lengthK": "%K Length",
+  "ind-prop-smoothK": "%K Smoothing",
+  "ind-prop-smoothD": "%D Smoothing",
+  "ind-prop-kLine": "%K",
+  "ind-prop-dLine": "%D"
 }

@@ -9,49 +9,47 @@ import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@eng
 import type { ChartBar, Datafeed } from '@engine/types'
 import { ta } from 'oakscriptjs'
 
-const ST_SCHEMA = {
+const SAR_SCHEMA = {
   inputs: [
-    { type: 'number', key: 'length', default: 10, min: 1 },
-    { type: 'number', key: 'factor', default: 3, min: 1, step: 1 }
+    { type: 'number', key: 'start', default: 0.02, min: 0.001, step: 0.01 },
+    { type: 'number', key: 'inc', default: 0.02, min: 0.001, step: 0.01 },
+    { type: 'number', key: 'max', default: 0.2, min: 0.01, step: 0.01 }
   ],
-  style: [
-    { type: 'color', key: 'bullish', default: '#00E5CC' },
-    { type: 'color', key: 'bearish', default: '#FF5252' }
-  ]
+  style: [{ type: 'color', key: 'color', default: '#ffffff' }]
 } as const satisfies StudySchema
 
-type STParams = InferStudyValues<typeof ST_SCHEMA.inputs> & InferStudyValues<typeof ST_SCHEMA.style>
+type SARParams = InferStudyValues<typeof SAR_SCHEMA.inputs> & InferStudyValues<typeof SAR_SCHEMA.style>
 
-export class Supertrend extends AbstractIndicator implements Indicator {
-  static readonly ikey: IndicatorName = 'supertrend'
+export class ParabolicSAR extends AbstractIndicator implements Indicator {
+  static readonly ikey: IndicatorName = 'sar'
 
   #chart: IChartApi
-  #params: STParams
+  #params: SARParams
   #series: ISeriesApi<SeriesType>
   #lastBars: ChartBar[] = []
 
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(ST_SCHEMA.inputs, ST_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(SAR_SCHEMA.inputs, SAR_SCHEMA.style, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 2, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, lineStyle: 3, priceLineVisible: false },
       this.paneIndex
     )
   }
 
   getSchema() {
     return {
-      ikey: Supertrend.ikey,
-      schema: ST_SCHEMA,
+      ikey: ParabolicSAR.ikey,
+      schema: SAR_SCHEMA,
       params: this.#params
     }
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ST_SCHEMA.inputs, ST_SCHEMA.style, params)
+    this.#params = resolveStudyParams(SAR_SCHEMA.inputs, SAR_SCHEMA.style, params)
     if (this.#lastBars.length) {
       this.#series.setData(this.#calculate(this.#lastBars))
     }
@@ -62,9 +60,9 @@ export class Supertrend extends AbstractIndicator implements Indicator {
 
     if (data) {
       return {
-        key: Supertrend.ikey.toUpperCase(),
+        key: ParabolicSAR.ikey.toUpperCase(),
         paneIndex: this.paneIndex,
-        data: [{ value: formatPrice(data.value), color: data.color ?? this.#params.bullish }]
+        data: [{ value: formatPrice(data.value), color: this.#params.color }]
       }
     }
 
@@ -81,24 +79,25 @@ export class Supertrend extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const [trendSeries, dirSeries] = ta.supertrend(bars, this.#params.factor, this.#params.length)
+    const sarArr = ta.sar(bars, this.#params.start, this.#params.inc, this.#params.max).toArray()
 
-    const trendArr = trendSeries.toArray()
-    const dirArr = dirSeries.toArray()
-
-    return trendArr.map((value, i) => {
+    return sarArr.map((value, i) => {
       const time = bars[i].time
 
-      if (!value) return { time }
+      if (!value) {
+        return { time }
+      }
 
-      const dir = dirArr[i]
-      const nextDir = dirArr[i + 1]
-      const effectiveDir = nextDir && nextDir !== dir ? nextDir : dir
+      const dir = value < bars[i].close
+      const nextValue = sarArr[i + 1]
+      const nextDir = nextValue && nextValue < bars[i + 1]?.close
+
+      const dirChanged = nextValue && dir !== nextDir
 
       return {
         time,
         value,
-        color: effectiveDir === -1 ? this.#params.bullish : this.#params.bearish
+        color: dirChanged ? 'transparent' : this.#params.color
       }
     })
   }
