@@ -17,8 +17,8 @@ const STOCHRSI_SCHEMA = {
     { type: 'number', key: 'smoothD', default: 3, min: 1 }
   ],
   style: [
-    { type: 'color', key: 'kLine', default: '#2962FF' },
-    { type: 'color', key: 'dLine', default: '#FF6D00' }
+    { type: 'color', key: 'kLine', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'dLine', default: 'rgb(255 109 0)' }
   ]
 } as const satisfies StudySchema
 

@@ -11,7 +11,7 @@ import { getSourceSeries, ta } from 'oakscriptjs'
 
 const SMA_SCHEMA = {
   inputs: [{ type: 'number', key: 'length', default: 9, min: 1 }],
-  style: [{ type: 'color', key: 'color', default: '#2962FF' }]
+  style: [{ type: 'color', key: 'color', default: 'rgb(41 98 255)' }]
 } as const satisfies StudySchema
 
 type SMAParams = InferStudyValues<typeof SMA_SCHEMA.inputs> & InferStudyValues<typeof SMA_SCHEMA.style>

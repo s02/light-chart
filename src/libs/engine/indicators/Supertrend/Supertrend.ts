@@ -15,8 +15,8 @@ const ST_SCHEMA = {
     { type: 'number', key: 'factor', default: 3, min: 1, step: 1 }
   ],
   style: [
-    { type: 'color', key: 'bullish', default: '#00E5CC' },
-    { type: 'color', key: 'bearish', default: '#FF5252' }
+    { type: 'color', key: 'bullish', default: 'rgb(0 229 204)' },
+    { type: 'color', key: 'bearish', default: 'rgb(255 82 82)' }
   ]
 } as const satisfies StudySchema
 

@@ -16,10 +16,10 @@ const MACD_SCHEMA = {
     { type: 'number', key: 'signal', default: 9, min: 1 }
   ],
   style: [
-    { type: 'color', key: 'macdLine', default: '#2962FF' },
-    { type: 'color', key: 'signalLine', default: '#FF6D00' },
-    { type: 'color', key: 'histUp', default: '#26A69A' },
-    { type: 'color', key: 'histDown', default: '#EF5350' }
+    { type: 'color', key: 'macdLine', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'signalLine', default: 'rgb(255 109 0)' },
+    { type: 'color', key: 'histUp', default: 'rgb(38 166 154)' },
+    { type: 'color', key: 'histDown', default: 'rgb(239 83 80)' }
   ]
 } as const satisfies StudySchema
 

@@ -19,12 +19,11 @@ export class CircleRenderer implements IPrimitivePaneRenderer {
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
-      //line(scope, this.#p1, this.#p2, { width: this.#params.width, color: this.#params.color })
       circlep(scope, this.#p1, this.#p2, this.#params)
 
       if (this.#withDots) {
-        dot(scope, this.#p1, { color: this.#params.color })
-        dot(scope, this.#p2, { color: this.#params.color })
+        dot(scope, this.#p1, { color: this.#params['line-color'] })
+        dot(scope, this.#p2, { color: this.#params['line-color'] })
       }
     })
   }

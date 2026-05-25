@@ -1,10 +1,12 @@
 import type { StudyParams, StudySchema } from '@engine/schema'
 import type { BaseDrawing } from './BaseDrawing'
-import type { IChartApi, Point, Time } from 'lightweight-charts'
+import type { Coordinate, IChartApi, Point, Time } from 'lightweight-charts'
 
 export type Anchor = {
   time: Time
   price: number
+  x: Coordinate
+  y: Coordinate
 }
 
 export type DrawingViewport = {
@@ -21,8 +23,15 @@ interface DrawingConstructor {
   readonly hitThreashold: number
 }
 
-export type DrawingGroup = 'lines'
-export type DrawingName = 'trend-line' | 'horizontal-line' | 'vertical-line' | 'circle' | 'ray'
+export type DrawingGroup = 'lines' | 'text'
+export type DrawingName =
+  | 'trend-line'
+  | 'horizontal-line'
+  | 'vertical-line'
+  | 'circle'
+  | 'ray'
+  | 'text'
+  | 'anchored-text'
 export type DrawingScript = { group: DrawingGroup; drawing: DrawingConstructor }
 
 export type DrawingOptions = {

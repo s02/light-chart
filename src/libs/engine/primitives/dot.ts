@@ -7,5 +7,5 @@ type Params = {
 }
 
 export const dot = (scope: BitmapCoordinatesRenderingScope, p: Point, params: Params) => {
-  return circle(scope, p, { radius: 5, color: params.color, width: 2, fill: '#001B36' })
+  return circle(scope, p, { radius: 5, 'line-color': params.color, 'line-width': 2, fill: '#001B36' })
 }

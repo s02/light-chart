@@ -18,12 +18,12 @@ export class VerticalLineRenderer implements IPrimitivePaneRenderer {
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
       line(scope, { x: this.#p.x, y: 0 } as Point, { x: this.#p.x, y: scope.bitmapSize.height } as Point, {
-        width: this.#params.width,
-        color: this.#params.color
+        width: this.#params['line-width'],
+        color: this.#params['line-color']
       })
 
       if (this.#withDots) {
-        dot(scope, this.#p, { color: this.#params.color })
+        dot(scope, this.#p, { color: this.#params['line-color'] })
       }
     })
   }

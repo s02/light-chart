@@ -1,0 +1,32 @@
+.drawing-settings {
+  background-color: #001020;
+  box-shadow: 0 2px 4px 0 #0006;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.drawing-settings-handle {
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drw-text-input {
+  height: 38px;
+  min-width: 80px;
+  max-width: 160px;
+  padding: 0 8px;
+  background: #0a1a2a;
+  border: 1px solid #303030;
+  border-radius: 4px;
+  color: #dbdbdb;
+  font-size: 12px;
+
+  &:focus {
+    outline: none;
+    border-color: #2962ff;
+  }
+}

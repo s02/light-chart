@@ -6,8 +6,11 @@ import { resolveStudyParams, type InferStudyValues, type StudyParams, type Study
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const CIRCLE_SCHEMA = {
-  inputs: [{ type: 'number', key: 'width', default: 1, min: 1 }],
-  style: [{ type: 'color', key: 'color', default: '#2962FF' }]
+  inputs: [{ type: 'number', key: 'line-width', default: 1 }],
+  style: [
+    { type: 'color', key: 'line-color', default: 'rgb(144 41 255)' },
+    { type: 'color', key: 'fill', default: 'none' }
+  ]
 } as const satisfies StudySchema
 
 export type CircleParams = InferStudyValues<typeof CIRCLE_SCHEMA.inputs> & InferStudyValues<typeof CIRCLE_SCHEMA.style>

@@ -4,9 +4,9 @@ import type { Point } from 'lightweight-charts'
 
 type Params = {
   radius: number
-  color?: string
   fill?: string
-  width?: number
+  'line-color'?: string
+  'line-width'?: number
 }
 
 export const circlep = (
@@ -27,14 +27,14 @@ export const circle = (scope: BitmapCoordinatesRenderingScope, p: Point, params:
   ctx.beginPath()
   ctx.arc(p.x * hpr, p.y * vpr, params.radius * hpr, 0, Math.PI * params.radius * hpr)
 
-  ctx.lineWidth = (params.width ?? 1) * hpr
+  ctx.lineWidth = (params['line-width'] ?? 1) * hpr
 
-  if (params.color) {
-    ctx.strokeStyle = params.color
+  if (params['line-color']) {
+    ctx.strokeStyle = params['line-color']
     ctx.stroke()
   }
 
-  if (params.fill) {
+  if (params.fill && params.fill !== 'none') {
     ctx.fillStyle = params.fill
     ctx.fill()
   }

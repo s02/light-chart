@@ -15,7 +15,7 @@ const SAR_SCHEMA = {
     { type: 'number', key: 'inc', default: 0.02, min: 0.001, step: 0.01 },
     { type: 'number', key: 'max', default: 0.2, min: 0.01, step: 0.01 }
   ],
-  style: [{ type: 'color', key: 'color', default: '#ffffff' }]
+  style: [{ type: 'color', key: 'color', default: 'rgb(255 255 255)' }]
 } as const satisfies StudySchema
 
 type SARParams = InferStudyValues<typeof SAR_SCHEMA.inputs> & InferStudyValues<typeof SAR_SCHEMA.style>

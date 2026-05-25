@@ -30,15 +30,18 @@ const setColor = (color: string) => {
   }
 
   params.value[currentKey.value] = color
-  btnColorMenu.value = null
-  currentKey.value = null
-  closeMenuColor()
 }
 
 const openColorMenu = (target: HTMLElement, key: string) => {
   btnColorMenu.value = target
   currentKey.value = key
   openMenuColor()
+}
+
+const closeMenu = () => {
+  btnColorMenu.value = null
+  currentKey.value = null
+  closeMenuColor()
 }
 </script>
 
@@ -81,7 +84,12 @@ const openColorMenu = (target: HTMLElement, key: string) => {
             </div>
           </template>
           <ChartMenu :menu-key="colorMenuKey" placement="bottom-start">
-            <ColorPicker ref="colorPicker" @select="setColor" />
+            <ColorPicker
+              v-if="currentKey"
+              ref="colorPicker"
+              :color="String(params[currentKey])"
+              @select="setColor"
+              @close="closeMenu()" />
           </ChartMenu>
         </template>
       </div>

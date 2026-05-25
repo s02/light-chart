@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 
-defineProps<{ width: number }>()
+defineProps<{ size: number }>()
 
 const emit = defineEmits<{
-  (e: 'select', width: number): void
+  (e: 'select', size: number): void
   (e: 'close'): void
 }>()
 
-const WIDTHS = [1, 2, 3, 4, 5]
+const sizes = [8, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 40]
 
 const select = (v: number) => {
   emit('select', v)
@@ -18,10 +18,7 @@ const select = (v: number) => {
 
 <template>
   <div class="line-picker">
-    <ChartMenuItem v-for="w of WIDTHS" :key="w" :active="w === width" @click="select(w)">
-      <div class="line-picker-w" :style="{ height: `${w}px` }"></div>
-      {{ w }}px</ChartMenuItem
-    >
+    <ChartMenuItem v-for="s of sizes" :key="s" :active="s === size" @click="select(s)"> {{ s }}px</ChartMenuItem>
   </div>
 </template>
 

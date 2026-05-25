@@ -19,11 +19,11 @@ export class TrendLineRenderer implements IPrimitivePaneRenderer {
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
-      line(scope, this.#p1, this.#p2, { width: this.#params.width, color: this.#params.color })
+      line(scope, this.#p1, this.#p2, { width: this.#params['line-width'], color: this.#params['line-color'] })
 
       if (this.#withDots) {
-        dot(scope, this.#p1, { color: this.#params.color })
-        dot(scope, this.#p2, { color: this.#params.color })
+        dot(scope, this.#p1, { color: this.#params['line-color'] })
+        dot(scope, this.#p2, { color: this.#params['line-color'] })
       }
     })
   }

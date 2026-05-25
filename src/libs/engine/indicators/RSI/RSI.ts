@@ -11,7 +11,7 @@ import type { ChartBar, Datafeed } from '@engine/types'
 
 const RSI_SCHEMA = {
   inputs: [{ type: 'number', key: 'length', default: 14, min: 1 }],
-  style: [{ type: 'color', key: 'color', default: '#7e57c2' }]
+  style: [{ type: 'color', key: 'color', default: 'rgb(126 87 194)' }]
 } as const satisfies StudySchema
 
 type RSIParams = InferStudyValues<typeof RSI_SCHEMA.inputs> & InferStudyValues<typeof RSI_SCHEMA.style>

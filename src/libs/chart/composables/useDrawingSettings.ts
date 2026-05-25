@@ -14,6 +14,7 @@ export const useDrawingSettings = () => {
     }
 
     updateDrawing(selectedDrawingElement.value.id, params)
+    selectedDrawingElement.value.ds.params = params
   }
 
   const remove = () => {

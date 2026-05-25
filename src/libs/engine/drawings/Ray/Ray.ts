@@ -6,8 +6,8 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
 
 const RAY_SCHEMA = {
-  inputs: [{ type: 'number', key: 'width', default: 1, min: 1 }],
-  style: [{ type: 'color', key: 'color', default: '#2962FF' }]
+  inputs: [{ type: 'number', key: 'line-width', default: 1 }],
+  style: [{ type: 'color', key: 'line-color', default: 'rgb(41 255 98)' }]
 } as const satisfies StudySchema
 
 export type RayParams = InferStudyValues<typeof RAY_SCHEMA.inputs> & InferStudyValues<typeof RAY_SCHEMA.style>

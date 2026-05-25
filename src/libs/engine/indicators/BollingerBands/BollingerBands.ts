@@ -16,10 +16,10 @@ const BB_SCHEMA = {
     { type: 'number', key: 'mul', default: 2, min: 1, step: 1 }
   ],
   style: [
-    { type: 'color', key: 'upper', default: '#2962FF' },
-    { type: 'color', key: 'middle', default: '#FFAB40' },
-    { type: 'color', key: 'lower', default: '#2962FF' },
-    { type: 'color', key: 'fill', default: 'rgba(41,98,255,0.1)' }
+    { type: 'color', key: 'upper', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'middle', default: 'rgb(255 171 64)' },
+    { type: 'color', key: 'lower', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 10%)' }
   ]
 } as const satisfies StudySchema
 

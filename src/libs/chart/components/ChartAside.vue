@@ -1,28 +1,32 @@
 <script setup lang="ts">
 import ChartAsideButton from '@chart/components/ChartAsideButton.vue'
-import LineDrawingMenu from '@chart/components/LineDrawingMenu.vue'
+import DrawingMenu from '@chart/components/DrawingMenu.vue'
 import ChartMenu from '@chart/components/ChartMenu.vue'
 import { provideChartMenu } from '@chart/useChartMenu'
 import { ref, useTemplateRef } from 'vue'
-import LineIcon from '@chart/components/LineIcon.vue'
+import DrawingIcon from '@chart/components/DrawingIcon.vue'
 import { useEngine } from '@chart/composables/useEngine'
-import type { DrawingName } from '@engine/drawings'
+import type { DrawingGroup, DrawingName } from '@engine/drawings'
 
-const {
-  close: closeLineMenu,
-  open: openLineMenu,
-  key: lineMenuKey
-} = provideChartMenu('line-menu', useTemplateRef('btnLineMenu'))
+const { close: closeMenu, open: openMenu, key: menuKey } = provideChartMenu('line-menu', useTemplateRef('btnLineMenu'))
 
 const { startDrawing } = useEngine()
 
+const drawingGroup = ref<DrawingGroup | null>(null)
 const line = ref<DrawingName>('trend-line')
+const text = ref<DrawingName>('text')
+
 const initialized = ref<DrawingName | null>()
 
 const selectDrawing = (name: DrawingName) => {
-  line.value = name
+  if (drawingGroup.value === 'lines') {
+    line.value = name
+  } else if (drawingGroup.value === 'text') {
+    text.value = name
+  }
+
   initialized.value = name
-  closeLineMenu()
+  closeMenu()
   init()
 }
 
@@ -49,16 +53,25 @@ const handleStart = (name: DrawingName) => {
   initialized.value = name
   init()
 }
+
+const open = (group: DrawingGroup) => {
+  drawingGroup.value = group
+  openMenu()
+}
 </script>
 
 <template>
   <div class="chart-aside">
-    <ChartAsideButton ref="btnLineMenu" @open="openLineMenu" @start="handleStart(line)">
-      <LineIcon :name="line" :class="{ initialized: initialized === line }" />
+    <ChartAsideButton ref="btnLineMenu" @open="open('lines')" @start="handleStart(line)">
+      <DrawingIcon :name="line" :class="{ initialized: initialized === line }" />
     </ChartAsideButton>
 
-    <ChartMenu :menu-key="lineMenuKey" placement="top-end">
-      <LineDrawingMenu @selected="selectDrawing" />
+    <ChartAsideButton ref="btnTextMenu" @open="open('text')" @start="handleStart(text)">
+      <DrawingIcon :name="text" :class="{ initialized: initialized === text }" />
+    </ChartAsideButton>
+
+    <ChartMenu :menu-key="menuKey" placement="top-end">
+      <DrawingMenu v-if="drawingGroup" :group="drawingGroup" @selected="selectDrawing" />
     </ChartMenu>
   </div>
 </template>

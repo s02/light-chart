@@ -34,6 +34,8 @@
   "draw-line-vertical-line": "Vertical Line",
   "draw-line-horizontal-line": "Horizontal Line",
   "draw-line-circle": "Circle",
+  "draw-line-text": "Text",
+  "draw-line-anchored-text": "Anchored Text",
   "tab-inputs": "Inputs",
   "tab-style": "Style",
   "ind-prop-length": "Length",
@@ -62,5 +64,8 @@
   "ind-prop-kLine": "%K",
   "ind-prop-dLine": "%D",
   "ind-prop-rsiLength": "RSI Length",
-  "ind-prop-stochLength": "Stoch Length"
+  "ind-prop-stochLength": "Stoch Length",
+  "ind-prop-text": "Text",
+  "ind-prop-fontSize": "Font Size",
+  "indicator-text": "Text"
 }

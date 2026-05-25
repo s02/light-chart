@@ -18,12 +18,12 @@ export class HorizontalLineRenderer implements IPrimitivePaneRenderer {
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
       line(scope, { x: 0, y: this.#p.y } as Point, { x: scope.bitmapSize.width, y: this.#p.y } as Point, {
-        width: this.#params.width,
-        color: this.#params.color
+        width: this.#params['line-width'],
+        color: this.#params['line-color']
       })
 
       if (this.#withDots) {
-        dot(scope, this.#p, { color: this.#params.color })
+        dot(scope, this.#p, { color: this.#params['line-color'] })
       }
     })
   }

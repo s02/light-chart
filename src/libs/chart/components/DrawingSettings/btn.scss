@@ -1,0 +1,16 @@
+.drw-btn {
+  height: 38px;
+  width: 38px;
+  transition: background-color 200ms ease;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #dbdbdb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.active,
+  &:hover {
+    background-color: #303030;
+  }
+}

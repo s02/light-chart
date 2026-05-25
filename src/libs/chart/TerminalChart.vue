@@ -9,7 +9,7 @@ import ChartLegend from '@chart/components/ChartLegend.vue'
 import PaneLegend from '@chart/components/PaneLegend.vue'
 import { useModal } from '@chart/composables/useModal'
 import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
-import DrawingSettings from '@chart/components/DrawingSettings.vue'
+import DrawingSettings from '@chart/components/DrawingSettings/DrawingSettings.vue'
 import type {
   ChartSeriesLegend,
   DrawingName,
