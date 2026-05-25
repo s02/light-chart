@@ -137,7 +137,9 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
 
         return {
           time,
-          price
+          price,
+          x: point.x,
+          y: point.y
         }
       },
       anchorToPoint: (anchor: Anchor) => {
