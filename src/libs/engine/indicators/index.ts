@@ -4,6 +4,8 @@ import { MACD } from './MACD/MACD'
 import { Supertrend } from './Supertrend/Supertrend'
 import { ParabolicSAR } from './ParabolicSAR/ParabolicSAR'
 import { Stochastic } from './Stochastic/Stochastic'
+import { RSI } from './RSI/RSI'
+import { StochasticRSI } from './StochasticRSI/StochasticRSI'
 import type { IndicatorScript } from './types'
 
 export const INDICATOR_SCRIPTS: IndicatorScript[] = [
@@ -25,6 +27,14 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
   },
   {
     indicator: Stochastic,
+    separatePane: true
+  },
+  {
+    indicator: RSI,
+    separatePane: true
+  },
+  {
+    indicator: StochasticRSI,
     separatePane: true
   }
   /* {

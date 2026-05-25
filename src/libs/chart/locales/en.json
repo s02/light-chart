@@ -60,5 +60,7 @@
   "ind-prop-smoothK": "%K Smoothing",
   "ind-prop-smoothD": "%D Smoothing",
   "ind-prop-kLine": "%K",
-  "ind-prop-dLine": "%D"
+  "ind-prop-dLine": "%D",
+  "ind-prop-rsiLength": "RSI Length",
+  "ind-prop-stochLength": "Stoch Length"
 }
