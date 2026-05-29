@@ -1,6 +1,7 @@
 import type { StudyParams, StudySchema } from '@engine/schema'
 import type { BaseDrawing } from './BaseDrawing'
 import type { Coordinate, IChartApi, Point, Time } from 'lightweight-charts'
+import type { DrawingName } from '@engine/drawings'
 
 export type Anchor = {
   time: Time
@@ -16,23 +17,16 @@ export type DrawingViewport = {
 
 export type DrawingSelectFn = (el: { id: number; ds: DrawingSchema }) => void
 
-interface DrawingConstructor {
-  new (chart: IChartApi, options?: DrawingOptions): BaseDrawing
-  readonly ikey: DrawingName
-  readonly points: number
-  readonly hitThreashold: number
+export type DrawingScript = {
+  group: string
+  drawing: {
+    new (chart: IChartApi, options?: DrawingOptions): BaseDrawing
+    readonly ikey: string
+    readonly points: number
+    readonly hitThreashold: number
+  }
+  icon: string
 }
-
-export type DrawingGroup = 'lines' | 'text'
-export type DrawingName =
-  | 'trend-line'
-  | 'horizontal-line'
-  | 'vertical-line'
-  | 'circle'
-  | 'ray'
-  | 'text'
-  | 'anchored-text'
-export type DrawingScript = { group: DrawingGroup; drawing: DrawingConstructor }
 
 export type DrawingOptions = {
   params?: StudyParams

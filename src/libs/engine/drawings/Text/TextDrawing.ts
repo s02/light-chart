@@ -2,7 +2,7 @@ import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { TextPaneView } from '@engine/drawings/Text/TextPaneView'
 import { textLabelBounds } from '@engine/primitives/text-label'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
-import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
+import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const TEXT_SCHEMA = {
@@ -17,7 +17,7 @@ const TEXT_SCHEMA = {
 export type TextParams = InferStudyValues<typeof TEXT_SCHEMA.inputs> & InferStudyValues<typeof TEXT_SCHEMA.style>
 
 export class TextDrawing extends BaseDrawing {
-  static readonly ikey: DrawingName = 'text'
+  static readonly ikey = 'text' as const
   static readonly points = 1
 
   #params: TextParams

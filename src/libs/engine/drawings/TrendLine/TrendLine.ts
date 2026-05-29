@@ -3,7 +3,7 @@ import { BaseDrawing } from '../BaseDrawing'
 import { geometry } from '../geometry'
 import { TrendLinePaneView } from './TrendLinePaneView'
 import type { IChartApi, Point } from 'lightweight-charts'
-import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
+import type { DrawingOptions } from '@engine/drawings/types'
 
 const TREND_LINE_SCHEMA = {
   inputs: [{ type: 'number', key: 'line-width', default: 1 }],
@@ -14,7 +14,7 @@ export type TrendLineParams = InferStudyValues<typeof TREND_LINE_SCHEMA.inputs> 
   InferStudyValues<typeof TREND_LINE_SCHEMA.style>
 
 export class TrendLine extends BaseDrawing {
-  static readonly ikey: DrawingName = 'trend-line'
+  static readonly ikey = 'trend-line' as const
   static readonly points = 2
   #params: TrendLineParams
 

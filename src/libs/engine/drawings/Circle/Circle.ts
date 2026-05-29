@@ -1,7 +1,7 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { CirclePaneView } from '@engine/drawings/Circle/CirclePaneView'
 import { geometry } from '@engine/drawings/geometry'
-import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
+import type { DrawingOptions } from '@engine/drawings/types'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 import type { IChartApi, Point } from 'lightweight-charts'
 
@@ -16,7 +16,7 @@ const CIRCLE_SCHEMA = {
 export type CircleParams = InferStudyValues<typeof CIRCLE_SCHEMA.inputs> & InferStudyValues<typeof CIRCLE_SCHEMA.style>
 
 export class Circle extends BaseDrawing {
-  static readonly ikey: DrawingName = 'circle'
+  static readonly ikey = 'circle' as const
   static readonly points = 2
   #params: CircleParams
 

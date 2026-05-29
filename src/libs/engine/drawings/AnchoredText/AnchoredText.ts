@@ -1,7 +1,7 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { textLabelBounds } from '@engine/primitives/text-label'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
-import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
+import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 import { AnchoredTextPaneView } from '@engine/drawings/AnchoredText/AnchoredTextPaneView'
 
@@ -17,7 +17,7 @@ const TEXT_SCHEMA = {
 export type TextParams = InferStudyValues<typeof TEXT_SCHEMA.inputs> & InferStudyValues<typeof TEXT_SCHEMA.style>
 
 export class AnchoredText extends BaseDrawing {
-  static readonly ikey: DrawingName = 'anchored-text'
+  static readonly ikey = 'anchored-text' as const
   static readonly points = 1
 
   #params: TextParams

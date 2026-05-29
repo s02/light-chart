@@ -33,6 +33,7 @@
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
   "draw-line-horizontal-line": "Horizontal Line",
+  "draw-line-horizontal-ray": "Horizontal Ray",
   "draw-line-circle": "Circle",
   "draw-line-text": "Text",
   "draw-line-anchored-text": "Anchored Text",

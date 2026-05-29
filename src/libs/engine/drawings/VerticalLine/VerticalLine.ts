@@ -2,7 +2,7 @@ import { BaseDrawing } from '../BaseDrawing'
 import { resolveStudyParams } from '@engine/schema'
 import { VerticalLinePaneView } from '@engine/drawings/VerticalLine/VertialLinePaneView'
 import type { InferStudyValues, StudyParams, StudySchema } from '@engine/schema'
-import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
+import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const VERTICAL_LINE_SCHEMA = {
@@ -14,7 +14,7 @@ export type VerticalLineParams = InferStudyValues<typeof VERTICAL_LINE_SCHEMA.in
   InferStudyValues<typeof VERTICAL_LINE_SCHEMA.style>
 
 export class VerticalLine extends BaseDrawing {
-  static readonly ikey: DrawingName = 'vertical-line'
+  static readonly ikey = 'vertical-line' as const
   static readonly points = 1
 
   #params: VerticalLineParams

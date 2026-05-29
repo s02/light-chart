@@ -3,7 +3,7 @@ import { BaseDrawing } from '../BaseDrawing'
 import { geometry } from '../geometry'
 import { RayPaneView } from './RayPaneView'
 import type { IChartApi, Point } from 'lightweight-charts'
-import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
+import type { DrawingOptions } from '@engine/drawings/types'
 
 const RAY_SCHEMA = {
   inputs: [{ type: 'number', key: 'line-width', default: 1 }],
@@ -13,7 +13,7 @@ const RAY_SCHEMA = {
 export type RayParams = InferStudyValues<typeof RAY_SCHEMA.inputs> & InferStudyValues<typeof RAY_SCHEMA.style>
 
 export class Ray extends BaseDrawing {
-  static readonly ikey: DrawingName = 'ray'
+  static readonly ikey = 'ray' as const
   static readonly points = 2
   #params: RayParams
 

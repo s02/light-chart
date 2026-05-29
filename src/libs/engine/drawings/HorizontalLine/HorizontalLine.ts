@@ -1,4 +1,4 @@
-import type { DrawingName, DrawingOptions } from '@engine/drawings/types'
+import type { DrawingOptions } from '@engine/drawings/types'
 import { BaseDrawing } from '../BaseDrawing'
 import { HorizontalLinePaneView } from './HorizontalLinePaneView'
 import type { IChartApi, Point } from 'lightweight-charts'
@@ -13,7 +13,7 @@ export type HorizontalLineParams = InferStudyValues<typeof HORIZONTAL_LINE_SCHEM
   InferStudyValues<typeof HORIZONTAL_LINE_SCHEMA.style>
 
 export class HorizontalLine extends BaseDrawing {
-  static readonly ikey: DrawingName = 'horizontal-line'
+  static readonly ikey = 'horizontal-line' as const
   static readonly points = 1
 
   #params: HorizontalLineParams

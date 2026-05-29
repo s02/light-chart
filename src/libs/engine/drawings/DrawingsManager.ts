@@ -1,10 +1,10 @@
-import { DRAWINGS } from '@engine/drawings'
+import { DRAWINGS, type DrawingName } from '@engine/drawings'
 import { PointsCollector } from './PointsCollector'
 import { DrawingDragHandler } from '@engine/drawings/DrawingDragHandler'
 import { DrawingSelectHandler } from '@engine/drawings/DrawingSelectHandler'
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { BaseDrawing } from './BaseDrawing'
-import type { DrawingName, DrawingSelectFn } from './types'
+import type { DrawingSelectFn } from './types'
 import type { StudyParams } from '@engine/schema'
 
 export type DrawingElement = {

@@ -32,6 +32,7 @@ export default [
       }
     },
     rules: {
+      'vue/no-v-html': 'off',
       'promise/catch-or-return': 'off',
       'promise/always-return': 'off',
       '@typescript-eslint/no-unused-vars': [
