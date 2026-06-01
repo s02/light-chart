@@ -29,6 +29,7 @@
   "indicator-stochastic":"Stochastic",
   "indicator-stochastic-rsi":"Stochastic RSI",
   "indicator-pricechannel": "Price Channel",
+  "indicator-donchian": "Donchian Channels",
   "indicator-sma": "SMA",
   "indicator-sar": "Parabolic SAR",
   "indicator-alligator": "Williams Alligator",
