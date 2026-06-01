@@ -11,6 +11,7 @@ import { EMACross } from './EMACross/EMACross'
 import { PriceChannel } from './PriceChannel/PriceChannel'
 import { DonchianChannels } from './DonchianChannels/DonchianChannels'
 import { ExponentialMovingAverage } from './ExponentialMovingAverage/ExponentialMovingAverage'
+import { ZigZag } from './ZigZag/ZigZag'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -79,6 +80,9 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: ExponentialMovingAverage
+  },
+  {
+    indicator: ZigZag
   }
 ] satisfies {
   indicator: {

@@ -34,6 +34,7 @@
   "indicator-sma": "SMA",
   "indicator-sar": "Parabolic SAR",
   "indicator-alligator": "Williams Alligator",
+  "indicator-zigzag": "ZigZag",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
@@ -86,6 +87,8 @@
   "ind-prop-long": "Long",
   "ind-prop-text": "Text",
   "ind-prop-cross": "Crosses",
+  "ind-prop-deviation": "Deviation",
+  "ind-prop-depth": "Depth",
   "ind-prop-fontSize": "Font Size",
   "ind-prop-offset": "Offset",
   "indicator-text": "Text"
