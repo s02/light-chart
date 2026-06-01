@@ -82,6 +82,7 @@
   "ind-prop-short": "Short",
   "ind-prop-long": "Long",
   "ind-prop-text": "Text",
+  "ind-prop-cross": "Crosses",
   "ind-prop-fontSize": "Font Size",
   "indicator-text": "Text"
 }

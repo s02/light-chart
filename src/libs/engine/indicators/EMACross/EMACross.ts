@@ -1,10 +1,18 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, createSeriesMarkers } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
-import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
+import type {
+  IChartApi,
+  ISeriesApi,
+  ISeriesMarkersPluginApi,
+  LineData,
+  SeriesMarker,
+  SeriesType,
+  Time
+} from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
 import { getSourceSeries, ta } from 'oakscriptjs'
@@ -16,7 +24,8 @@ const EMA_CROSS_SCHEMA = {
   ],
   style: [
     { type: 'color', key: 'short', default: 'rgb(255 109 0)' },
-    { type: 'color', key: 'long', default: 'rgb(67 160 71)' }
+    { type: 'color', key: 'long', default: 'rgb(67 160 71)' },
+    { type: 'color', key: 'cross', default: 'rgb(33 150 243)' }
   ]
 } as const satisfies StudySchema
 
@@ -32,6 +41,8 @@ export class EMACross extends AbstractIndicator implements Indicator {
     fast: ISeriesApi<SeriesType>
     slow: ISeriesApi<SeriesType>
   }
+
+  #markers: ISeriesMarkersPluginApi<Time>
 
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
@@ -50,6 +61,8 @@ export class EMACross extends AbstractIndicator implements Indicator {
         this.paneIndex
       )
     }
+
+    this.#markers = createSeriesMarkers(this.#series.fast)
   }
 
   getSchema() {
@@ -88,9 +101,11 @@ export class EMACross extends AbstractIndicator implements Indicator {
     const pp = this.#calculate(data)
     this.#series.fast.setData(pp.fast)
     this.#series.slow.setData(pp.slow)
+    this.#markers.setMarkers(pp.markers)
   }
 
   protected removeSeries() {
+    this.#markers.detach()
     this.#chart.removeSeries(this.#series.fast)
     this.#chart.removeSeries(this.#series.slow)
   }
@@ -105,9 +120,36 @@ export class EMACross extends AbstractIndicator implements Indicator {
       value: value ?? NaN
     })
 
+    const markers: SeriesMarker<Time>[] = []
+
+    for (let i = 1; i < bars.length; i++) {
+      const fast = fastArr[i]
+      const slow = slowArr[i]
+      const prevFast = fastArr[i - 1]
+      const prevSlow = slowArr[i - 1]
+
+      if (fast == null || slow == null || prevFast == null || prevSlow == null) continue
+
+      const crossover = prevFast <= prevSlow && fast > slow
+      const crossunder = prevFast >= prevSlow && fast < slow
+
+      if (crossover || crossunder) {
+        const price = (fast + slow) / 2
+        markers.push({
+          time: bars[i].time,
+          position: 'atPriceMiddle',
+          shape: 'square',
+          color: this.#params.cross,
+          price,
+          size: 0.6
+        })
+      }
+    }
+
     return {
       fast: this.filter(fastArr.map(toBar)),
-      slow: this.filter(slowArr.map(toBar))
+      slow: this.filter(slowArr.map(toBar)),
+      markers
     }
   }
 }
