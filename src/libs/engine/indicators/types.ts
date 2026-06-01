@@ -3,13 +3,6 @@ import type { SeriesLegend, SeriesOverlayData } from '@engine/series'
 import type { Datafeed } from '@engine/types'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 
-export type IndicatorName = 'bb' | 'sma' | 'macd' | 'supertrend' | 'sar' | 'stochastic' | 'rsi' | 'stochastic-rsi'
-
-interface IndicatorConstructor {
-  new (chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions): Indicator
-  readonly ikey: IndicatorName
-}
-
 export type SeriesMap = Map<ISeriesApi<SeriesType, Time>, SeriesOverlayData>
 
 export type IndicatorOptions = {
@@ -18,7 +11,10 @@ export type IndicatorOptions = {
 }
 
 export type IndicatorScript = {
-  indicator: IndicatorConstructor
+  indicator: {
+    new (chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions): Indicator
+    readonly ikey: string
+  }
   separatePane?: boolean
 }
 
@@ -29,7 +25,7 @@ export type Indicator = {
   setDatafeed: (datafeed: Datafeed) => void
   getLegend: (seriesData: SeriesMap) => SeriesLegend | undefined
   getSchema: () => {
-    ikey: IndicatorName
+    ikey: string
     schema: StudySchema
     params: StudyParams
   }

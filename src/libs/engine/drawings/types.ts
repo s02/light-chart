@@ -1,6 +1,5 @@
 import type { StudyParams, StudySchema } from '@engine/schema'
-import type { BaseDrawing } from './BaseDrawing'
-import type { Coordinate, IChartApi, Point, Time } from 'lightweight-charts'
+import type { Coordinate, Point, Time } from 'lightweight-charts'
 import type { DrawingName } from '@engine/drawings'
 
 export type Anchor = {
@@ -16,17 +15,6 @@ export type DrawingViewport = {
 }
 
 export type DrawingSelectFn = (el: { id: number; ds: DrawingSchema }) => void
-
-export type DrawingScript = {
-  group: string
-  drawing: {
-    new (chart: IChartApi, options?: DrawingOptions): BaseDrawing
-    readonly ikey: string
-    readonly points: number
-    readonly hitThreashold: number
-  }
-  icon: string
-}
 
 export type DrawingOptions = {
   params?: StudyParams

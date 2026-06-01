@@ -5,7 +5,7 @@ import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
-import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
+import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
 import { ta } from 'oakscriptjs'
 
@@ -23,7 +23,7 @@ const ST_SCHEMA = {
 type STParams = InferStudyValues<typeof ST_SCHEMA.inputs> & InferStudyValues<typeof ST_SCHEMA.style>
 
 export class Supertrend extends AbstractIndicator implements Indicator {
-  static readonly ikey: IndicatorName = 'supertrend'
+  static readonly ikey = 'supertrend' as const
 
   #chart: IChartApi
   #params: STParams

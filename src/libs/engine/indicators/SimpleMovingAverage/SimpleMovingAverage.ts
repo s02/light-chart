@@ -6,7 +6,7 @@ import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { ChartBar, Datafeed } from '@engine/types'
-import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
+import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const SMA_SCHEMA = {
@@ -17,7 +17,7 @@ const SMA_SCHEMA = {
 type SMAParams = InferStudyValues<typeof SMA_SCHEMA.inputs> & InferStudyValues<typeof SMA_SCHEMA.style>
 
 export class SimpleMovingAverage extends AbstractIndicator implements Indicator {
-  static readonly ikey: IndicatorName = 'sma'
+  static readonly ikey = 'sma' as const
 
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>

@@ -5,7 +5,7 @@ import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import { formatPrice } from '@engine/helpers'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, HistogramData, SeriesType, Time } from 'lightweight-charts'
-import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
+import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
@@ -26,7 +26,7 @@ const MACD_SCHEMA = {
 type MACDParams = InferStudyValues<typeof MACD_SCHEMA.inputs> & InferStudyValues<typeof MACD_SCHEMA.style>
 
 export class MACD extends AbstractIndicator implements Indicator {
-  static readonly ikey: IndicatorName = 'macd'
+  static readonly ikey = 'macd' as const
 
   #chart: IChartApi
   #params: MACDParams

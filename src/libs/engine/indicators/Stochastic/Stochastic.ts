@@ -6,7 +6,7 @@ import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import { getSourceSeries, ta } from 'oakscriptjs'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
-import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
+import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
 
 const STOCH_SCHEMA = {
@@ -24,7 +24,7 @@ const STOCH_SCHEMA = {
 type StochParams = InferStudyValues<typeof STOCH_SCHEMA.inputs> & InferStudyValues<typeof STOCH_SCHEMA.style>
 
 export class Stochastic extends AbstractIndicator implements Indicator {
-  static readonly ikey: IndicatorName = 'stochastic'
+  static readonly ikey = 'stochastic' as const
 
   #chart: IChartApi
   #params: StochParams

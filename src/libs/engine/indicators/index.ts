@@ -6,9 +6,32 @@ import { ParabolicSAR } from './ParabolicSAR/ParabolicSAR'
 import { Stochastic } from './Stochastic/Stochastic'
 import { RSI } from './RSI/RSI'
 import { StochasticRSI } from './StochasticRSI/StochasticRSI'
-import type { IndicatorScript } from './types'
+import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
+import type { Datafeed } from '@engine/types'
+import type { StudyParams, StudySchema } from '@engine/schema'
+import type { SeriesLegend, SeriesOverlayData } from '@engine/series'
 
-export const INDICATOR_SCRIPTS: IndicatorScript[] = [
+type SeriesMap = Map<ISeriesApi<SeriesType, Time>, SeriesOverlayData>
+
+type Indicator = {
+  apply: () => Promise<void>
+  remove: () => Promise<void> | void
+  setParams: (params: StudyParams) => void
+  setDatafeed: (datafeed: Datafeed) => void
+  getLegend: (seriesData: SeriesMap) => SeriesLegend | undefined
+  getSchema: () => {
+    ikey: string
+    schema: StudySchema
+    params: StudyParams
+  }
+}
+
+type IndicatorOptions = {
+  params?: StudyParams
+  paneIndex?: number
+}
+
+export const INDICATOR_SCRIPTS = [
   {
     indicator: BollingerBands
   },
@@ -37,22 +60,14 @@ export const INDICATOR_SCRIPTS: IndicatorScript[] = [
     indicator: StochasticRSI,
     separatePane: true
   }
-  /* {
-    key: 'supertrend'
-  },
-  {
-    key: 'parabolic-sar'
-  },
-  {
-    key: 'rsi'
-  },
-  {
-    key: 'stochastic'
-  },
-  {
-    key: 'stochastic-rsi'
-  } */
-] as const
+] satisfies {
+  indicator: {
+    new (chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions): Indicator
+    readonly ikey: string
+  }
+  separatePane?: boolean
+}[]
 
 export { IndicatorsManager } from './IndicatorsManager'
-export type { IndicatorName, IndicatorScript } from './types'
+export type IndicatorName = (typeof INDICATOR_SCRIPTS)[number]['indicator']['ikey']
+export type IndicatorScript = (typeof INDICATOR_SCRIPTS)[number]

@@ -5,7 +5,7 @@ import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
-import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
+import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
 import { ta } from 'oakscriptjs'
 
@@ -21,7 +21,7 @@ const SAR_SCHEMA = {
 type SARParams = InferStudyValues<typeof SAR_SCHEMA.inputs> & InferStudyValues<typeof SAR_SCHEMA.style>
 
 export class ParabolicSAR extends AbstractIndicator implements Indicator {
-  static readonly ikey: IndicatorName = 'sar'
+  static readonly ikey = 'sar' as const
 
   #chart: IChartApi
   #params: SARParams

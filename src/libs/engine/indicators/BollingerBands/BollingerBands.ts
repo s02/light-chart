@@ -6,7 +6,7 @@ import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
-import type { Indicator, IndicatorName, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
+import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
@@ -26,7 +26,7 @@ const BB_SCHEMA = {
 export type BBParams = InferStudyValues<typeof BB_SCHEMA.inputs> & InferStudyValues<typeof BB_SCHEMA.style>
 
 export class BollingerBands extends AbstractIndicator implements Indicator {
-  static readonly ikey: IndicatorName = 'bb'
+  static readonly ikey = 'bb' as const
 
   #chart: IChartApi
   #params: BBParams = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style)

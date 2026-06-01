@@ -54,6 +54,7 @@ export type ChartSeriesLegend = {
   id: number
 } & SeriesLegend
 
-export type { IndicatorName, IndicatorScript } from '@engine/indicators'
+export type { IndicatorName } from '@engine/indicators'
 export type { DrawingName } from '@engine/drawings'
 export type { SeriesId } from '@engine/series'
+export type { IndicatorScript } from '@engine/indicators'
