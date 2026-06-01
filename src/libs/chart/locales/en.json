@@ -28,6 +28,7 @@
   "indicator-macd":"MACD",
   "indicator-stochastic":"Stochastic",
   "indicator-stochastic-rsi":"Stochastic RSI",
+  "indicator-pricechannel": "Price Channel",
   "indicator-sma": "SMA",
   "indicator-sar": "Parabolic SAR",
   "indicator-alligator": "Williams Alligator",
@@ -84,5 +85,6 @@
   "ind-prop-text": "Text",
   "ind-prop-cross": "Crosses",
   "ind-prop-fontSize": "Font Size",
+  "ind-prop-offset": "Offset",
   "indicator-text": "Text"
 }

@@ -121,18 +121,10 @@ export class WilliamsAlligator extends AbstractIndicator implements Indicator {
       lips: ta.rma(hl2, this.#params.lipsLength).toArray()
     }
 
-    const applyOffset = (values: number[], offset: number): number[] => {
-      const result: number[] = new Array(values.length).fill(NaN)
-      for (let i = 0; i < values.length - offset; i++) {
-        result[i + offset] = values[i]
-      }
-      return result
-    }
-
     const shifted = {
-      jaw: applyOffset(smma.jaw, this.#params.jawOffset),
-      teeth: applyOffset(smma.teeth, this.#params.teethOffset),
-      lips: applyOffset(smma.lips, this.#params.lipsOffset)
+      jaw: this.applyOffset(smma.jaw, this.#params.jawOffset),
+      teeth: this.applyOffset(smma.teeth, this.#params.teethOffset),
+      lips: this.applyOffset(smma.lips, this.#params.lipsOffset)
     }
 
     const toBar = (value: number, i: number) => ({

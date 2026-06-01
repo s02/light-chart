@@ -36,6 +36,14 @@ export abstract class AbstractIndicator {
     this.removeSeries()
   }
 
+  protected applyOffset(values: number[], offset: number): number[] {
+    const result: number[] = new Array(values.length).fill(NaN)
+    for (let i = 0; i < values.length - offset; i++) {
+      result[i + offset] = values[i]
+    }
+    return result
+  }
+
   protected filter(data: LineData<Time>[]): (LineData<Time> | WhitespaceData<Time>)[] {
     if (this.#config.preserveGaps) {
       return data.map((d) => {
