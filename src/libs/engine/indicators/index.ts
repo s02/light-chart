@@ -15,6 +15,7 @@ import { ZigZag } from './ZigZag/ZigZag'
 import { WilliamsFractal } from './WilliamsFractal/WilliamsFractal'
 import { ConnorsRSI } from './ConnorsRSI/ConnorsRSI'
 import { AwesomeOscillator } from './AwesomeOscillator/AwesomeOscillator'
+import { KnowSureThing } from './KnowSureThing/KnowSureThing'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -96,6 +97,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: AwesomeOscillator,
+    separatePane: true
+  },
+  {
+    indicator: KnowSureThing,
     separatePane: true
   }
 ] satisfies {

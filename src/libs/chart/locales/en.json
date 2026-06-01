@@ -37,6 +37,7 @@
   "indicator-zigzag": "ZigZag",
   "indicator-crsi": "Connors RSI",
   "indicator-ao": "Awesome Oscillator",
+  "indicator-kst": "Know Sure Thing",
   "indicator-fractal": "Williams Fractals",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
@@ -100,5 +101,14 @@
   "ind-prop-lenrsi": "RSI Length",
   "ind-prop-lenupdown": "UpDown Length",
   "ind-prop-lenroc": "ROC Length",
+  "ind-prop-roc1": "ROC Length 1",
+  "ind-prop-roc2": "ROC Length 2",
+  "ind-prop-roc3": "ROC Length 3",
+  "ind-prop-roc4": "ROC Length 4",
+  "ind-prop-sma1": "SMA Length 1",
+  "ind-prop-sma2": "SMA Length 2",
+  "ind-prop-sma3": "SMA Length 3",
+  "ind-prop-sma4": "SMA Length 4",
+  "ind-prop-kstLine": "KST",
   "indicator-text": "Text"
 }
