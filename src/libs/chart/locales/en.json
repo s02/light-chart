@@ -26,6 +26,7 @@
   "indicator-emacross": "EMA Cross",
   "indicator-rsi":"RSI",
   "indicator-macd":"MACD",
+  "indicator-ema": "EMA",
   "indicator-stochastic":"Stochastic",
   "indicator-stochastic-rsi":"Stochastic RSI",
   "indicator-pricechannel": "Price Channel",
