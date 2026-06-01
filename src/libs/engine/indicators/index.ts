@@ -16,6 +16,7 @@ import { WilliamsFractal } from './WilliamsFractal/WilliamsFractal'
 import { ConnorsRSI } from './ConnorsRSI/ConnorsRSI'
 import { AwesomeOscillator } from './AwesomeOscillator/AwesomeOscillator'
 import { KnowSureThing } from './KnowSureThing/KnowSureThing'
+import { WilliamsR } from './WilliamsR/WilliamsR'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -101,6 +102,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: KnowSureThing,
+    separatePane: true
+  },
+  {
+    indicator: WilliamsR,
     separatePane: true
   }
 ] satisfies {
