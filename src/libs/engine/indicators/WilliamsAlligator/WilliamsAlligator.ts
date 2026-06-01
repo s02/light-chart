@@ -140,12 +140,6 @@ export class WilliamsAlligator extends AbstractIndicator implements Indicator {
       value: value ?? NaN
     })
 
-    console.log({
-      jaw: this.filter(shifted.jaw.map(toBar)),
-      teeth: this.filter(shifted.teeth.map(toBar)),
-      lips: this.filter(shifted.lips.map(toBar))
-    })
-
     return {
       jaw: this.filter(shifted.jaw.map(toBar)),
       teeth: this.filter(shifted.teeth.map(toBar)),

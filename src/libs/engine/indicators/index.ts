@@ -7,6 +7,7 @@ import { Stochastic } from './Stochastic/Stochastic'
 import { RSI } from './RSI/RSI'
 import { StochasticRSI } from './StochasticRSI/StochasticRSI'
 import { WilliamsAlligator } from './WilliamsAlligator/WilliamsAlligator'
+import { EMACross } from './EMACross/EMACross'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -63,6 +64,9 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: WilliamsAlligator
+  },
+  {
+    indicator: EMACross
   }
 ] satisfies {
   indicator: {

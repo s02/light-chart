@@ -23,6 +23,7 @@
   "indicator-bb": "Bollinger Bands",
   "indicator-supertrend":"Supertrend",
   "indicator-parabolic-sar":"Parabolic SAR",
+  "indicator-emacross": "EMA Cross",
   "indicator-rsi":"RSI",
   "indicator-macd":"MACD",
   "indicator-stochastic":"Stochastic",
@@ -76,6 +77,10 @@
   "ind-prop-dLine": "%D",
   "ind-prop-rsiLength": "RSI Length",
   "ind-prop-stochLength": "Stoch Length",
+  "ind-prop-shortLength": "Short Length",
+  "ind-prop-longLength": "Fast Length",
+  "ind-prop-short": "Short",
+  "ind-prop-long": "Long",
   "ind-prop-text": "Text",
   "ind-prop-fontSize": "Font Size",
   "indicator-text": "Text"
