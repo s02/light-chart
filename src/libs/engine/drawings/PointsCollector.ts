@@ -3,7 +3,7 @@ import type { IChartApi, ISeriesApi, Point, SeriesType } from 'lightweight-chart
 
 type PointsCollectingStatus = 'pending' | 'done'
 
-type PointsHandler = (params: { status: PointsCollectingStatus; points: (Point & Anchor)[] }) => void
+export type PointsHandler = (params: { status: PointsCollectingStatus; points: (Point & Anchor)[] }) => void
 
 export class PointsCollector {
   #chart: IChartApi
@@ -114,7 +114,7 @@ export class PointsCollector {
   destroy() {
     this.#el.removeEventListener('mousemove', this.#mousemoveHandler)
     this.#el.removeEventListener('click', this.#clickHandler)
-    this.#el.removeEventListener('dblclick', this.#clickHandler)
+    this.#el.removeEventListener('dblclick', this.#dblClickHandler)
     this.#handler = null
   }
 }

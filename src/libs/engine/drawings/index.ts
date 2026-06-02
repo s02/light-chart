@@ -11,6 +11,8 @@ import { TextDrawing } from '@engine/drawings/Text/TextDrawing'
 import { AnchoredText } from '@engine/drawings/AnchoredText/AnchoredText'
 import { ParallelChannel } from '@engine/drawings/ParallelChannel/ParallelChannel'
 import { Path } from '@engine/drawings/Path/Path'
+import { GannSquare } from '@engine/drawings/GannSquare/GannSquare'
+import { Brush } from '@engine/drawings/Brush/Brush'
 
 const icons = import.meta.glob('./*/icon.svg', { query: '?raw', import: 'default', eager: true }) as Record<
   string,
@@ -72,6 +74,16 @@ export const DRAWINGS = [
     group: 'lines',
     drawing: Path,
     icon: icons['./Path/icon.svg']
+  },
+  {
+    group: 'lines',
+    drawing: GannSquare,
+    icon: icons['./GannSquare/icon.svg']
+  },
+  {
+    group: 'lines',
+    drawing: Brush,
+    icon: icons['./Brush/icon.svg']
   },
   {
     group: 'text',

@@ -5,6 +5,9 @@ import type { Anchor, DrawingOptions } from '@engine/drawings/types'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 import type { IChartApi, Point } from 'lightweight-charts'
 
+// TODO: Добавить дополнительные anchors, чтобы увеличивать-уменьшать высоту
+// TODO: Добавить настройку для расширения влево или вправо
+
 const PARALLEL_CHANNEL_SCHEMA = {
   inputs: [{ type: 'number', key: 'line-width', default: 1 }],
   style: [

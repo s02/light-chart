@@ -1,5 +1,6 @@
 import { DRAWINGS, type DrawingName } from '@engine/drawings'
 import { PointsCollector } from './PointsCollector'
+import { ContinuousPointsCollector, CONTINUOUS_POINTS_MODE } from './ContinuousPointsCollector'
 import { DrawingDragHandler } from '@engine/drawings/DrawingDragHandler'
 import { DrawingSelectHandler } from '@engine/drawings/DrawingSelectHandler'
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
@@ -45,7 +46,10 @@ export class DrawingsManager {
     drawing.attach(this.#series)
 
     return new Promise((resolve, reject) => {
-      const pc = new PointsCollector(this.#chart, this.#series, script.drawing.points)
+      const pc =
+        script.drawing.points === CONTINUOUS_POINTS_MODE
+          ? new ContinuousPointsCollector(this.#chart, this.#series)
+          : new PointsCollector(this.#chart, this.#series, script.drawing.points)
       this.#pendingAdd = { pc, drawing, reject }
       pc.subscribe((params) => {
         drawing.setAnchorsVisible(true)

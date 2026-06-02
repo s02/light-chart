@@ -50,6 +50,8 @@
   "draw-line-path": "Path",
   "draw-line-horizontal-line": "Horizontal Line",
   "draw-line-horizontal-ray": "Horizontal Ray",
+  "draw-line-gann-square": "Gann Square",
+  "draw-line-brush": "Brush",
   "draw-line-circle": "Circle",
   "draw-line-text": "Text",
   "draw-line-anchored-text": "Anchored Text",
