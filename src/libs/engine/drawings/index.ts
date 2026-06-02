@@ -9,6 +9,7 @@ import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
 import { VerticalLine } from '@engine/drawings/VerticalLine/VerticalLine'
 import { TextDrawing } from '@engine/drawings/Text/TextDrawing'
 import { AnchoredText } from '@engine/drawings/AnchoredText/AnchoredText'
+import { Path } from '@engine/drawings/Path/Path'
 
 const icons = import.meta.glob('./*/icon.svg', { query: '?raw', import: 'default', eager: true }) as Record<
   string,
@@ -60,6 +61,11 @@ export const DRAWINGS = [
     group: 'lines',
     drawing: Circle,
     icon: icons['./Circle/icon.svg']
+  },
+  {
+    group: 'lines',
+    drawing: Path,
+    icon: icons['./Path/icon.svg']
   },
   {
     group: 'text',

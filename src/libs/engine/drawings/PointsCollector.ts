@@ -29,6 +29,7 @@ export class PointsCollector {
     this.#handler = handler
     this.#el.addEventListener('mousemove', this.#mousemoveHandler)
     this.#el.addEventListener('click', this.#clickHandler)
+    this.#el.addEventListener('dblclick', this.#dblClickHandler)
   }
 
   #mousemoveHandler = (e: MouseEvent) => {
@@ -56,7 +57,7 @@ export class PointsCollector {
 
     if (this.#points.length && this.#handler) {
       this.#points[this.#points.length - 1] = this.#currentPoint
-      this.#handler({ status: 'pending', points: this.#points })
+      this.#handler({ status: 'pending', points: this.#filterPoints(this.#points) })
     }
   }
 
@@ -70,7 +71,7 @@ export class PointsCollector {
     }
 
     const status = this.#points.length === this.#limit ? 'done' : 'pending'
-    this.#handler({ status, points: this.#points })
+    this.#handler({ status, points: this.#filterPoints(this.#points) })
 
     if (status === 'done') {
       this.destroy()
@@ -79,9 +80,41 @@ export class PointsCollector {
     }
   }
 
+  #dblClickHandler = () => {
+    if (this.#limit !== -1 || !this.#handler) {
+      return
+    }
+
+    this.#handler({ status: 'done', points: this.#filterPoints(this.#points) })
+    this.destroy()
+  }
+
+  #filterPoints(points: (Anchor & Point)[]) {
+    const result: (Anchor & Point)[] = []
+
+    for (let i = 0; i < points.length; i++) {
+      const currentPoint = points[i]
+
+      if (result.length) {
+        if (!this.#isEqualAnchors(currentPoint, result[result.length - 1])) {
+          result.push(currentPoint)
+        }
+      } else {
+        result.push(currentPoint)
+      }
+    }
+
+    return result
+  }
+
+  #isEqualAnchors(p1: Anchor, p2: Anchor) {
+    return p1.price === p2.price && p1.time === p2.time
+  }
+
   destroy() {
     this.#el.removeEventListener('mousemove', this.#mousemoveHandler)
     this.#el.removeEventListener('click', this.#clickHandler)
+    this.#el.removeEventListener('dblclick', this.#clickHandler)
     this.#handler = null
   }
 }

@@ -80,7 +80,6 @@ export class WilliamsFractal extends AbstractIndicator implements Indicator {
   protected onData(data: ChartBar[]) {
     this.#series.setData(data.map((d) => ({ ...d, value: d.close })))
     this.#markers.setMarkers(this.#calculate(data))
-    console.log(this.#markers.markers())
   }
 
   protected removeSeries() {
