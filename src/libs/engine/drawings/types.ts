@@ -10,7 +10,7 @@ export type Anchor = {
 }
 
 export type DrawingViewport = {
-  anchorToPoint: (a: Anchor) => Point | null
+  anchorToPoint: (a: { time: Time; price: number }) => Point | null
   pointToAnchor: (p: Point) => Anchor | null
 }
 

@@ -9,6 +9,7 @@ import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
 import { VerticalLine } from '@engine/drawings/VerticalLine/VerticalLine'
 import { TextDrawing } from '@engine/drawings/Text/TextDrawing'
 import { AnchoredText } from '@engine/drawings/AnchoredText/AnchoredText'
+import { ParallelChannel } from '@engine/drawings/ParallelChannel/ParallelChannel'
 import { Path } from '@engine/drawings/Path/Path'
 
 const icons = import.meta.glob('./*/icon.svg', { query: '?raw', import: 'default', eager: true }) as Record<
@@ -56,6 +57,11 @@ export const DRAWINGS = [
     group: 'lines',
     drawing: Rectangle,
     icon: icons['./Rectangle/icon.svg']
+  },
+  {
+    group: 'lines',
+    drawing: ParallelChannel,
+    icon: icons['./ParallelChannel/icon.svg']
   },
   {
     group: 'lines',

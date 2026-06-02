@@ -142,7 +142,7 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
           y: point.y
         }
       },
-      anchorToPoint: (anchor: Anchor) => {
+      anchorToPoint: (anchor: { time: Time; price: number }) => {
         assertSeries(this.#series)
 
         const x = this.#chart.timeScale().timeToCoordinate(anchor.time)
