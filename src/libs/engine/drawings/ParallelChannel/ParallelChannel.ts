@@ -9,7 +9,7 @@ const PARALLEL_CHANNEL_SCHEMA = {
   inputs: [{ type: 'number', key: 'line-width', default: 1 }],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 0%)' }
+    { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 5%)' }
   ]
 } as const satisfies StudySchema
 
@@ -71,59 +71,49 @@ export class ParallelChannel extends BaseDrawing {
       return
     }
 
-    if (anchors.length === 4) {
+    if (anchors.length < 4) {
       const delta = {
-        price: this.anchors[2].price - this.anchors[0].price,
-        length: this.anchors[2].y - anchors[0].y
+        price: anchors[2].price - anchors[1].price,
+        length: anchors[2].y - anchors[1].y
       }
 
-      const i = this.#findChangedAnchor(anchors)
+      const bl = this.#createLine([anchors[0], anchors[1]], delta)
 
-      if (i == 0 || i == 1) {
-        const a2 = { time: anchors[0].time, price: anchors[0].price + delta.price }
-        const a3 = { time: anchors[1].time, price: anchors[1].price + delta.price }
-
-        const p2 = viewport.anchorToPoint(a2)
-        const p3 = viewport.anchorToPoint(a3)
-
-        if (p2 && p3) {
-          super.setAnchors([anchors[0], anchors[1], { ...p2, ...a2 }, { ...p3, ...a3 }])
-        }
-
-        return
-      }
-
-      if (i == 2 || i == 3) {
-        const a0 = { time: anchors[2].time, price: anchors[2].price - delta.price }
-        const a1 = { time: anchors[3].time, price: anchors[3].price - delta.price }
-
-        const p0 = viewport.anchorToPoint(a0)
-        const p1 = viewport.anchorToPoint(a1)
-
-        if (p0 && p1) {
-          super.setAnchors([{ ...p0, ...a0 }, { ...p1, ...a1 }, anchors[2], anchors[3]])
-        }
-
-        return
+      if (bl) {
+        super.setAnchors([anchors[0], anchors[1], ...bl])
       }
 
       return
     }
 
     const delta = {
-      price: anchors[2].price - anchors[1].price,
-      length: anchors[2].y - anchors[1].y
+      price: this.anchors[2].price - this.anchors[0].price,
+      length: this.anchors[2].y - anchors[0].y
     }
 
-    const a2 = { time: anchors[0].time, price: anchors[0].price + delta.price }
-    const a3 = { time: anchors[1].time, price: anchors[1].price + delta.price }
+    const i = this.#findChangedAnchor(anchors)
 
-    const p2 = viewport.anchorToPoint(a2)
-    const p3 = viewport.anchorToPoint(a3)
+    if (i == 0 || i == 1) {
+      const bl = this.#createLine([anchors[0], anchors[1]], delta)
 
-    if (p2 && p3) {
-      super.setAnchors([anchors[0], anchors[1], { ...p2, ...a2 }, { ...p3, ...a3 }])
+      if (bl) {
+        super.setAnchors([anchors[0], anchors[1], ...bl])
+      }
+
+      return
     }
+
+    if (i == 2 || i == 3) {
+      const tl = this.#createLine([anchors[2], anchors[3]], { price: delta.price * -1, length: delta.length * -1 })
+
+      if (tl) {
+        super.setAnchors([...tl, anchors[2], anchors[3]])
+      }
+
+      return
+    }
+
+    return
   }
 
   override checkTap(point: Point) {
@@ -145,6 +135,28 @@ export class ParallelChannel extends BaseDrawing {
     }
 
     return false
+  }
+
+  #createLine(anchors: Anchor[], delta: { price: number; length: number }) {
+    const viewport = this.getViewport()
+    if (!viewport) {
+      return false
+    }
+
+    const a2 = { time: anchors[0].time, price: anchors[0].price + delta.price }
+    const a3 = { time: anchors[1].time, price: anchors[1].price + delta.price }
+
+    const p2 = viewport.anchorToPoint(a2)
+    const p3 = viewport.anchorToPoint(a3)
+
+    if (p2 && p3) {
+      return [
+        { ...p2, ...a2 },
+        { ...p3, ...a3 }
+      ]
+    }
+
+    return null
   }
 
   #findChangedAnchor(anchors: Anchor[]) {
