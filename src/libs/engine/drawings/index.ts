@@ -1,3 +1,4 @@
+import { Arrow } from '@engine/drawings/Arrow/Arrow'
 import { Circle } from '@engine/drawings/Circle/Circle'
 import { HorizontalLine } from '@engine/drawings/HorizontalLine/HorizontalLine'
 import { HorizontalRay } from '@engine/drawings/HorizontalRay/HorizontalRay'
@@ -17,6 +18,11 @@ export const DRAWINGS = [
     group: 'lines',
     drawing: TrendLine,
     icon: icons['./TrendLine/icon.svg']
+  },
+  {
+    group: 'lines',
+    drawing: Arrow,
+    icon: icons['./Arrow/icon.svg']
   },
   {
     group: 'lines',
