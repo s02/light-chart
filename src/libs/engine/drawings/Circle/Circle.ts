@@ -9,7 +9,7 @@ const CIRCLE_SCHEMA = {
   inputs: [{ type: 'number', key: 'line-width', default: 1 }],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(144 41 255)' },
-    { type: 'color', key: 'fill', default: 'none' }
+    { type: 'color', key: 'fill', default: 'rgb(144 41 255 / 0%)' }
   ]
 } as const satisfies StudySchema
 
@@ -58,7 +58,9 @@ export class Circle extends BaseDrawing {
     const center = viewport.anchorToPoint(this.anchors[0])
     const edge = viewport.anchorToPoint(this.anchors[1])
 
-    if (!center || !edge) return false
+    if (!center || !edge) {
+      return false
+    }
 
     const distToCenter = geometry.distance(point, center)
     const radius = geometry.distance(center, edge)

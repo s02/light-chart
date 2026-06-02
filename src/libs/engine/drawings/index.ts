@@ -1,5 +1,6 @@
 import { Arrow } from '@engine/drawings/Arrow/Arrow'
 import { Circle } from '@engine/drawings/Circle/Circle'
+import { Rectangle } from '@engine/drawings/Rectangle/Rectangle'
 import { HorizontalLine } from '@engine/drawings/HorizontalLine/HorizontalLine'
 import { HorizontalRay } from '@engine/drawings/HorizontalRay/HorizontalRay'
 import { Ray } from '@engine/drawings/Ray/Ray'
@@ -43,6 +44,11 @@ export const DRAWINGS = [
     group: 'lines',
     drawing: VerticalLine,
     icon: icons['./VerticalLine/icon.svg']
+  },
+  {
+    group: 'lines',
+    drawing: Rectangle,
+    icon: icons['./Rectangle/icon.svg']
   },
   {
     group: 'lines',
