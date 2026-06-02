@@ -49,8 +49,23 @@ const distanceToRay = (point: Point, rayOrigin: Point, rayThrough: Point) => {
   return Math.sqrt(px * px + py * py)
 }
 
+const distanceToLine = (point: Point, lineP1: Point, lineP2: Point) => {
+  const dx = lineP2.x - lineP1.x
+  const dy = lineP2.y - lineP1.y
+  const lengthSquared = dx * dx + dy * dy
+
+  if (lengthSquared === 0) {
+    const ex = point.x - lineP1.x
+    const ey = point.y - lineP1.y
+    return Math.sqrt(ex * ex + ey * ey)
+  }
+
+  return Math.abs((point.x - lineP1.x) * dy - (point.y - lineP1.y) * dx) / Math.sqrt(lengthSquared)
+}
+
 export const geometry = {
   distanceToLineSegment,
   distanceToRay,
+  distanceToLine,
   distance
 }
