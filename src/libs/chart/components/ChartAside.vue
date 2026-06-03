@@ -114,7 +114,7 @@ const selectDrawing = (script: DrawingScript) => {
       </div>
     </div>
 
-    <ChartMenu :menu-key="menuKey" placement="top-end">
+    <ChartMenu :menu-key="menuKey" placement="right-start">
       <div v-if="currentDrawingGroup" class="ca-drawing-menu">
         <ChartMenuGroup v-for="subg in getDrawingSubgroups(currentDrawingGroup)" :key="subg" :name="subg">
           <ChartMenuItem

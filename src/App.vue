@@ -71,7 +71,7 @@ body {
 *::after {
   box-sizing: border-box;
   scrollbar-width: thin;
-  scrollbar-color: rgb(155 155 155 / 50%) transparent;
+  scrollbar-color: rgb(155 155 155 / 25%) transparent;
 }
 
 .app {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { injectChartMenu, type ChartMenuKey } from '@chart/useChartMenu'
-import { useFloating, type Placement } from '@floating-ui/vue'
+import { useFloating, size, autoUpdate, type Placement } from '@floating-ui/vue'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 
@@ -18,7 +18,16 @@ const { isOpened, close, btn } = injectChartMenu(props.menuKey)
 
 const { floatingStyles: menuResStyles } = useFloating(btn, target, {
   placement: props.placement || 'bottom-start',
-  middleware: [],
+  whileElementsMounted: autoUpdate,
+  middleware: [
+    size({
+      apply({ availableHeight, elements }) {
+        Object.assign(elements.floating.style, {
+          maxHeight: `${Math.max(0, availableHeight)}px`
+        })
+      }
+    })
+  ],
   strategy: 'fixed'
 })
 

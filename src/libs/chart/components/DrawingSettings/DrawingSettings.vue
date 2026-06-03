@@ -15,7 +15,7 @@ import DrawingPropBrushWidth from '@chart/components/DrawingSettings/DrawingProp
 import FontSizePicker from '@chart/components/FontSizePicker.vue'
 import DrawingPropText from '@chart/components/DrawingSettings/DrawingPropText.vue'
 import type { DrawingSchema } from '@engine/drawings'
-import type { StudyParamDescriptor, StudySchema } from '@engine/schema'
+import type { StudyParamDescriptor } from '@engine/schema'
 
 type ParamKey = keyof DrawingSchema['params']
 type ParamValue = DrawingSchema['params'][ParamKey]
@@ -144,7 +144,7 @@ onUnmounted(() => {
           v-else-if="editSettings.type === 'line'"
           ref="linesPicker"
           :width="Number(drawingSchema.params[editSettings.el.key])"
-          :options="editSettings.el.type === 'number' ? editSettings.el.options : null"
+          :options="editSettings.el.type === 'number' ? editSettings.el.options : undefined"
           @select="apply(editSettings.el.key, $event)"
           @close="close()" />
 
@@ -161,4 +161,5 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @use 'DrawingSettings.scss';
+@use 'btn.scss';
 </style>
