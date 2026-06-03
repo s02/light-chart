@@ -3,41 +3,55 @@ import ChartMenu from '@chart/components/ChartMenu.vue'
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 import ChartMenuGroup from '@chart/components/ChartMenuGroup.vue'
 import { provideChartMenu } from '@chart/useChartMenu'
-import { computed, reactive, ref, shallowRef, useTemplateRef } from 'vue'
+import { ref, shallowRef, useTemplateRef } from 'vue'
 import { useEngine } from '@chart/composables/useEngine'
-import { DRAWINGS, type DrawingGroup, type DrawingName } from '@engine/drawings'
+import { DRAWINGS } from '@engine/drawings'
 import { i18n } from '@chart/i18n'
+import type { DrawingGroup, DrawingName, DrawingScript } from '@engine/drawings'
+
+type AsideMenu = Record<DrawingGroup, DrawingScript>
+
+const getDrawingGroups = () => {
+  const s = new Set()
+
+  DRAWINGS.forEach((d) => {
+    s.add(d.group)
+  })
+
+  return Array.from(s) as DrawingGroup[]
+}
+
+const getDrawingSubgroups = (group: DrawingGroup) => {
+  const s = new Set()
+
+  DRAWINGS.filter((d) => d.group === group).forEach((d) => {
+    s.add(d.subgroup)
+  })
+
+  return Array.from(s) as string[]
+}
+
+const getDrawingItems = (subg: string) => {
+  return DRAWINGS.filter((d) => d.subgroup === subg)
+}
+
+const getDrawingInitials = () => {
+  const result = {} as AsideMenu
+
+  groups.forEach((g) => {
+    result[g] = DRAWINGS.find((d) => d.group === g)!
+  })
+
+  return result
+}
 
 const { startDrawing } = useEngine()
 
-const drawings = reactive<Record<DrawingGroup, DrawingName>>({ lines: 'trend-line', text: 'text' })
-const groups = computed(() => Object.keys(drawings) as DrawingGroup[])
-
-const currentDrawingGroup = ref<DrawingGroup | null>(null)
-const currentGroupItems = computed(() => DRAWINGS.filter((drawing) => drawing.group === currentDrawingGroup.value))
-
-const icons = computed<Record<DrawingGroup, string>>(() => ({
-  lines: DRAWINGS.find((s) => s.drawing.ikey === drawings.lines)!.icon,
-  text: DRAWINGS.find((s) => s.drawing.ikey === drawings.text)!.icon
-}))
-
-const btns = useTemplateRef('btn')
-const activeBtn = shallowRef<NonNullable<typeof btns.value>[number] | null>(null)
-const { close: closeMenu, open: openMenu, key: menuKey } = provideChartMenu('line-menu', activeBtn)
+const groups = getDrawingGroups()
+const menu = ref<AsideMenu>(getDrawingInitials())
 
 const initialized = ref<DrawingName | null>()
-
-const selectDrawing = (name: DrawingName) => {
-  if (currentDrawingGroup.value === 'lines') {
-    drawings.lines = name
-  } else if (currentDrawingGroup.value === 'text') {
-    drawings.text = name
-  }
-
-  initialized.value = name
-  closeMenu()
-  init()
-}
+const currentDrawingGroup = ref<DrawingGroup | null>(null)
 
 const init = async () => {
   const name = initialized.value
@@ -68,6 +82,20 @@ const open = (group: DrawingGroup, i: number) => {
   activeBtn.value = btns.value?.[i] ?? null
   openMenu()
 }
+
+const btns = useTemplateRef('btn')
+const activeBtn = shallowRef<NonNullable<typeof btns.value>[number] | null>(null)
+const { close: closeMenu, open: openMenu, key: menuKey } = provideChartMenu('line-menu', activeBtn)
+
+const selectDrawing = (script: DrawingScript) => {
+  if (!currentDrawingGroup.value) {
+    return
+  }
+
+  menu.value[currentDrawingGroup.value] = script
+  handleStart(script.drawing.ikey)
+  closeMenu()
+}
 </script>
 
 <template>
@@ -75,9 +103,9 @@ const open = (group: DrawingGroup, i: number) => {
     <div v-for="(g, i) in groups" :key="g" ref="btn" class="ca-btn">
       <div
         class="ca-btn-icon"
-        :class="{ initialized: initialized === drawings[g] }"
-        @click="handleStart(drawings[g])"
-        v-html="icons[g]"></div>
+        :class="{ initialized: initialized === menu[g].drawing.ikey }"
+        @click="handleStart(menu[g].drawing.ikey)"
+        v-html="menu[g].icon"></div>
 
       <div class="ca-btn-collapse" @click="open(g, i)">
         <svg class="ca-btn-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" width="4" height="7">
@@ -88,11 +116,12 @@ const open = (group: DrawingGroup, i: number) => {
 
     <ChartMenu :menu-key="menuKey" placement="top-end">
       <div v-if="currentDrawingGroup" class="ca-drawing-menu">
-        <ChartMenuGroup :name="currentDrawingGroup">
+        <ChartMenuGroup v-for="subg in getDrawingSubgroups(currentDrawingGroup)" :key="subg" :name="subg">
           <ChartMenuItem
-            v-for="item in currentGroupItems"
+            v-for="item in getDrawingItems(subg)"
             :key="item.drawing.ikey"
-            @click="selectDrawing(item.drawing.ikey)">
+            class="ca-menu-item"
+            @click="selectDrawing(item)">
             <div v-html="item.icon"></div>
             {{ i18n.translate(`draw-line-${item.drawing.ikey}`) }}
           </ChartMenuItem>

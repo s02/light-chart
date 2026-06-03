@@ -1,4 +1,4 @@
-import { DRAWINGS, type DrawingName } from '@engine/drawings'
+import { findDrawingScript, type DrawingName } from '@engine/drawings'
 import { DrawingDragHandler } from '@engine/drawings/DrawingDragHandler'
 import { DrawingSelectHandler } from '@engine/drawings/DrawingSelectHandler'
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
@@ -38,7 +38,7 @@ export class DrawingsManager {
       this.#pendingAdd = undefined
     }
 
-    const script = DRAWINGS.find((d) => d.drawing.ikey === name)
+    const script = findDrawingScript(name)
     if (!script) {
       throw new Error(`unknown drawing key: ${name}`)
     }

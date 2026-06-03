@@ -10,9 +10,9 @@ import type { IChartApi, Point } from 'lightweight-charts'
 // TODO: Добавить настройку для расширения влево или вправо
 
 const PARALLEL_CHANNEL_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 1 }],
+  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'line-color', default: 'rgb(156 39 176)' },
     { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 5%)' }
   ]
 } as const satisfies StudySchema

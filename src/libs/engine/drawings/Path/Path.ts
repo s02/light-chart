@@ -7,8 +7,8 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import { POINTS_MODE } from '@engine/points'
 
 const PATH_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 1 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(41 98 255)' }]
+  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
+  style: [{ type: 'color', key: 'line-color', default: 'rgb(233 30 99)' }]
 } as const satisfies StudySchema
 
 export type PathParams = InferStudyValues<typeof PATH_SCHEMA.inputs> & InferStudyValues<typeof PATH_SCHEMA.style>

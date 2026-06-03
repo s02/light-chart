@@ -11,7 +11,7 @@ const GANN_SQUARE_SCHEMA = {
     { type: 'number', key: 'divisions', default: 5 }
   ],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'line-color', default: 'rgb(0, 188, 212)' },
     { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 0%)' }
   ]
 } as const satisfies StudySchema

@@ -9,7 +9,7 @@ const TEXT_SCHEMA = {
   inputs: [{ type: 'string', key: 'text', default: 'Text' }],
   style: [
     { type: 'color', key: 'text-color', default: 'rgb(255 255 255)' },
-    { type: 'color', key: 'fill', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'fill', default: 'rgb(0, 188, 212)' },
     { type: 'number', key: 'font-size', default: 16 }
   ]
 } as const satisfies StudySchema

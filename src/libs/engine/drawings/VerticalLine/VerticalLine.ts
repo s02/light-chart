@@ -6,8 +6,8 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const VERTICAL_LINE_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 1 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(70 224 245)' }]
+  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
+  style: [{ type: 'color', key: 'line-color', default: 'rgb(255 152 0)' }]
 } as const satisfies StudySchema
 
 export type VerticalLineParams = InferStudyValues<typeof VERTICAL_LINE_SCHEMA.inputs> &

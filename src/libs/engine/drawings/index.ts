@@ -22,89 +22,111 @@ const icons = import.meta.glob('./*/icon.svg', { query: '?raw', import: 'default
 
 export const DRAWINGS = [
   {
-    group: 'lines',
+    group: 'trend-line-tools',
+    subgroup: 'lines',
     drawing: TrendLine,
     icon: icons['./TrendLine/icon.svg']
   },
   {
-    group: 'lines',
-    drawing: Arrow,
-    icon: icons['./Arrow/icon.svg']
-  },
-  {
-    group: 'lines',
+    group: 'trend-line-tools',
+    subgroup: 'lines',
     drawing: ExtendedLine,
     icon: icons['./ExtendedLine/icon.svg']
   },
   {
-    group: 'lines',
+    group: 'trend-line-tools',
+    subgroup: 'lines',
     drawing: Ray,
     icon: icons['./Ray/icon.svg']
   },
   {
-    group: 'lines',
+    group: 'trend-line-tools',
+    subgroup: 'lines',
     drawing: HorizontalRay,
     icon: icons['./HorizontalRay/icon.svg']
   },
   {
-    group: 'lines',
+    group: 'trend-line-tools',
+    subgroup: 'lines',
     drawing: HorizontalLine,
     icon: icons['./HorizontalLine/icon.svg']
   },
   {
-    group: 'lines',
+    group: 'trend-line-tools',
+    subgroup: 'lines',
     drawing: VerticalLine,
     icon: icons['./VerticalLine/icon.svg']
   },
   {
-    group: 'lines',
-    drawing: Rectangle,
-    icon: icons['./Rectangle/icon.svg']
-  },
-  {
-    group: 'lines',
+    group: 'trend-line-tools',
+    subgroup: 'channels',
     drawing: ParallelChannel,
     icon: icons['./ParallelChannel/icon.svg']
   },
   {
-    group: 'lines',
-    drawing: Circle,
-    icon: icons['./Circle/icon.svg']
-  },
-  {
-    group: 'lines',
-    drawing: Path,
-    icon: icons['./Path/icon.svg']
-  },
-  {
-    group: 'lines',
+    group: 'gann-and-fib',
+    subgroup: 'gann',
     drawing: GannSquare,
     icon: icons['./GannSquare/icon.svg']
   },
   {
-    group: 'lines',
-    drawing: Brush,
-    icon: icons['./Brush/icon.svg']
-  },
-  {
-    group: 'lines',
-    drawing: Highlighter,
-    icon: icons['./Highlighter/icon.svg']
-  },
-  {
-    group: 'text',
+    group: 'annotation-tools',
+    subgroup: 'text',
     drawing: TextDrawing,
     icon: icons['./Text/icon.svg']
   },
   {
-    group: 'text',
+    group: 'annotation-tools',
+    subgroup: 'text',
     drawing: AnchoredText,
     icon: icons['./AnchoredText/icon.svg']
+  },
+  {
+    group: 'geometric-shapes',
+    subgroup: 'brushes',
+    drawing: Brush,
+    icon: icons['./Brush/icon.svg']
+  },
+  {
+    group: 'geometric-shapes',
+    subgroup: 'brushes',
+    drawing: Highlighter,
+    icon: icons['./Highlighter/icon.svg']
+  },
+  {
+    group: 'geometric-shapes',
+    subgroup: 'arrows',
+    drawing: Arrow,
+    icon: icons['./Arrow/icon.svg']
+  },
+  {
+    group: 'geometric-shapes',
+    subgroup: 'shapes',
+    drawing: Rectangle,
+    icon: icons['./Rectangle/icon.svg']
+  },
+  {
+    group: 'geometric-shapes',
+    subgroup: 'shapes',
+    drawing: Path,
+    icon: icons['./Path/icon.svg']
+  },
+  {
+    group: 'geometric-shapes',
+    subgroup: 'shapes',
+    drawing: Circle,
+    icon: icons['./Circle/icon.svg']
   }
 ] as const
 
 export { DrawingsManager } from '@engine/drawings/DrawingsManager'
 
+export const findDrawingScript = (key: string) => {
+  return DRAWINGS.find((d) => d.drawing.ikey === key)
+}
+
 export type DrawingGroup = (typeof DRAWINGS)[number]['group']
-export type DrawingName = (typeof DRAWINGS)[number]['drawing']['ikey']
+export type DrawingScript = (typeof DRAWINGS)[number]
+export type DrawingName = DrawingScript['drawing']['ikey']
 export type { DrawingSchema } from '@engine/drawings/types'
+export { DRAWING_COLORS } from './constants'

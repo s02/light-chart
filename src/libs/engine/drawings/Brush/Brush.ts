@@ -7,8 +7,8 @@ import { geometry } from '../geometry'
 import { POINTS_MODE } from '@engine/points'
 
 const BRUSH_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(41 98 255)' }]
+  inputs: [{ type: 'number', key: 'line-width', default: 3 }],
+  style: [{ type: 'color', key: 'line-color', default: 'rgb(255 152 0)' }]
 } as const satisfies StudySchema
 
 export type BrushParams = InferStudyValues<typeof BRUSH_SCHEMA.inputs> & InferStudyValues<typeof BRUSH_SCHEMA.style>

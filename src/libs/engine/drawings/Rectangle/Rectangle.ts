@@ -6,9 +6,9 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
 
 const RECTANGLE_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 1 }],
+  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'line-color', default: 'rgb(76 175 80)' },
     { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 0%)' }
   ]
 } as const satisfies StudySchema

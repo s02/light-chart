@@ -6,8 +6,8 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
 
 const EXTENDED_LINE_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 1 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(41 98 255)' }]
+  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
+  style: [{ type: 'color', key: 'line-color', default: 'rgb(0, 188, 212)' }]
 } as const satisfies StudySchema
 
 export type ExtendedLineParams = InferStudyValues<typeof EXTENDED_LINE_SCHEMA.inputs> &
