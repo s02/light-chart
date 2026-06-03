@@ -1,7 +1,8 @@
 import { CircleRenderer } from '@engine/drawings/Circle/CircleRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 import type { CircleParams } from '@engine/drawings/Circle/Circle'
+import type { Anchor } from '@engine/points'
 
 export class CirclePaneView implements IPrimitivePaneView {
   #anchors: Anchor[]

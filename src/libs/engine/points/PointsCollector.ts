@@ -1,11 +1,7 @@
-import type { Anchor } from '@engine/drawings/types'
+import { POINTS_MODE, type Anchor, type PointsHandler, type PointsManager } from '@engine/points'
 import type { IChartApi, ISeriesApi, Point, SeriesType } from 'lightweight-charts'
 
-type PointsCollectingStatus = 'pending' | 'done'
-
-export type PointsHandler = (params: { status: PointsCollectingStatus; points: (Point & Anchor)[] }) => void
-
-export class PointsCollector {
+export class PointsCollector implements PointsManager {
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>
   #points: (Anchor & Point)[] = []
@@ -81,7 +77,7 @@ export class PointsCollector {
   }
 
   #dblClickHandler = () => {
-    if (this.#limit !== -1 || !this.#handler) {
+    if (this.#limit !== POINTS_MODE.INF || !this.#handler) {
       return
     }
 

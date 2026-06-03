@@ -1,7 +1,8 @@
 import { TextRenderer } from '@engine/drawings/Text/TextRenderer'
 import type { TextParams } from '@engine/drawings/Text/TextDrawing'
-import type { Anchor, DrawingViewport } from '@engine/drawings/types'
+import type { DrawingViewport } from '@engine/drawings/types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
+import type { Anchor } from '@engine/points'
 
 export class TextPaneView implements IPrimitivePaneView {
   #anchor: Anchor

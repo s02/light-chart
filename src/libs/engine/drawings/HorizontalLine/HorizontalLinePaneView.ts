@@ -1,7 +1,8 @@
 import { HorizontalLineRenderer } from './HorizontalLineRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 import type { HorizontalLineParams } from '@engine/drawings/HorizontalLine/HorizontalLine'
+import type { Anchor } from '@engine/points'
 
 export class HorizontalLinePaneView implements IPrimitivePaneView {
   #viewport: DrawingViewport

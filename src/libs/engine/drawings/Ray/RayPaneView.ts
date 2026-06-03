@@ -1,7 +1,8 @@
 import { RayRenderer } from './RayRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 import type { RayParams } from '@engine/drawings/Ray/Ray'
+import type { Anchor } from '@engine/points'
 
 export class RayPaneView implements IPrimitivePaneView {
   #anchors: Anchor[]

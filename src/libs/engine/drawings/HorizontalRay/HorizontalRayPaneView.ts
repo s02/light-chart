@@ -1,7 +1,8 @@
 import { HorizontalRayRenderer } from './HorizontalRayRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 import type { HorizontalRayParams } from './HorizontalRay'
+import type { Anchor } from '@engine/points'
 
 export class HorizontalRayPaneView implements IPrimitivePaneView {
   #anchor: Anchor

@@ -1,8 +1,5 @@
-import type { Anchor } from '@engine/drawings/types'
+import type { Anchor, PointsHandler } from '@engine/points'
 import type { IChartApi, ISeriesApi, Point, SeriesType } from 'lightweight-charts'
-import type { PointsHandler } from './PointsCollector'
-
-export const CONTINUOUS_POINTS_MODE = -2
 
 export class ContinuousPointsCollector {
   #chart: IChartApi

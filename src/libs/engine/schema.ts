@@ -5,6 +5,7 @@ type StudyNumberParam = {
   min?: number
   max?: number
   step?: number
+  options?: number[]
 }
 
 type StudyColorParam = {

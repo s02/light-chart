@@ -11,9 +11,11 @@ import DrawingPropFontSize from '@chart/components/DrawingSettings/DrawingPropFo
 import DrawingPropFillColor from '@chart/components/DrawingSettings/DrawingPropFillColor.vue'
 import DrawingPropTextColor from '@chart/components/DrawingSettings/DrawingPropTextColor.vue'
 import DrawingPropLineWidth from '@chart/components/DrawingSettings/DrawingPropLineWidth.vue'
+import DrawingPropBrushWidth from '@chart/components/DrawingSettings/DrawingPropBrushWidth.vue'
 import FontSizePicker from '@chart/components/FontSizePicker.vue'
 import DrawingPropText from '@chart/components/DrawingSettings/DrawingPropText.vue'
 import type { DrawingSchema } from '@engine/drawings'
+import type { StudyParamDescriptor, StudySchema } from '@engine/schema'
 
 type ParamKey = keyof DrawingSchema['params']
 type ParamValue = DrawingSchema['params'][ParamKey]
@@ -34,7 +36,7 @@ onClickOutside(
   { ignore: [colorPickerRef, linesPickerRef, fontPickerRef] }
 )
 
-const editSettings = ref<{ key: string; type: MenuType } | null>(null)
+const editSettings = ref<{ el: StudyParamDescriptor; type: MenuType } | null>(null)
 
 const apply = (key: string, val: ParamValue) => {
   if (!drawingSchema.value) {
@@ -54,13 +56,13 @@ const apply = (key: string, val: ParamValue) => {
 
 const { close: closeMenu, open: openMenu, key: menuKey } = provideChartMenu('menu', dwsBtn)
 
-const open = (key: string, type: MenuType) => {
-  if (editSettings.value && key === editSettings.value.key) {
+const open = (el: StudyParamDescriptor, type: MenuType) => {
+  if (editSettings.value && el.key === editSettings.value.el.key) {
     editSettings.value = null
     return
   }
 
-  editSettings.value = { key, type }
+  editSettings.value = { el, type }
   openMenu()
 }
 
@@ -93,28 +95,32 @@ onUnmounted(() => {
           v-if="el.key === 'text'"
           :text="String(drawingSchema.params[el.key])"
           @select="apply('text', $event)" />
+        <DrawingPropBrushWidth
+          v-if="el.key === 'brush-width'"
+          :width="Number(drawingSchema.params[el.key])"
+          @click="open(el, 'line')" />
         <DrawingPropLineWidth
           v-if="el.key === 'line-width'"
           :width="Number(drawingSchema.params[el.key])"
-          @click="open(el.key, 'line')" />
+          @click="open(el, 'line')" />
       </template>
       <template v-for="el in drawingSchema.schema.style" :key="el.key">
         <DrawingPropFontSize
           v-if="el.key === 'font-size'"
           :width="Number(drawingSchema.params[el.key])"
-          @click="open(el.key, 'font')" />
+          @click="open(el, 'font')" />
         <DrawingPropLineColor
           v-else-if="el.key === 'line-color'"
           :color="String(drawingSchema.params[el.key])"
-          @click="open(el.key, 'color')" />
+          @click="open(el, 'color')" />
         <DrawingPropFillColor
           v-else-if="el.key === 'fill'"
           :color="String(drawingSchema.params[el.key])"
-          @click="open(el.key, 'color')" />
+          @click="open(el, 'color')" />
         <DrawingPropTextColor
           v-else-if="el.key === 'text-color'"
           :color="String(drawingSchema.params[el.key])"
-          @click="open(el.key, 'color')" />
+          @click="open(el, 'color')" />
       </template>
       <div class="drw-btn" @click="remove()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
@@ -130,22 +136,23 @@ onUnmounted(() => {
         <ColorPicker
           v-if="editSettings.type === 'color'"
           ref="colorPicker"
-          :color="`${drawingSchema.params[editSettings.key]}`"
-          @select="apply(editSettings.key, $event)"
+          :color="`${drawingSchema.params[editSettings.el.key]}`"
+          @select="apply(editSettings.el.key, $event)"
           @close="close()" />
 
         <LineWidthPicker
           v-else-if="editSettings.type === 'line'"
           ref="linesPicker"
-          :width="Number(drawingSchema.params[editSettings.key])"
-          @select="apply(editSettings.key, $event)"
+          :width="Number(drawingSchema.params[editSettings.el.key])"
+          :options="editSettings.el.type === 'number' ? editSettings.el.options : null"
+          @select="apply(editSettings.el.key, $event)"
           @close="close()" />
 
         <FontSizePicker
           v-else-if="editSettings.type === 'font'"
           ref="fontPicker"
-          :size="Number(drawingSchema.params[editSettings.key])"
-          @select="apply(editSettings.key, $event)"
+          :size="Number(drawingSchema.params[editSettings.el.key])"
+          @select="apply(editSettings.el.key, $event)"
           @close="close()" />
       </template>
     </ChartMenu>

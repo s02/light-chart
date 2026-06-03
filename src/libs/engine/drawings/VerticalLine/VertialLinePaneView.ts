@@ -1,7 +1,8 @@
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 import { VerticalLineRenderer } from '@engine/drawings/VerticalLine/VerticalLineRenderer'
 import type { VerticalLineParams } from '@engine/drawings/VerticalLine/VerticalLine'
+import type { Anchor } from '@engine/points'
 
 export class VerticalLinePaneView implements IPrimitivePaneView {
   #viewport: DrawingViewport

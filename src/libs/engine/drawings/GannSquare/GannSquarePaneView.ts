@@ -1,7 +1,8 @@
 import type { GannSquareParams } from '@engine/drawings/GannSquare/GannSquare'
 import { GannSquareRenderer } from './GannSquareRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
+import type { Anchor } from '@engine/points'
 
 export class GannSquarePaneView implements IPrimitivePaneView {
   #anchors: Anchor[]

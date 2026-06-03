@@ -32,7 +32,8 @@ export const extendedLine = (scope: BitmapCoordinatesRenderingScope, p1: Point, 
   const canvasH = scope.bitmapSize.height / vpr
 
   const forward = extendToEdge(p1, p2, canvasW, canvasH)
-  const backward = extendToEdge(p1, { x: p1.x - (p2.x - p1.x), y: p1.y - (p2.y - p1.y) }, canvasW, canvasH)
+  const pinf = { x: p1.x - (p2.x - p1.x), y: p1.y - (p2.y - p1.y) } as Point
+  const backward = extendToEdge(p1, pinf, canvasW, canvasH)
 
   ctx.beginPath()
   ctx.moveTo(backward.x * hpr, backward.y * vpr)

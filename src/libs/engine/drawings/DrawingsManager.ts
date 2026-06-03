@@ -1,12 +1,13 @@
 import { DRAWINGS, type DrawingName } from '@engine/drawings'
-import { PointsCollector } from './PointsCollector'
-import { ContinuousPointsCollector, CONTINUOUS_POINTS_MODE } from './ContinuousPointsCollector'
 import { DrawingDragHandler } from '@engine/drawings/DrawingDragHandler'
 import { DrawingSelectHandler } from '@engine/drawings/DrawingSelectHandler'
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { BaseDrawing } from './BaseDrawing'
 import type { DrawingSelectFn } from './types'
 import type { StudyParams } from '@engine/schema'
+import { POINTS_MODE, type PointsManager } from '@engine/points'
+import { ContinuousPointsCollector } from '@engine/points/ContinuousPointsCollector'
+import { PointsCollector } from '@engine/points/PointsCollector'
 
 export type DrawingElement = {
   id: number
@@ -20,7 +21,7 @@ export class DrawingsManager {
   #dragHandler: DrawingDragHandler
   #selectHandler: DrawingSelectHandler
   #subscribers: DrawingSelectFn[] = []
-  #pendingAdd?: { pc: PointsCollector; drawing: BaseDrawing; reject: (reason?: unknown) => void }
+  #pendingAdd?: { pc: PointsManager; drawing: BaseDrawing; reject: (reason?: unknown) => void }
 
   constructor(chart: IChartApi, series: ISeriesApi<SeriesType>) {
     this.#chart = chart
@@ -46,8 +47,8 @@ export class DrawingsManager {
     drawing.attach(this.#series)
 
     return new Promise((resolve, reject) => {
-      const pc =
-        script.drawing.points === CONTINUOUS_POINTS_MODE
+      const pc: PointsManager =
+        script.drawing.points === POINTS_MODE.BRUSH
           ? new ContinuousPointsCollector(this.#chart, this.#series)
           : new PointsCollector(this.#chart, this.#series, script.drawing.points)
       this.#pendingAdd = { pc, drawing, reject }

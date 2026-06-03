@@ -1,13 +1,7 @@
 import type { StudyParams, StudySchema } from '@engine/schema'
-import type { Coordinate, Point, Time } from 'lightweight-charts'
+import type { Point, Time } from 'lightweight-charts'
 import type { DrawingName } from '@engine/drawings'
-
-export type Anchor = {
-  time: Time
-  price: number
-  x: Coordinate
-  y: Coordinate
-}
+import type { Anchor } from '@engine/points'
 
 export type DrawingViewport = {
   anchorToPoint: (a: { time: Time; price: number }) => Point | null

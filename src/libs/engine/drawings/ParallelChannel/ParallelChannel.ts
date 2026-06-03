@@ -1,7 +1,8 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { geometry } from '@engine/drawings/geometry'
 import { ParallelChannelPaneView } from '@engine/drawings/ParallelChannel/ParallelChannelPaneView'
-import type { Anchor, DrawingOptions } from '@engine/drawings/types'
+import type { DrawingOptions } from '@engine/drawings/types'
+import type { Anchor } from '@engine/points'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 import type { IChartApi, Point } from 'lightweight-charts'
 

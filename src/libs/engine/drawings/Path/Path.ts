@@ -4,6 +4,7 @@ import { geometry } from '../geometry'
 import { PathPaneView } from './PathPaneView'
 import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
+import { POINTS_MODE } from '@engine/points'
 
 const PATH_SCHEMA = {
   inputs: [{ type: 'number', key: 'line-width', default: 1 }],
@@ -14,7 +15,7 @@ export type PathParams = InferStudyValues<typeof PATH_SCHEMA.inputs> & InferStud
 
 export class Path extends BaseDrawing {
   static readonly ikey = 'path' as const
-  static readonly points = -1
+  static readonly points = POINTS_MODE.INF
   #params: PathParams
 
   constructor(chart: IChartApi, options?: DrawingOptions) {

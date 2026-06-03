@@ -1,30 +1,31 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
-import { BrushPaneView } from '@engine/drawings/Brush/BrushPaneView'
+import { HighlighterPaneView } from '@engine/drawings/Highlighter/HighlighterPaneView'
 import type { DrawingOptions } from '@engine/drawings/types'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
 import { POINTS_MODE } from '@engine/points'
 
-const BRUSH_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(41 98 255)' }]
+const HIGHLIGHTER_SCHEMA = {
+  inputs: [{ type: 'number', key: 'brush-width', default: 20, options: [8, 12, 20, 32, 48, 64, 80, 96] }],
+  style: [{ type: 'color', key: 'line-color', default: 'rgb(255 255 255 / 25%)' }]
 } as const satisfies StudySchema
 
-export type BrushParams = InferStudyValues<typeof BRUSH_SCHEMA.inputs> & InferStudyValues<typeof BRUSH_SCHEMA.style>
+export type HighlighterParams = InferStudyValues<typeof HIGHLIGHTER_SCHEMA.inputs> &
+  InferStudyValues<typeof HIGHLIGHTER_SCHEMA.style>
 
-export class Brush extends BaseDrawing {
-  static readonly ikey = 'brush' as const
+export class Highlighter extends BaseDrawing {
+  static readonly ikey = 'highlighter' as const
   static readonly points = POINTS_MODE.BRUSH
-  #params: BrushParams
+  #params: HighlighterParams
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(BRUSH_SCHEMA.inputs, BRUSH_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(HIGHLIGHTER_SCHEMA.inputs, HIGHLIGHTER_SCHEMA.style, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(BRUSH_SCHEMA.inputs, BRUSH_SCHEMA.style, params)
+    this.#params = resolveStudyParams(HIGHLIGHTER_SCHEMA.inputs, HIGHLIGHTER_SCHEMA.style, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }
@@ -32,8 +33,8 @@ export class Brush extends BaseDrawing {
 
   override getSchema() {
     return {
-      ikey: Brush.ikey,
-      schema: BRUSH_SCHEMA,
+      ikey: Highlighter.ikey,
+      schema: HIGHLIGHTER_SCHEMA,
       params: this.#params
     }
   }
@@ -41,7 +42,7 @@ export class Brush extends BaseDrawing {
   override paneViews() {
     const viewport = this.getViewport()
     if (viewport) {
-      return [new BrushPaneView(viewport, this.anchors, this.#params)]
+      return [new HighlighterPaneView(viewport, this.anchors, this.#params)]
     }
     return []
   }
@@ -54,11 +55,13 @@ export class Brush extends BaseDrawing {
     const viewport = this.getViewport()
     if (!viewport) return false
 
+    const hitRadius = this.#params['brush-width'] / 2 + Highlighter.hitThreashold
+
     for (let i = 0; i < this.anchors.length - 1; i++) {
       const start = viewport.anchorToPoint(this.anchors[i])
       const end = viewport.anchorToPoint(this.anchors[i + 1])
 
-      if (start && end && geometry.distanceToLineSegment(point, start, end) < Brush.hitThreashold) {
+      if (start && end && geometry.distanceToLineSegment(point, start, end) < hitRadius) {
         return true
       }
     }

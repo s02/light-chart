@@ -1,7 +1,8 @@
 import type { RectangleParams } from '@engine/drawings/Rectangle/Rectangle'
 import { RectangleRenderer } from './RectangleRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
+import type { Anchor } from '@engine/points'
 
 export class RectanglePaneView implements IPrimitivePaneView {
   #anchors: Anchor[]

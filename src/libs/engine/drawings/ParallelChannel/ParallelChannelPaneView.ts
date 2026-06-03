@@ -1,7 +1,8 @@
 import type { ParallelChannelParams } from '@engine/drawings/ParallelChannel/ParallelChannel'
 import { ParallelChannelRenderer } from './ParallelChannelRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
+import type { Anchor } from '@engine/points'
 
 export class ParallelChannelPaneView implements IPrimitivePaneView {
   #anchors: Anchor[]

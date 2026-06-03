@@ -1,7 +1,8 @@
 import { TrendLineRenderer } from './TrendLineRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 import type { TrendLineParams } from '@engine/drawings/TrendLine/TrendLine'
+import type { Anchor } from '@engine/points'
 
 export class TrendLinePaneView implements IPrimitivePaneView {
   #anchors: Anchor[]

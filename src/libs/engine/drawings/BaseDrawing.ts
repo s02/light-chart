@@ -1,5 +1,6 @@
 import { geometry } from '@engine/drawings/geometry'
-import type { Anchor, DrawingSchema, DrawingViewport } from '@engine/drawings/types'
+import type { DrawingSchema, DrawingViewport } from '@engine/drawings/types'
+import type { Anchor } from '@engine/points'
 import type { StudyParams } from '@engine/schema'
 import type {
   IChartApi,

@@ -1,7 +1,8 @@
 import type { ExtendedLineParams } from '@engine/drawings/ExtendedLine/ExtendedLine'
 import { ExtendedLineRenderer } from './ExtendedLineRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
+import type { Anchor } from '@engine/points'
 
 export class ExtendedLinePaneView implements IPrimitivePaneView {
   #anchors: Anchor[]

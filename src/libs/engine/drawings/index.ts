@@ -13,6 +13,7 @@ import { ParallelChannel } from '@engine/drawings/ParallelChannel/ParallelChanne
 import { Path } from '@engine/drawings/Path/Path'
 import { GannSquare } from '@engine/drawings/GannSquare/GannSquare'
 import { Brush } from '@engine/drawings/Brush/Brush'
+import { Highlighter } from '@engine/drawings/Highlighter/Highlighter'
 
 const icons = import.meta.glob('./*/icon.svg', { query: '?raw', import: 'default', eager: true }) as Record<
   string,
@@ -84,6 +85,11 @@ export const DRAWINGS = [
     group: 'lines',
     drawing: Brush,
     icon: icons['./Brush/icon.svg']
+  },
+  {
+    group: 'lines',
+    drawing: Highlighter,
+    icon: icons['./Highlighter/icon.svg']
   },
   {
     group: 'text',

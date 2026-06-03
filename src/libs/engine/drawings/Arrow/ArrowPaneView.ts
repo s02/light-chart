@@ -1,7 +1,8 @@
 import type { ArrowParams } from '@engine/drawings/Arrow/Arrow'
 import { ArrowRenderer } from './ArrowRenderer'
-import type { Anchor, DrawingViewport } from '../types'
+import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
+import type { Anchor } from '@engine/points'
 
 export class ArrowPaneView implements IPrimitivePaneView {
   #anchors: Anchor[]
