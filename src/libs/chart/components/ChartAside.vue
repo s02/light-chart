@@ -4,7 +4,7 @@ import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 import ChartMenuGroup from '@chart/components/ChartMenuGroup.vue'
 import { provideChartMenu } from '@chart/useChartMenu'
 import { ref, shallowRef, useTemplateRef } from 'vue'
-import { useEngine } from '@chart/composables/useEngine'
+import { useEngineApi } from '@chart/composables/useEngine'
 import { DRAWINGS } from '@engine/drawings'
 import { i18n } from '@chart/i18n'
 import type { DrawingGroup, DrawingName, DrawingScript } from '@engine/drawings'
@@ -45,7 +45,7 @@ const getDrawingInitials = () => {
   return result
 }
 
-const { startDrawing } = useEngine()
+const { startDrawing } = useEngineApi()
 
 const groups = getDrawingGroups()
 const menu = ref<AsideMenu>(getDrawingInitials())

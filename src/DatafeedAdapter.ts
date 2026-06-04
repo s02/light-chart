@@ -44,6 +44,7 @@ export class DatafeedAdapter implements Datafeed {
 
   unsubscribe(id: string) {
     this.#callbacks.delete(id)
+    this.#dataCallbacks.delete(id)
   }
 
   destroy() {
@@ -54,7 +55,7 @@ export class DatafeedAdapter implements Datafeed {
 
   async subscribeForData(callback: DatafeedDataCallbackFn) {
     await this.#inited
-    ++this.#nextCallbackId
+    this.#nextCallbackId++
 
     const id = this.#nextCallbackId.toString()
     this.#dataCallbacks.set(id, callback)

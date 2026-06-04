@@ -55,7 +55,11 @@ export class ExponentialMovingAverage extends AbstractIndicator implements Indic
   }
 
   getLegend(seriesData: SeriesMap) {
-    const legend: SeriesLegend = { key: ExponentialMovingAverage.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
+    const legend: SeriesLegend = {
+      key: ExponentialMovingAverage.ikey.toUpperCase(),
+      paneIndex: this.paneIndex,
+      data: []
+    }
     const data = seriesData.get(this.#series)
     if (data) {
       legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })

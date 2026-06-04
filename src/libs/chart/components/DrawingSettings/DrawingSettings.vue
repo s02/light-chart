@@ -2,7 +2,6 @@
 import ChartMenu from '@chart/components/ChartMenu.vue'
 import ColorPicker from '@chart/components/ColorPicker.vue'
 import LineWidthPicker from '@chart/components/LineWidthPicker.vue'
-import { useDrawingSettings } from '@chart/composables/useDrawingSettings'
 import { provideChartMenu } from '@chart/useChartMenu'
 import { onClickOutside } from '@vueuse/core'
 import { onUnmounted, ref, useTemplateRef } from 'vue'
@@ -16,12 +15,12 @@ import FontSizePicker from '@chart/components/FontSizePicker.vue'
 import DrawingPropText from '@chart/components/DrawingSettings/DrawingPropText.vue'
 import type { DrawingSchema } from '@engine/drawings'
 import type { StudyParamDescriptor } from '@engine/schema'
+import { useEngineApi } from '@chart/composables/useEngine'
 
 type ParamKey = keyof DrawingSchema['params']
 type ParamValue = DrawingSchema['params'][ParamKey]
 type MenuType = 'line' | 'color' | 'font'
-
-const { drawingSchema, update, set, remove } = useDrawingSettings()
+const { updateDrawing, removeDrawing, drawingSchema, selectDrawing } = useEngineApi()
 const dwsBtn = useTemplateRef('dws')
 const colorPickerRef = useTemplateRef<HTMLElement>('colorPicker')
 const linesPickerRef = useTemplateRef<HTMLElement>('linesPicker')
@@ -31,7 +30,7 @@ onClickOutside(
   dwsBtn,
   () => {
     editSettings.value = null
-    set(null)
+    selectDrawing(null)
   },
   { ignore: [colorPickerRef, linesPickerRef, fontPickerRef] }
 )
@@ -43,12 +42,7 @@ const apply = (key: string, val: ParamValue) => {
     return
   }
 
-  console.log('update', {
-    ...drawingSchema.value.params,
-    [key]: val
-  })
-
-  update({
+  updateDrawing({
     ...drawingSchema.value.params,
     [key]: val
   })
@@ -72,7 +66,7 @@ const close = () => {
 }
 
 onUnmounted(() => {
-  set(null)
+  selectDrawing(null)
   editSettings.value = null
 })
 </script>
@@ -122,7 +116,7 @@ onUnmounted(() => {
           :color="String(drawingSchema.params[el.key])"
           @click="open(el, 'color')" />
       </template>
-      <div class="drw-btn" @click="remove()">
+      <div class="drw-btn" @click="removeDrawing()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
           <path
             fill="currentColor"

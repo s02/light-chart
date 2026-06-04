@@ -1,66 +1,192 @@
 import type { DrawingName } from '@engine/drawings'
 import type { IndicatorName } from '@engine/indicators'
+import { PlotEngine } from '@engine/PlotEngine'
 import type { StudyParams } from '@engine/schema'
+import PaneLegend from '@chart/components/PaneLegend.vue'
+import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
+import { computed, h, ref, render, watch, type Ref } from 'vue'
+import { useModal } from '@chart/composables/useModal'
+import type {
+  AssetSymbol,
+  ChartExpiration,
+  ChartOption,
+  ChartSeriesLegend,
+  ResolutionId,
+  SeriesId
+} from '@engine/types'
+import type { DrawingSelectFn } from '@engine/drawings/types'
+import type { DatafeedFactory } from '@chart/types'
 
-type EngineCallbacks = {
-  addIndicator: (key: IndicatorName) => Promise<number>
-  removeIndicator: (id: number) => void
-  editIndicator: (id: number) => void
-  startDrawing: (name: DrawingName) => Promise<number> | undefined
-  updateDrawing: (id: number, params: StudyParams) => void
-  removeDrawing: (id: number) => void
+type DrawingElement = Parameters<DrawingSelectFn>[0]
+
+type EngineOptions = {
+  seriesId: Ref<SeriesId>
+  options: Ref<ChartOption[] | undefined>
+  expiration: Ref<ChartExpiration | undefined>
+  assetSymbol: Ref<AssetSymbol>
+  resolutionId: Ref<ResolutionId>
+  datafeedFactory: DatafeedFactory
 }
 
-function assertEngine(engine: EngineCallbacks | null): asserts engine {
-  if (!engine) {
-    throw `Engine should be registered.`
+function assertDrawingElement(el: DrawingElement | null): asserts el {
+  if (!el) {
+    throw new Error(`Drawing doesn't selected`)
   }
 }
 
-let engine: EngineCallbacks | null = null
+function assertEngine(engine: PlotEngine | null): asserts engine {
+  if (!engine) {
+    throw new Error(`Engine isn't defined.`)
+  }
+}
 
-export const useEngine = () => {
-  const registerEngine = (callbacks: EngineCallbacks) => {
-    engine = callbacks
+let pe: PlotEngine | null = null
+const unwatch: Array<() => void> = []
+
+const selectedDrawingElement = ref<DrawingElement | null>(null)
+
+export const useEngineApi = () => {
+  const legends = ref<ChartSeriesLegend[]>([])
+
+  const { open: openModal } = useModal()
+
+  const register = (el: HTMLElement, options: EngineOptions) => {
+    pe = new PlotEngine(el, {
+      datafeed: options.datafeedFactory(options.assetSymbol.value, options.resolutionId.value),
+      seriesId: options.seriesId.value
+    })
+
+    if (options.options.value) {
+      pe.setOptions(options.options.value)
+    }
+
+    if (options.expiration.value) {
+      pe.setExpiration(options.expiration.value)
+    }
+
+    unwatch.push(
+      pe.subscribeToLegends((l) => {
+        legends.value = l
+      })
+    )
+
+    pe.subscribeToSelectDrawing(selectDrawing)
+
+    unwatch.push(
+      watch(options.expiration, (next) => {
+        assertEngine(pe)
+        if (next) {
+          pe.setExpiration(next)
+        }
+      })
+    )
+
+    unwatch.push(
+      watch(options.seriesId, (next) => {
+        assertEngine(pe)
+        pe.setSeriesId(next)
+      })
+    )
+
+    unwatch.push(
+      watch(options.options, (next) => {
+        assertEngine(pe)
+        if (next) {
+          pe.setOptions(next)
+        }
+      })
+    )
+
+    unwatch.push(
+      watch(
+        () => ({
+          assetSymbol: options.assetSymbol.value,
+          resolutionId: options.resolutionId.value
+        }),
+        (next) => {
+          assertEngine(pe)
+          if (next) {
+            pe.setDatafeed(options.datafeedFactory(next.assetSymbol, next.resolutionId))
+          }
+        }
+      )
+    )
+  }
+
+  const unregister = () => {
+    if (pe) {
+      pe.destroy()
+      pe = null
+    }
+
+    unwatch.forEach((fn) => fn())
   }
 
   const addIndicator = async (key: IndicatorName) => {
-    assertEngine(engine)
-    engine.addIndicator(key)
+    assertEngine(pe)
+    const t = await pe.addIndicator(key)
+
+    if (t.paneIndex && t.paneIndex > 0 && t.el) {
+      render(h(PaneLegend, { paneIndex: t.paneIndex, subscribeToLegends: pe.subscribeToLegends.bind(pe) }), t.el)
+    }
+
+    return t.id
   }
 
   const removeIndicator = (id: number) => {
-    assertEngine(engine)
-    engine.removeIndicator(id)
+    assertEngine(pe)
+    pe.removeIndicator(id)
   }
 
-  const editIndicator = (id: number) => {
-    assertEngine(engine)
-    engine.editIndicator(id)
+  const editIndicator = async (id: number) => {
+    assertEngine(pe)
+
+    const schema = pe.getIndicatorSchema(id)
+    const params = await openModal<StudyParams | undefined>(ModalIndicatorSettings, { props: schema })
+    if (params) {
+      pe.updateIndicator(id, params)
+    }
   }
 
-  const startDrawing = (name: DrawingName) => {
-    assertEngine(engine)
-    return engine.startDrawing(name)
+  const startDrawing = (id: DrawingName) => {
+    assertEngine(pe)
+    return pe.addDrawing(id)
   }
 
-  const updateDrawing = (id: number, params: StudyParams) => {
-    assertEngine(engine)
-    engine.updateDrawing(id, params)
+  const updateDrawing = (params: StudyParams) => {
+    assertEngine(pe)
+    assertDrawingElement(selectedDrawingElement.value)
+    pe.updateDrawing(selectedDrawingElement.value.id, params)
   }
 
-  const removeDrawing = (id: number) => {
-    assertEngine(engine)
-    engine.removeDrawing(id)
+  const removeDrawing = () => {
+    assertEngine(pe)
+    assertDrawingElement(selectedDrawingElement.value)
+    pe.removeDrawing(selectedDrawingElement.value.id)
+    selectedDrawingElement.value = null
+  }
+
+  const selectDrawing = (res: DrawingElement | null) => {
+    selectedDrawingElement.value = res
   }
 
   return {
-    registerEngine,
+    register,
+    unregister,
     addIndicator,
     removeIndicator,
     editIndicator,
     startDrawing,
     updateDrawing,
-    removeDrawing
+    removeDrawing,
+    selectDrawing,
+    legends,
+    drawingSchema: computed(() => {
+      if (selectedDrawingElement.value) {
+        return selectedDrawingElement.value.ds
+      }
+
+      return null
+    })
   }
 }

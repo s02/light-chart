@@ -1,21 +1,13 @@
 import type { StudyParams, StudySchema } from '@engine/schema'
 import type { SeriesLegend, SeriesOverlayData } from '@engine/series'
 import type { Datafeed } from '@engine/types'
-import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
+import type { ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 
 export type SeriesMap = Map<ISeriesApi<SeriesType, Time>, SeriesOverlayData>
 
 export type IndicatorOptions = {
   params?: StudyParams
   paneIndex?: number
-}
-
-export type IndicatorScript = {
-  indicator: {
-    new (chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions): Indicator
-    readonly ikey: string
-  }
-  separatePane?: boolean
 }
 
 export type Indicator = {

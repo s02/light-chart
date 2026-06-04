@@ -4,13 +4,13 @@ import ChartMenu from '@chart/components/ChartMenu.vue'
 import type { ChartSeriesLegend } from '@engine/types'
 import { ref, shallowRef } from 'vue'
 import IndicatorLegendMenu from '@chart/components/IndicatorLegendMenu.vue'
-import { useEngine } from '@chart/composables/useEngine'
+import { useEngineApi } from '@chart/composables/useEngine'
 
 defineProps<{ legends: ChartSeriesLegend[] }>()
 
 const btnMenu = shallowRef<HTMLElement | null>(null)
 const { close: closeMenu, open, key: menuKey } = provideChartMenu('indicators-menu', btnMenu)
-const { removeIndicator, editIndicator } = useEngine()
+const { removeIndicator, editIndicator } = useEngineApi()
 
 const id = ref<number | null>(null)
 

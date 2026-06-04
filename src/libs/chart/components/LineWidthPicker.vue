@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 
-const props = defineProps<{ width: number; options?: number[] }>()
+defineProps<{ width: number; options?: number[] }>()
 
 const emit = defineEmits<{
   (e: 'select', width: number): void
@@ -14,7 +14,6 @@ const select = (v: number) => {
   emit('select', v)
   emit('close')
 }
-console.log(props.options)
 </script>
 
 <template>
