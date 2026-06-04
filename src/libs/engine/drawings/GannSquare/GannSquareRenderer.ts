@@ -19,18 +19,13 @@ export class GannSquareRenderer implements IPrimitivePaneRenderer {
   }
 
   draw(target: CanvasRenderingTarget2D) {
-    target.useBitmapCoordinateSpace((scope) => {
-      const p1 = this.#p1
-      const p2 = this.#p2
-      const color = this.#params['line-color']
-      const width = this.#params['line-width']
-      const divisions = Math.max(1, Math.round(this.#params['divisions']))
+    const { p1, p2 } = { p1: this.#p1, p2: this.#p2 }
+    const color = this.#params['line-color']
+    const width = this.#params['line-width']
+    const divisions = Math.max(1, Math.round(this.#params['divisions']))
 
-      rect(scope, p1, p2, {
-        'line-color': color,
-        'line-width': width,
-        fill: this.#params['fill']
-      })
+    target.useBitmapCoordinateSpace((scope) => {
+      rect(scope, p1, p2, { 'line-color': color, 'line-width': width, fill: this.#params['fill'] })
 
       const minX = Math.min(p1.x, p2.x)
       const maxX = Math.max(p1.x, p2.x)

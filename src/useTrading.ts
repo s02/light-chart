@@ -22,7 +22,6 @@ const loadHistory = () => {
   if (hist) {
     try {
       const h = JSON.parse(hist)
-      console.log(h)
       return h
     } catch (e) {
       console.log('History is broken', e)

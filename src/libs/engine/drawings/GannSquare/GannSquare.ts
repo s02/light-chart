@@ -47,7 +47,7 @@ export class GannSquare extends BaseDrawing {
   override paneViews() {
     const viewport = this.getViewport()
     if (viewport) {
-      return [new GannSquarePaneView(viewport, this.anchors, this.anchorsVisible, this.#params)]
+      return new GannSquarePaneView(viewport, this.anchors, this.anchorsVisible, this.#params).views()
     }
     return []
   }
