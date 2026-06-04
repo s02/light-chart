@@ -7,6 +7,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { ta } from 'oakscriptjs'
 
 const ST_SCHEMA = {
@@ -58,17 +59,12 @@ export class Supertrend extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: Supertrend.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series) as LineData<Time> | undefined
-
     if (data) {
-      return {
-        key: Supertrend.ikey.toUpperCase(),
-        paneIndex: this.paneIndex,
-        data: [{ value: formatPrice(data.value), color: data.color ?? this.#params.bullish }]
-      }
+      legend.data.push({ value: formatPrice(data.value), color: data.color ?? this.#params.bullish })
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

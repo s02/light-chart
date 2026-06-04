@@ -7,6 +7,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 // TODO: Добавить настройки линии сглаживания https://github.com/deepentropy/lightweight-charts-indicators/blob/main/src/standard/ema.ts#L67
@@ -54,17 +55,12 @@ export class ExponentialMovingAverage extends AbstractIndicator implements Indic
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: ExponentialMovingAverage.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
-
     if (data) {
-      return {
-        key: ExponentialMovingAverage.ikey.toUpperCase(),
-        paneIndex: this.paneIndex,
-        data: [{ value: formatPrice((data as LineData<Time>).value), color: this.#params.color }]
-      }
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

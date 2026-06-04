@@ -41,10 +41,13 @@ export class PlotEngine {
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
     const handler = (params: MouseEventParams) => {
+      if (!params.time) {
+        return
+      }
+
       const result: ChartSeriesLegend[] = []
       const series = this.#seriesOverlay.getSeries()
       const data = params.seriesData.get(series)
-
       if (data) {
         result.push({
           category: 'main',

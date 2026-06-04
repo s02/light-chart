@@ -5,10 +5,11 @@ import type { Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types
 import type { IChartApi } from 'lightweight-charts'
 import type { StudyParams } from '@engine/schema'
 
+type IndicatorId = number
 export class IndicatorsManager {
   #chart: IChartApi
   #datafeed: Datafeed
-  #indicators: { id: number; indicator: Indicator }[] = []
+  #indicators: { id: IndicatorId; indicator: Indicator }[] = []
   #id = 10
 
   constructor(chart: IChartApi, datafeed: Datafeed) {
@@ -27,14 +28,13 @@ export class IndicatorsManager {
     const legends: ChartSeriesLegend[] = []
     this.#indicators.forEach((el) => {
       const legend = el.indicator.getLegend(seriesData)
-      if (legend) {
-        legends.push({
-          id: el.id,
-          category: 'indicators',
-          ...legend
-        })
-      }
+      legends.push({
+        id: el.id,
+        category: 'indicators',
+        ...legend
+      })
     })
+
     return legends
   }
 

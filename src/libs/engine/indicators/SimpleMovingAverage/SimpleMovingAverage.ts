@@ -7,6 +7,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
+import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const SMA_SCHEMA = {
@@ -49,26 +50,12 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   }
 
   getLegend(seriesData: SeriesMap) {
-    if (!this.#series) {
-      return
-    }
-
+    const legend: SeriesLegend = { key: SimpleMovingAverage.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
-
     if (data) {
-      return {
-        key: SimpleMovingAverage.ikey.toUpperCase(),
-        paneIndex: this.paneIndex,
-        data: [
-          {
-            value: formatPrice((data as LineData<Time>).value),
-            color: this.#params.color
-          }
-        ]
-      }
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

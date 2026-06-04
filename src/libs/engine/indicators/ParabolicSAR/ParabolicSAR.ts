@@ -7,6 +7,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { ta } from 'oakscriptjs'
 
 const SAR_SCHEMA = {
@@ -56,17 +57,12 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: ParabolicSAR.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series) as LineData<Time> | undefined
-
     if (data) {
-      return {
-        key: ParabolicSAR.ikey.toUpperCase(),
-        paneIndex: this.paneIndex,
-        data: [{ value: formatPrice(data.value), color: this.#params.color }]
-      }
+      legend.data.push({ value: formatPrice(data.value), color: this.#params.color })
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

@@ -7,6 +7,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const ALLIGATOR_SCHEMA = {
@@ -80,23 +81,18 @@ export class WilliamsAlligator extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: 'ALLIGATOR', paneIndex: this.paneIndex, data: [] }
     const jawData = seriesData.get(this.#series.jaw)
     const teethData = seriesData.get(this.#series.teeth)
     const lipsData = seriesData.get(this.#series.lips)
-
     if (jawData && teethData && lipsData) {
-      return {
-        key: 'ALLIGATOR',
-        paneIndex: this.paneIndex,
-        data: [
-          { value: formatPrice((jawData as LineData<Time>).value), color: this.#params.jaw },
-          { value: formatPrice((teethData as LineData<Time>).value), color: this.#params.teeth },
-          { value: formatPrice((lipsData as LineData<Time>).value), color: this.#params.lips }
-        ]
-      }
+      legend.data.push(
+        { value: formatPrice((jawData as LineData<Time>).value), color: this.#params.jaw },
+        { value: formatPrice((teethData as LineData<Time>).value), color: this.#params.teeth },
+        { value: formatPrice((lipsData as LineData<Time>).value), color: this.#params.lips }
+      )
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

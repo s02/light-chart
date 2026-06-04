@@ -8,6 +8,7 @@ import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightwei
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const BB_SCHEMA = {
@@ -82,32 +83,18 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: BollingerBands.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const uData = seriesData.get(this.#series.upper)
     const mData = seriesData.get(this.#series.middle)
     const lData = seriesData.get(this.#series.lower)
-
     if (uData && mData && lData) {
-      return {
-        key: BollingerBands.ikey.toUpperCase(),
-        paneIndex: this.paneIndex,
-        data: [
-          {
-            value: formatPrice((mData as LineData<Time>).value),
-            color: this.#params.middle
-          },
-          {
-            value: formatPrice((uData as LineData<Time>).value),
-            color: this.#params.lower
-          },
-          {
-            value: formatPrice((lData as LineData<Time>).value),
-            color: this.#params.upper
-          }
-        ]
-      }
+      legend.data.push(
+        { value: formatPrice((mData as LineData<Time>).value), color: this.#params.middle },
+        { value: formatPrice((uData as LineData<Time>).value), color: this.#params.lower },
+        { value: formatPrice((lData as LineData<Time>).value), color: this.#params.upper }
+      )
     }
-
-    return undefined
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

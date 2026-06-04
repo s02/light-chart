@@ -7,6 +7,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, HistogramData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const MACD_SCHEMA = {
@@ -76,24 +77,19 @@ export class MACD extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: MACD.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const macdData = seriesData.get(this.#series.macd)
     const signalData = seriesData.get(this.#series.signal)
     const histData = seriesData.get(this.#series.hist)
-
     if (macdData && signalData && histData) {
       const histValue = (histData as HistogramData<Time>).value
-      return {
-        key: MACD.ikey.toUpperCase(),
-        paneIndex: this.paneIndex,
-        data: [
-          { value: formatPrice(histValue), color: histValue >= 0 ? this.#params.histUp : this.#params.histDown },
-          { value: formatPrice((macdData as LineData<Time>).value), color: this.#params.macdLine },
-          { value: formatPrice((signalData as LineData<Time>).value), color: this.#params.signalLine }
-        ]
-      }
+      legend.data.push(
+        { value: formatPrice(histValue), color: histValue >= 0 ? this.#params.histUp : this.#params.histDown },
+        { value: formatPrice((macdData as LineData<Time>).value), color: this.#params.macdLine },
+        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params.signalLine }
+      )
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

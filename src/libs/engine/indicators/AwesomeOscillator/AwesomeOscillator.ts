@@ -8,6 +8,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, HistogramData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 
 const AO_SCHEMA = {
   inputs: [
@@ -59,18 +60,13 @@ export class AwesomeOscillator extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: 'AO', paneIndex: this.paneIndex, data: [] }
     const histData = seriesData.get(this.#series.hist)
-
     if (histData) {
       const value = (histData as HistogramData<Time>).value
-      return {
-        key: 'AO',
-        paneIndex: this.paneIndex,
-        data: [{ value: formatPrice(value), color: value >= 0 ? this.#params.histUp : this.#params.histDown }]
-      }
+      legend.data.push({ value: formatPrice(value), color: value >= 0 ? this.#params.histUp : this.#params.histDown })
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

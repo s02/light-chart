@@ -8,6 +8,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 
 const STOCHRSI_SCHEMA = {
   inputs: [
@@ -113,21 +114,16 @@ export class StochasticRSI extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: StochasticRSI.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const kData = seriesData.get(this.#series.k)
     const dData = seriesData.get(this.#series.d)
-
     if (kData && dData) {
-      return {
-        key: StochasticRSI.ikey.toUpperCase(),
-        paneIndex: this.paneIndex,
-        data: [
-          { value: formatPrice((kData as LineData<Time>).value), color: this.#params.kLine },
-          { value: formatPrice((dData as LineData<Time>).value), color: this.#params.dLine }
-        ]
-      }
+      legend.data.push(
+        { value: formatPrice((kData as LineData<Time>).value), color: this.#params.kLine },
+        { value: formatPrice((dData as LineData<Time>).value), color: this.#params.dLine }
+      )
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

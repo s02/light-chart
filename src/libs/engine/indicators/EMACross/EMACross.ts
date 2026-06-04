@@ -15,6 +15,7 @@ import type {
 } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const EMA_CROSS_SCHEMA = {
@@ -80,21 +81,16 @@ export class EMACross extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: 'EMA CROSS', paneIndex: this.paneIndex, data: [] }
     const fastData = seriesData.get(this.#series.fast)
     const slowData = seriesData.get(this.#series.slow)
-
     if (fastData && slowData) {
-      return {
-        key: 'EMA CROSS',
-        paneIndex: this.paneIndex,
-        data: [
-          { value: formatPrice((fastData as LineData<Time>).value), color: this.#params.short },
-          { value: formatPrice((slowData as LineData<Time>).value), color: this.#params.long }
-        ]
-      }
+      legend.data.push(
+        { value: formatPrice((fastData as LineData<Time>).value), color: this.#params.short },
+        { value: formatPrice((slowData as LineData<Time>).value), color: this.#params.long }
+      )
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

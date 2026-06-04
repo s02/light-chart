@@ -6,6 +6,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, ISeriesMarkersPluginApi, SeriesMarker, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { formatPrice } from '@engine/helpers'
 
 const WF_SCHEMA = {
@@ -59,22 +60,19 @@ export class WilliamsFractal extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: 'Fractals', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
-    if (!data) return
-
-    const t = data.time
-    const markers = this.#markers.markers()
-    const hasBear = markers.some((m) => m.time === t && m.position === 'atPriceTop')
-    const hasBull = markers.some((m) => m.time === t && m.position === 'atPriceBottom')
-
-    return {
-      key: 'Fractals',
-      paneIndex: this.paneIndex,
-      data: [
+    if (data) {
+      const t = data.time
+      const markers = this.#markers.markers()
+      const hasBear = markers.some((m) => m.time === t && m.position === 'atPriceTop')
+      const hasBull = markers.some((m) => m.time === t && m.position === 'atPriceBottom')
+      legend.data.push(
         { value: hasBear ? formatPrice(1) : formatPrice(0), color: this.#params.bull },
         { value: hasBull ? formatPrice(1) : formatPrice(0), color: this.#params.bear }
-      ]
+      )
     }
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

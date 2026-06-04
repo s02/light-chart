@@ -8,6 +8,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 
 const KST_SCHEMA = {
   inputs: [
@@ -74,21 +75,16 @@ export class KnowSureThing extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: 'KST', paneIndex: this.paneIndex, data: [] }
     const kstData = seriesData.get(this.#series.kst)
     const signalData = seriesData.get(this.#series.signal)
-
     if (kstData && signalData) {
-      return {
-        key: 'KST',
-        paneIndex: this.paneIndex,
-        data: [
-          { value: formatPrice((kstData as LineData<Time>).value), color: this.#params.kstLine },
-          { value: formatPrice((signalData as LineData<Time>).value), color: this.#params.signalLine }
-        ]
-      }
+      legend.data.push(
+        { value: formatPrice((kstData as LineData<Time>).value), color: this.#params.kstLine },
+        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params.signalLine }
+      )
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

@@ -7,6 +7,7 @@ import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
+import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const DC_SCHEMA = {
@@ -75,23 +76,18 @@ export class DonchianChannels extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
+    const legend: SeriesLegend = { key: 'DC', paneIndex: this.paneIndex, data: [] }
     const uData = seriesData.get(this.#series.upper)
     const mData = seriesData.get(this.#series.middle)
     const lData = seriesData.get(this.#series.lower)
-
     if (uData && mData && lData) {
-      return {
-        key: 'DC',
-        paneIndex: this.paneIndex,
-        data: [
-          { value: formatPrice((lData as LineData<Time>).value), color: this.#params.lower },
-          { value: formatPrice((uData as LineData<Time>).value), color: this.#params.upper },
-          { value: formatPrice((mData as LineData<Time>).value), color: this.#params.middle }
-        ]
-      }
+      legend.data.push(
+        { value: formatPrice((lData as LineData<Time>).value), color: this.#params.lower },
+        { value: formatPrice((uData as LineData<Time>).value), color: this.#params.upper },
+        { value: formatPrice((mData as LineData<Time>).value), color: this.#params.middle }
+      )
     }
-
-    return
+    return legend
   }
 
   protected onData(data: ChartBar[]) {

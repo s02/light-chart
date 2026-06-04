@@ -23,7 +23,7 @@ export type Indicator = {
   remove: () => Promise<void> | void
   setParams: (params: StudyParams) => void
   setDatafeed: (datafeed: Datafeed) => void
-  getLegend: (seriesData: SeriesMap) => SeriesLegend | undefined
+  getLegend: (seriesData: SeriesMap) => SeriesLegend
   getSchema: () => {
     ikey: string
     schema: StudySchema
