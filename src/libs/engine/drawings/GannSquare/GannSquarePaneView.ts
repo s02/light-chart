@@ -45,17 +45,13 @@ export class GannSquarePaneView {
     const color = this.#params['line-color']
     const lineWidth = this.#params['line-width']
     const divisions = Math.max(1, Math.round(this.#params['divisions']))
-    const minX = Math.min(p1.x, p2.x)
-    const minY = Math.min(p1.y, p2.y)
-    const maxX = Math.max(p1.x, p2.x)
-    const maxY = Math.max(p1.y, p2.y)
 
     const zOrder = (): PrimitivePaneViewZOrder => 'normal'
 
     return [
       { zOrder, renderer: () => new GannSquareRenderer(p1, p2, this.#withDots, this.#params) },
       { zOrder, renderer: () => new GannSquareFanRenderer(p1, p2, color, lineWidth) },
-      { zOrder, renderer: () => new GannSquareArcRenderer(minX, minY, maxX, maxY, divisions, color, lineWidth, ARCS) }
+      { zOrder, renderer: () => new GannSquareArcRenderer(p1, p2, divisions, color, lineWidth, ARCS) }
     ]
   }
 }

@@ -1,30 +1,24 @@
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
-import type { IPrimitivePaneRenderer } from 'lightweight-charts'
+import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 
 export class GannSquareArcRenderer implements IPrimitivePaneRenderer {
-  #minX: number
-  #minY: number
-  #maxX: number
-  #maxY: number
+  #p1: Point
+  #p2: Point
   #divisions: number
   #color: string
   #lineWidth: number
   #arcs: { x: number; y: number }[]
 
   constructor(
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
+    p1: Point,
+    p2: Point,
     divisions: number,
     color: string,
     lineWidth: number,
     arcs: { x: number; y: number }[]
   ) {
-    this.#minX = minX
-    this.#minY = minY
-    this.#maxX = maxX
-    this.#maxY = maxY
+    this.#p1 = p1
+    this.#p2 = p2
     this.#divisions = divisions
     this.#color = color
     this.#lineWidth = lineWidth
@@ -37,13 +31,18 @@ export class GannSquareArcRenderer implements IPrimitivePaneRenderer {
       const hpr = scope.horizontalPixelRatio
       const vpr = scope.verticalPixelRatio
 
-      const boxW = (this.#maxX - this.#minX) * hpr
-      const boxH = (this.#maxY - this.#minY) * vpr
+      const boxW = Math.abs(this.#p2.x - this.#p1.x) * hpr
+      const boxH = Math.abs(this.#p2.y - this.#p1.y) * vpr
       const s = boxH / boxW
+      const signX = Math.sign(this.#p2.x - this.#p1.x) || 1
+      const signY = Math.sign(this.#p2.y - this.#p1.y) || 1
+
+      const minX = Math.min(this.#p1.x, this.#p2.x)
+      const minY = Math.min(this.#p1.y, this.#p2.y)
 
       ctx.save()
       ctx.beginPath()
-      ctx.rect(this.#minX * hpr, this.#minY * vpr, boxW, boxH)
+      ctx.rect(minX * hpr, minY * vpr, boxW, boxH)
       ctx.clip()
 
       ctx.strokeStyle = this.#color
@@ -56,11 +55,11 @@ export class GannSquareArcRenderer implements IPrimitivePaneRenderer {
         const a = Math.sqrt(px * px + (py / s) * (py / s))
 
         ctx.save()
-        ctx.translate(this.#minX * hpr, this.#minY * vpr)
-        ctx.scale(1, s)
+        ctx.translate(this.#p1.x * hpr, this.#p1.y * vpr)
+        ctx.scale(signX, signY * s)
         ctx.beginPath()
         ctx.arc(0, 0, a, 0, Math.PI / 2)
-        ctx.scale(1, 1 / s)
+        ctx.scale(signX, signY / s)
         ctx.stroke()
         ctx.restore()
       }
