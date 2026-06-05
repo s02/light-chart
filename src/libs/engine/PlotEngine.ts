@@ -3,6 +3,7 @@ import { CHART_PARAMS, RESOLUTION_SETTINGS } from './constants'
 import { IndicatorsManager } from '@engine/indicators'
 import { seriesOverlayFactory } from '@engine/series'
 import { PluginManager } from '@engine/plugins'
+import { WhitespaceSeries } from './WhitespaceSeries'
 import type { IChartApi, LogicalRange, MouseEventParams } from 'lightweight-charts'
 import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
@@ -24,6 +25,7 @@ export class PlotEngine {
   #seriesOverlay: SeriesOverlay
   #indicatorsManager: IndicatorsManager
   #drawingsManager: DrawingsManager
+  #whitespace: WhitespaceSeries
 
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
@@ -35,6 +37,7 @@ export class PlotEngine {
     this.#drawingsManager = new DrawingsManager(this.#chart, this.#seriesOverlay.getSeries())
     this.#pluginManager = new PluginManager(this.#chart, this.#datafeed.getResolutionId())
     this.#pluginManager.attach(this.#seriesOverlay.getSeries())
+    this.#whitespace = new WhitespaceSeries(this.#chart, this.#datafeed)
 
     this.#chart.timeScale().subscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
   }
@@ -89,6 +92,7 @@ export class PlotEngine {
     this.#seriesOverlay.setDatafeed(datafeed)
     this.#indicatorsManager.setDatafeed(datafeed)
     this.#pluginManager.setResolution(datafeed.getResolutionId())
+    this.#whitespace.setDatafeed(datafeed)
   }
 
   setOptions(options: ChartOption[]) {
@@ -134,6 +138,7 @@ export class PlotEngine {
   }
 
   destroy() {
+    this.#whitespace.destroy()
     this.#pluginManager.detach()
     this.#indicatorsManager.destroy()
     this.#seriesOverlay.destroy()
