@@ -14,6 +14,8 @@ import { Path } from '@engine/drawings/Path/Path'
 import { GannSquare } from '@engine/drawings/GannSquare/GannSquare'
 import { Brush } from '@engine/drawings/Brush/Brush'
 import { Highlighter } from '@engine/drawings/Highlighter/Highlighter'
+import type { IChartApi } from 'lightweight-charts'
+import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
 
 const icons = import.meta.glob('./*/icon.svg', { query: '?raw', import: 'default', eager: true }) as Record<
   string,
@@ -22,102 +24,113 @@ const icons = import.meta.glob('./*/icon.svg', { query: '?raw', import: 'default
 
 export const DRAWINGS = [
   {
-    group: 'trend-line-tools',
+    group: 'trend-line-tools' as const,
     subgroup: 'lines',
     drawing: TrendLine,
     icon: icons['./TrendLine/icon.svg']
   },
   {
-    group: 'trend-line-tools',
+    group: 'trend-line-tools' as const,
     subgroup: 'lines',
     drawing: ExtendedLine,
     icon: icons['./ExtendedLine/icon.svg']
   },
   {
-    group: 'trend-line-tools',
+    group: 'trend-line-tools' as const,
     subgroup: 'lines',
     drawing: Ray,
     icon: icons['./Ray/icon.svg']
   },
   {
-    group: 'trend-line-tools',
+    group: 'trend-line-tools' as const,
     subgroup: 'lines',
     drawing: HorizontalRay,
     icon: icons['./HorizontalRay/icon.svg']
   },
   {
-    group: 'trend-line-tools',
+    group: 'trend-line-tools' as const,
     subgroup: 'lines',
     drawing: HorizontalLine,
     icon: icons['./HorizontalLine/icon.svg']
   },
   {
-    group: 'trend-line-tools',
+    group: 'trend-line-tools' as const,
     subgroup: 'lines',
     drawing: VerticalLine,
     icon: icons['./VerticalLine/icon.svg']
   },
   {
-    group: 'trend-line-tools',
+    group: 'trend-line-tools' as const,
     subgroup: 'channels',
     drawing: ParallelChannel,
     icon: icons['./ParallelChannel/icon.svg']
   },
   {
-    group: 'gann-and-fib',
+    group: 'gann-and-fib' as const,
     subgroup: 'gann',
     drawing: GannSquare,
     icon: icons['./GannSquare/icon.svg']
   },
   {
-    group: 'annotation-tools',
+    group: 'annotation-tools' as const,
     subgroup: 'text',
     drawing: TextDrawing,
     icon: icons['./Text/icon.svg']
   },
   {
-    group: 'annotation-tools',
+    group: 'annotation-tools' as const,
     subgroup: 'text',
     drawing: AnchoredText,
     icon: icons['./AnchoredText/icon.svg']
   },
   {
-    group: 'geometric-shapes',
+    group: 'geometric-shapes' as const,
     subgroup: 'brushes',
     drawing: Brush,
+    manualStop: true,
     icon: icons['./Brush/icon.svg']
   },
   {
-    group: 'geometric-shapes',
+    group: 'geometric-shapes' as const,
     subgroup: 'brushes',
     drawing: Highlighter,
+    manualStop: true,
     icon: icons['./Highlighter/icon.svg']
   },
   {
-    group: 'geometric-shapes',
+    group: 'geometric-shapes' as const,
     subgroup: 'arrows',
     drawing: Arrow,
     icon: icons['./Arrow/icon.svg']
   },
   {
-    group: 'geometric-shapes',
+    group: 'geometric-shapes' as const,
     subgroup: 'shapes',
     drawing: Rectangle,
     icon: icons['./Rectangle/icon.svg']
   },
   {
-    group: 'geometric-shapes',
+    group: 'geometric-shapes' as const,
     subgroup: 'shapes',
     drawing: Path,
     icon: icons['./Path/icon.svg']
   },
   {
-    group: 'geometric-shapes',
+    group: 'geometric-shapes' as const,
     subgroup: 'shapes',
     drawing: Circle,
     icon: icons['./Circle/icon.svg']
   }
-] as const
+] satisfies {
+  group: string
+  subgroup: string
+  icon: string
+  manualStop?: boolean
+  drawing: {
+    new (chart: IChartApi): BaseDrawing
+    readonly ikey: string
+  }
+}[]
 
 export { DrawingsManager } from '@engine/drawings/DrawingsManager'
 
@@ -125,8 +138,4 @@ export const findDrawingScript = (key: string) => {
   return DRAWINGS.find((d) => d.drawing.ikey === key)
 }
 
-export type DrawingGroup = (typeof DRAWINGS)[number]['group']
-export type DrawingScript = (typeof DRAWINGS)[number]
-export type DrawingName = DrawingScript['drawing']['ikey']
-export type { DrawingSchema } from '@engine/drawings/types'
 export { DRAWING_COLORS } from './constants'

@@ -9,12 +9,14 @@ export class DrawingSelectHandler {
   #chart: IChartApi
   #getElements: GetElementsFn
   #onSelect: DrawingSelectFn
+  #isAvailable: () => boolean
 
-  constructor(chart: IChartApi, getElements: GetElementsFn, onSelect: DrawingSelectFn) {
+  constructor(chart: IChartApi, getElements: GetElementsFn, onSelect: DrawingSelectFn, isAvailable: () => boolean) {
     this.#chart = chart
     this.#el = this.#chart.chartElement()
     this.#getElements = getElements
     this.#onSelect = onSelect
+    this.#isAvailable = isAvailable
     this.#el.addEventListener('click', this.#clickHandler)
     this.#el.addEventListener('mousemove', this.#mousemoveHandler)
   }
@@ -29,6 +31,10 @@ export class DrawingSelectHandler {
   }
 
   #mousemoveHandler = (e: MouseEvent) => {
+    if (!this.#isAvailable()) {
+      return
+    }
+
     const rect = this.#el.getBoundingClientRect()
     const { width, height } = this.#chart.paneSize()
 
@@ -44,6 +50,10 @@ export class DrawingSelectHandler {
   }
 
   #clickHandler = ({ layerX: x, layerY: y }: MouseEvent) => {
+    if (!this.#isAvailable()) {
+      return
+    }
+
     this.#getElements().forEach((el) => {
       if (el.drawing.checkTap({ x, y } as Point)) {
         this.select(el)

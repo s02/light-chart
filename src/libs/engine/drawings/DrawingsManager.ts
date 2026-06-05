@@ -1,13 +1,13 @@
-import { findDrawingScript, type DrawingName } from '@engine/drawings'
+import { findDrawingScript } from '@engine/drawings'
 import { DrawingDragHandler } from '@engine/drawings/DrawingDragHandler'
 import { DrawingSelectHandler } from '@engine/drawings/DrawingSelectHandler'
-import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
-import type { BaseDrawing } from './BaseDrawing'
-import type { DrawingSelectFn } from './types'
-import type { StudyParams } from '@engine/schema'
 import { POINTS_MODE, type PointsManager } from '@engine/points'
 import { ContinuousPointsCollector } from '@engine/points/ContinuousPointsCollector'
 import { PointsCollector } from '@engine/points/PointsCollector'
+import type { DrawingName, DrawingSelectFn } from '@engine/drawings/types'
+import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
+import type { BaseDrawing } from './BaseDrawing'
+import type { StudyParams } from '@engine/schema'
 
 export type DrawingElement = {
   id: number
@@ -26,17 +26,30 @@ export class DrawingsManager {
   constructor(chart: IChartApi, series: ISeriesApi<SeriesType>) {
     this.#chart = chart
     this.#series = series
-    this.#dragHandler = new DrawingDragHandler(this.#chart, () => this.#drawings.map((el) => el.drawing))
-    this.#selectHandler = new DrawingSelectHandler(this.#chart, () => this.#drawings, this.#onSelect)
+    this.#dragHandler = new DrawingDragHandler(
+      this.#chart,
+      () => this.#drawings.map((el) => el.drawing),
+      () => !this.#pendingAdd
+    )
+    this.#selectHandler = new DrawingSelectHandler(
+      this.#chart,
+      () => this.#drawings,
+      this.#onSelect,
+      () => !this.#pendingAdd
+    )
   }
 
-  add(name: DrawingName): Promise<number> {
+  cancelCurrent() {
     if (this.#pendingAdd) {
       this.#pendingAdd.pc.destroy()
       this.#pendingAdd.drawing.detach()
       this.#pendingAdd.reject(new Error('cancelled'))
       this.#pendingAdd = undefined
     }
+  }
+
+  add(name: DrawingName) {
+    this.cancelCurrent()
 
     const script = findDrawingScript(name)
     if (!script) {
@@ -46,7 +59,7 @@ export class DrawingsManager {
     const drawing = new script.drawing(this.#chart)
     drawing.attach(this.#series)
 
-    return new Promise((resolve, reject) => {
+    return new Promise<number>((resolve, reject) => {
       const pc: PointsManager =
         script.drawing.points === POINTS_MODE.BRUSH
           ? new ContinuousPointsCollector(this.#chart, this.#series)

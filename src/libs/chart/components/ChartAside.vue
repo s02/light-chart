@@ -7,7 +7,7 @@ import { ref, shallowRef, useTemplateRef } from 'vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import { DRAWINGS } from '@engine/drawings'
 import { i18n } from '@chart/i18n'
-import type { DrawingGroup, DrawingName, DrawingScript } from '@engine/drawings'
+import type { DrawingGroup, DrawingName, DrawingScript } from '@engine/drawings/types'
 
 type AsideMenu = Record<DrawingGroup, DrawingScript>
 
@@ -45,7 +45,7 @@ const getDrawingInitials = () => {
   return result
 }
 
-const { startDrawing } = useEngineApi()
+const { startDrawing, cancelDrawing } = useEngineApi()
 
 const groups = getDrawingGroups()
 const menu = ref<AsideMenu>(getDrawingInitials())
@@ -53,28 +53,32 @@ const menu = ref<AsideMenu>(getDrawingInitials())
 const initialized = ref<DrawingName | null>()
 const currentDrawingGroup = ref<DrawingGroup | null>(null)
 
-const init = async () => {
-  const name = initialized.value
-  if (!name) return
-
+const init = async (name: DrawingName, manualStop?: boolean) => {
   try {
     await startDrawing(name)
+    if (manualStop) {
+      init(name, manualStop)
+    }
   } catch {
     // cancelled by a subsequent add() call — expected
   } finally {
-    if (initialized.value === name) {
-      initialized.value = null
+    if (!manualStop) {
+      if (initialized.value === name) {
+        initialized.value = null
+      }
     }
   }
 }
 
 const handleStart = (name: DrawingName) => {
-  if (initialized.value) {
-    return
+  if (name === initialized.value) {
+    initialized.value = null
+    cancelDrawing()
+  } else {
+    initialized.value = name
+    const drawing = DRAWINGS.find((d) => d.drawing.ikey === name)
+    init(name, drawing?.manualStop)
   }
-
-  initialized.value = name
-  init()
 }
 
 const open = (group: DrawingGroup, i: number) => {

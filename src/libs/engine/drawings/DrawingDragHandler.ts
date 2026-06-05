@@ -6,11 +6,13 @@ export class DrawingDragHandler {
   #chart: IChartApi
   #dragging: { drawing: BaseDrawing; initialPoint: Point; anchorIndex: number | null } | null = null
   #getDrawings: () => BaseDrawing[]
+  #isAvailable: () => boolean
 
-  constructor(chart: IChartApi, getDrawings: () => BaseDrawing[]) {
+  constructor(chart: IChartApi, getDrawings: () => BaseDrawing[], isAvailable: () => boolean) {
     this.#el = chart.chartElement()
     this.#chart = chart
     this.#getDrawings = getDrawings
+    this.#isAvailable = isAvailable
     this.#el.addEventListener('mousedown', this.#mousedownHandler, { capture: true })
   }
 
@@ -22,7 +24,7 @@ export class DrawingDragHandler {
   }
 
   #mousemoveHandler = (e: MouseEvent) => {
-    if (!this.#dragging) {
+    if (!this.#dragging || !this.#isAvailable()) {
       return
     }
 

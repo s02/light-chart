@@ -1,4 +1,3 @@
-import type { DrawingName } from '@engine/drawings'
 import type { IndicatorName } from '@engine/indicators'
 import { PlotEngine } from '@engine/PlotEngine'
 import type { StudyParams } from '@engine/schema'
@@ -14,7 +13,7 @@ import type {
   ResolutionId,
   SeriesId
 } from '@engine/types'
-import type { DrawingSelectFn } from '@engine/drawings/types'
+import type { DrawingName, DrawingSelectFn } from '@engine/drawings/types'
 import type { DatafeedFactory } from '@chart/types'
 
 type DrawingElement = Parameters<DrawingSelectFn>[0]
@@ -153,6 +152,11 @@ export const useEngineApi = () => {
     return pe.addDrawing(id)
   }
 
+  const cancelDrawing = () => {
+    assertEngine(pe)
+    return pe.cancelDrawing()
+  }
+
   const updateDrawing = (params: StudyParams) => {
     assertEngine(pe)
     assertDrawingElement(selectedDrawingElement.value)
@@ -177,6 +181,7 @@ export const useEngineApi = () => {
     removeIndicator,
     editIndicator,
     startDrawing,
+    cancelDrawing,
     updateDrawing,
     removeDrawing,
     selectDrawing,

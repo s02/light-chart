@@ -7,8 +7,8 @@ import type { IChartApi, LogicalRange, MouseEventParams } from 'lightweight-char
 import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
 import type { IndicatorName } from '@engine/indicators'
-import { DrawingsManager, type DrawingName } from '@engine/drawings'
-import type { DrawingSelectFn } from '@engine/drawings/types'
+import { DrawingsManager } from '@engine/drawings'
+import type { DrawingName, DrawingSelectFn } from '@engine/drawings/types'
 import type { StudyParams } from '@engine/schema'
 
 type Params = {
@@ -127,6 +127,10 @@ export class PlotEngine {
 
   removeDrawing(id: number) {
     this.#drawingsManager.remove(id)
+  }
+
+  cancelDrawing() {
+    this.#drawingsManager.cancelCurrent()
   }
 
   destroy() {

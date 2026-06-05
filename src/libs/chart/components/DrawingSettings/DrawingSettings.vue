@@ -13,7 +13,7 @@ import DrawingPropLineWidth from '@chart/components/DrawingSettings/DrawingPropL
 import DrawingPropBrushWidth from '@chart/components/DrawingSettings/DrawingPropBrushWidth.vue'
 import FontSizePicker from '@chart/components/FontSizePicker.vue'
 import DrawingPropText from '@chart/components/DrawingSettings/DrawingPropText.vue'
-import type { DrawingSchema } from '@engine/drawings'
+import type { DrawingSchema } from '@engine/drawings/types'
 import type { StudyParamDescriptor } from '@engine/schema'
 import { useEngineApi } from '@chart/composables/useEngine'
 
