@@ -33,6 +33,7 @@
   "indicator-donchian": "Donchian Channels",
   "indicator-sma": "SMA",
   "indicator-sar": "Parabolic SAR",
+  "indicator-cks":" Chande Kroll Stop",
   "indicator-alligator": "Williams Alligator",
   "indicator-zigzag": "ZigZag",
   "indicator-crsi": "Connors RSI",
@@ -121,5 +122,10 @@
   "ind-prop-sma3": "SMA Length 3",
   "ind-prop-sma4": "SMA Length 4",
   "ind-prop-kstLine": "KST",
-  "ind-prop-useTrueRange": "Use True Range"
+  "ind-prop-useTrueRange": "Use True Range",
+  "ind-prop-p": "P",
+  "ind-prop-q": "Q",
+  "ind-prop-x": "X",
+  "ind-prop-stopShort": "Short",
+  "ind-prop-stopLong": "Long"
 }
