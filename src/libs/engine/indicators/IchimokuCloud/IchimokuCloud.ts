@@ -157,12 +157,13 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
+    const displacement = this.#params.leadingShiftPeriods - 1
     const [tenkan, kijun, senkouA, senkouB] = ta.ichimoku(
       bars,
       this.#params.conversionPeriods,
       this.#params.basePeriods,
       this.#params.leadingSpanPeriods,
-      this.#params.leadingShiftPeriods - 1
+      displacement
     )
 
     const tenkanArr = tenkan.toArray()
@@ -178,11 +179,42 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
 
     const toBar = (value: number, i: number) => ({ time: bars[i].time, value: value ?? NaN })
 
+    const barInterval =
+      bars.length >= 2 ? (bars[bars.length - 1].time as number) - (bars[bars.length - 2].time as number) : 86400
+
+    const futureSenkouA: LineData<Time>[] = []
+    const futureSenkouB: LineData<Time>[] = []
+    const spanLen = this.#params.leadingSpanPeriods
+
+    for (let j = 1; j <= displacement; j++) {
+      const futureTime = ((bars[bars.length - 1].time as number) + barInterval * j) as Time
+      const srcIdx = bars.length - 1 + j - displacement
+
+      if (srcIdx >= 0) {
+        const t = tenkanArr[srcIdx]
+        const k = kijunArr[srcIdx]
+        if (!isNaN(t) && !isNaN(k)) {
+          futureSenkouA.push({ time: futureTime, value: (t + k) / 2 })
+        }
+
+        const start = Math.max(0, srcIdx - spanLen + 1)
+        let hi = -Infinity
+        let lo = Infinity
+        for (let n = start; n <= srcIdx; n++) {
+          if (bars[n].high > hi) hi = bars[n].high
+          if (bars[n].low < lo) lo = bars[n].low
+        }
+        if (hi !== -Infinity && lo !== Infinity) {
+          futureSenkouB.push({ time: futureTime, value: (hi + lo) / 2 })
+        }
+      }
+    }
+
     return {
       tenkan: this.filter(tenkanArr.map(toBar)),
       kijun: this.filter(kijunArr.map(toBar)),
-      senkouA: this.filter(senkouAArr.map(toBar)),
-      senkouB: this.filter(senkouBArr.map(toBar)),
+      senkouA: [...this.filter(senkouAArr.map(toBar)), ...futureSenkouA],
+      senkouB: [...this.filter(senkouBArr.map(toBar)), ...futureSenkouB],
       chikou: this.filter(chikouArr.map(toBar))
     }
   }
