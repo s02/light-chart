@@ -17,7 +17,7 @@ const ZZ_SCHEMA = {
     { type: 'number', key: 'deviation', default: 0.001, min: 0 },
     { type: 'number', key: 'depth', default: 10, min: 1 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 171 64)' }]
+  style: [{ type: 'color', key: 'color', default: 'rgb(33 150 243)' }]
 } as const satisfies StudySchema
 
 type ZZParams = InferStudyValues<typeof ZZ_SCHEMA.inputs> & InferStudyValues<typeof ZZ_SCHEMA.style>
@@ -100,8 +100,12 @@ export class ZigZag extends AbstractIndicator implements Indicator {
     const seriesData: LineData<Time>[] = []
     const lines: ZigZagLine[] = []
 
+    let prev: number | null = null
     for (const pivot of allPivots) {
-      seriesData.push({ time: bars[pivot.end.barIndex].time, value: pivot.end.price })
+      if (pivot.end.barIndex !== prev) {
+        seriesData.push({ time: bars[pivot.end.barIndex].time, value: pivot.end.price })
+      }
+      prev = pivot.end.barIndex
     }
 
     for (let i = 1; i < allPivots.length; i++) {
