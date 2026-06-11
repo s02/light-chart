@@ -45,6 +45,7 @@
   "indicator-kc": "Keltner Channels",
   "indicator-lsma": "Least Squares MA",
   "indicator-wma": "Moving Average Weighted",
+  "indicator-md": "McGinley Dynamic",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
