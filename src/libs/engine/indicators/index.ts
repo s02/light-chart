@@ -20,6 +20,7 @@ import { WilliamsR } from './WilliamsR/WilliamsR'
 import { KeltnerChannels } from './KeltnerChannels/KeltnerChannels'
 import { LeastSquaresMA } from './LeastSquaresMA/LeastSquaresMA'
 import { ChandeKrollStop } from './ChandeKrollStop/ChandeKrollStop'
+import { WeightedMovingAverage } from './WeightedMovingAverage/WeightedMovingAverage'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -119,6 +120,9 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: ChandeKrollStop
+  },
+  {
+    indicator: WeightedMovingAverage
   }
 ] satisfies {
   indicator: {

@@ -70,6 +70,10 @@ const closeMenu = () => {
               :min="el.min"
               :max="el.max"
               :step="el.step || 1" />
+
+            <select v-if="el.type === 'select'" v-model="params[el.key]">
+              <option v-for="val in el.values" :key="val" :value="val">{{ val }}</option>
+            </select>
           </template>
         </template>
 

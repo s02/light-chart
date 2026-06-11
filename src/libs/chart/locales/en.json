@@ -43,6 +43,7 @@
   "indicator-fractal": "Williams Fractals",
   "indicator-kc": "Keltner Channels",
   "indicator-lsma": "Least Squares MA",
+  "indicator-wma": "Moving Average Weighted",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
@@ -127,5 +128,6 @@
   "ind-prop-q": "Q",
   "ind-prop-x": "X",
   "ind-prop-stopShort": "Short",
-  "ind-prop-stopLong": "Long"
+  "ind-prop-stopLong": "Long",
+  "ind-prop-source": "Source"
 }

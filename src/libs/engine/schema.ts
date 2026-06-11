@@ -20,7 +20,14 @@ type StudyStringParam = {
   default: string
 }
 
-export type StudyParamDescriptor = StudyNumberParam | StudyColorParam | StudyStringParam
+type StudySelectParam = {
+  type: 'select'
+  key: string
+  default: string
+  values: string[]
+}
+
+export type StudyParamDescriptor = StudyNumberParam | StudyColorParam | StudyStringParam | StudySelectParam
 
 export type StudyParams = Record<string, number | string>
 
