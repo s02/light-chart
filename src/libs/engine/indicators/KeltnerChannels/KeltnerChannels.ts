@@ -32,7 +32,7 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
 
   #chart: IChartApi
   #params: KCParams = resolveStudyParams(KC_SCHEMA.inputs, KC_SCHEMA.style)
-  #fill = new KeltnerChannelsFill(this.#params)
+  #fill = new KeltnerChannelsFill(this.#params.fill)
 
   #series: {
     upper: ISeriesApi<SeriesType>
@@ -80,7 +80,7 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
     this.#series.upper.applyOptions({ color: this.#params.upper })
     this.#series.middle.applyOptions({ color: this.#params.middle })
     this.#series.lower.applyOptions({ color: this.#params.lower })
-    this.#fill.setParams(this.#params)
+    this.#fill.fill = this.#params.fill
   }
 
   getLegend(seriesData: SeriesMap) {

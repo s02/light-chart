@@ -16,6 +16,6 @@ export class KeltnerChannelsFillPaneView implements IPrimitivePaneView {
   renderer() {
     const { chart, series, points } = this.#primitive
     if (!chart || !series) return null
-    return new KeltnerChannelsFillRenderer(points, chart, series, this.#primitive.params)
+    return new KeltnerChannelsFillRenderer(points, chart, series, this.#primitive.fill)
   }
 }
