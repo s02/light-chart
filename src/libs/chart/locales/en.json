@@ -46,6 +46,7 @@
   "indicator-lsma": "Least Squares MA",
   "indicator-wma": "Moving Average Weighted",
   "indicator-md": "McGinley Dynamic",
+  "indicator-ichimoku": "Ichimoku Cloud",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
@@ -131,5 +132,17 @@
   "ind-prop-x": "X",
   "ind-prop-stopShort": "Short",
   "ind-prop-stopLong": "Long",
-  "ind-prop-source": "Source"
+  "ind-prop-source": "Source",
+  "ind-prop-conversionPeriods": "Conversion Line Periods",
+  "ind-prop-basePeriods": "Base Line Periods",
+  "ind-prop-leadingSpanPeriods": "Leading Span Periods",
+  "ind-prop-laggingSpanPeriods": "Lagging Span Periods",
+  "ind-prop-leadingShiftPeriods": "Leading Shift Periods",
+  "ind-prop-tenkan": "Conversion Line",
+  "ind-prop-kijun": "Base Line",
+  "ind-prop-senkouA": "Lead 1",
+  "ind-prop-senkouB": "Lead 2",
+  "ind-prop-chikou": "Lagging Span",
+  "ind-prop-cloudBull": "Cloud Up",
+  "ind-prop-cloudBear": "Cloud Down"
 }

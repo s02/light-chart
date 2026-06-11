@@ -23,6 +23,7 @@ import { ChandeKrollStop } from './ChandeKrollStop/ChandeKrollStop'
 import { WeightedMovingAverage } from './WeightedMovingAverage/WeightedMovingAverage'
 import { SmoothedMovingAverage } from './SmoothedMovingAverage/SmoothedMovingAverage'
 import { McGinleyDynamic } from './McGinleyDynamic/McGinleyDynamic'
+import { IchimokuCloud } from './IchimokuCloud/IchimokuCloud'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -131,6 +132,9 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: McGinleyDynamic
+  },
+  {
+    indicator: IchimokuCloud
   }
 ] satisfies {
   indicator: {
