@@ -75,7 +75,10 @@ export class ZigZag extends AbstractIndicator implements Indicator {
 
     if (data) {
       legend.data.push({ value: formatPrice(data.value), color: this.#params.color })
+    } else {
+      legend.data.push({ value: '∅', color: this.#params.color })
     }
+
     return legend
   }
 
