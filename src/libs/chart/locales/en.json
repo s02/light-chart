@@ -40,6 +40,8 @@
   "indicator-kst": "Know Sure Thing",
   "indicator-wpr": "Williams %R",
   "indicator-fractal": "Williams Fractals",
+  "indicator-kc": "Keltner Channels",
+  "indicator-lsma": "Least Squares MA",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
@@ -119,5 +121,5 @@
   "ind-prop-sma3": "SMA Length 3",
   "ind-prop-sma4": "SMA Length 4",
   "ind-prop-kstLine": "KST",
-  "indicator-text": "Text"
+  "ind-prop-useTrueRange": "Use True Range"
 }

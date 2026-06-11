@@ -18,6 +18,7 @@ import { AwesomeOscillator } from './AwesomeOscillator/AwesomeOscillator'
 import { KnowSureThing } from './KnowSureThing/KnowSureThing'
 import { WilliamsR } from './WilliamsR/WilliamsR'
 import { KeltnerChannels } from './KeltnerChannels/KeltnerChannels'
+import { LeastSquaresMA } from './LeastSquaresMA/LeastSquaresMA'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -111,6 +112,9 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: KeltnerChannels
+  },
+  {
+    indicator: LeastSquaresMA
   }
 ] satisfies {
   indicator: {
