@@ -1,6 +1,6 @@
 import { LineSeries } from 'lightweight-charts'
 import type { IChartApi, ISeriesApi, SeriesType, WhitespaceData } from 'lightweight-charts'
-import { RESOLUTION_SETTINGS } from './constants'
+import { RESOLUTION_SETTINGS } from '../constants'
 import type { ChartBar, Datafeed, UTCTimestamp } from '@engine/types'
 
 const WHITESPACE_BARS = 50
