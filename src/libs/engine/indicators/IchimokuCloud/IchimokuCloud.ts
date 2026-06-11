@@ -162,7 +162,7 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
       this.#params.conversionPeriods,
       this.#params.basePeriods,
       this.#params.leadingSpanPeriods,
-      this.#params.leadingShiftPeriods
+      this.#params.leadingShiftPeriods - 1
     )
 
     const tenkanArr = tenkan.toArray()
