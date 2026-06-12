@@ -40,6 +40,7 @@ export class PlotEngine {
     this.#whitespace = new WhitespaceSeries(this.#chart, this.#datafeed)
 
     this.#chart.timeScale().subscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
+    console.log(`%c[Plot Engine: started]`, 'background: magenta; color:#90ac12')
   }
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
