@@ -27,6 +27,7 @@ import { IchimokuCloud } from './IchimokuCloud/IchimokuCloud'
 import { AcceleratorOscillator } from './AcceleratorOscillator/AcceleratorOscillator'
 import { CCI } from './CCI/CCI'
 import { TSI } from './TSI/TSI'
+import { ATR } from './ATR/ATR'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -149,6 +150,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: TSI,
+    separatePane: true
+  },
+  {
+    indicator: ATR,
     separatePane: true
   }
 ] satisfies {

@@ -50,6 +50,7 @@
   "indicator-ac": "Accelerator Oscillator",
   "indicator-cci": "Commodity Channel Index",
   "indicator-tsi": "True Strength Index",
+  "indicator-atr": "Average True Range",
   "ind-prop-tsiLine": "TSI",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
