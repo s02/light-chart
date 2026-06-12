@@ -31,7 +31,7 @@ jobs:
 
       - name: Publish dist to target repository
         env:
-          TARGET_REPO: ${{ vars.BUILD_TARGET_REPO }}
+          TARGET_REPO: s02/light-chart-dist
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           echo "TARGET_REPO=${TARGET_REPO}"
