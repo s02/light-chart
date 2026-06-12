@@ -49,6 +49,8 @@
   "indicator-ichimoku": "Ichimoku Cloud",
   "indicator-ac": "Accelerator Oscillator",
   "indicator-cci": "Commodity Channel Index",
+  "indicator-tsi": "True Strength Index",
+  "ind-prop-tsiLine": "TSI",
   "draw-line-trend-line": "Trend Line",
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
