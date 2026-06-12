@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: PROD
 
     steps:
       - name: Checkout source
@@ -31,7 +32,7 @@ jobs:
 
       - name: Publish dist to target repository
         env:
-          TARGET_REPO: s02/light-chart-dist
+          TARGET_REPO: ${{ vars.BUILD_TARGET_REPO }}
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           echo "TARGET_REPO=${TARGET_REPO}"
