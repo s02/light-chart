@@ -17,6 +17,7 @@ import { Path } from '@engine/drawings/Path/Path'
 import { GannSquare } from '@engine/drawings/GannSquare/GannSquare'
 import { Brush } from '@engine/drawings/Brush/Brush'
 import { Highlighter } from '@engine/drawings/Highlighter/Highlighter'
+import { ElliottDouble } from '@engine/drawings/ElliottDouble/ElliottDouble'
 import type { IChartApi } from 'lightweight-charts'
 import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
 
@@ -141,6 +142,12 @@ export const DRAWINGS = [
     subgroup: 'shapes',
     drawing: Circle,
     icon: icons['./Circle/icon.svg']
+  },
+  {
+    group: 'patterns' as const,
+    subgroup: 'elliott-waves',
+    drawing: ElliottDouble,
+    icon: icons['./ElliottDouble/icon.svg']
   }
 ] satisfies {
   group: string

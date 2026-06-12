@@ -4,8 +4,8 @@ import type { Point } from 'lightweight-charts'
 type Params = {
   text: string
   'text-color': string
-  fill: string
   'font-size': number
+  fill?: string
 }
 
 export const textLabel = (scope: BitmapCoordinatesRenderingScope, p: Point, params: Params) => {
@@ -26,19 +26,21 @@ export const textLabel = (scope: BitmapCoordinatesRenderingScope, p: Point, para
   const x = p.x * hpr
   const y = p.y * vpr
 
-  ctx.beginPath()
-  ctx.moveTo(x + radius, y)
-  ctx.lineTo(x + boxWidth - radius, y)
-  ctx.arcTo(x + boxWidth, y, x + boxWidth, y + radius, radius)
-  ctx.lineTo(x + boxWidth, y + boxHeight - radius)
-  ctx.arcTo(x + boxWidth, y + boxHeight, x + boxWidth - radius, y + boxHeight, radius)
-  ctx.lineTo(x + radius, y + boxHeight)
-  ctx.arcTo(x, y + boxHeight, x, y + boxHeight - radius, radius)
-  ctx.lineTo(x, y + radius)
-  ctx.arcTo(x, y, x + radius, y, radius)
-  ctx.closePath()
-  ctx.fillStyle = params.fill
-  ctx.fill()
+  if (params.fill) {
+    ctx.beginPath()
+    ctx.moveTo(x + radius, y)
+    ctx.lineTo(x + boxWidth - radius, y)
+    ctx.arcTo(x + boxWidth, y, x + boxWidth, y + radius, radius)
+    ctx.lineTo(x + boxWidth, y + boxHeight - radius)
+    ctx.arcTo(x + boxWidth, y + boxHeight, x + boxWidth - radius, y + boxHeight, radius)
+    ctx.lineTo(x + radius, y + boxHeight)
+    ctx.arcTo(x, y + boxHeight, x, y + boxHeight - radius, radius)
+    ctx.lineTo(x, y + radius)
+    ctx.arcTo(x, y, x + radius, y, radius)
+    ctx.closePath()
+    ctx.fillStyle = params.fill
+    ctx.fill()
+  }
 
   ctx.fillStyle = params['text-color']
   ctx.textAlign = 'left'
