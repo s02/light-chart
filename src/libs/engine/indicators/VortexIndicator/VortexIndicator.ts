@@ -129,7 +129,9 @@ export class VortexIndicator extends AbstractIndicator implements Indicator {
     const viMinusArr = new Array<number>(n).fill(NaN)
 
     for (let i = len; i < n; i++) {
-      let sumTR = 0, sumVMPlus = 0, sumVMMinus = 0
+      let sumTR = 0,
+        sumVMPlus = 0,
+        sumVMMinus = 0
       for (let j = i - len + 1; j <= i; j++) {
         sumTR += tr[j]
         sumVMPlus += vmPlus[j]

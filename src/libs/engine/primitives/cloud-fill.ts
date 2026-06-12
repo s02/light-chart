@@ -11,8 +11,10 @@ export const cloudFill = (
   const { context: ctx, horizontalPixelRatio: hpr, verticalPixelRatio: vpr } = scope
 
   for (let i = 0; i < upper.length - 1; i++) {
-    const u0 = upper[i], u1 = upper[i + 1]
-    const l0 = lower[i], l1 = lower[i + 1]
+    const u0 = upper[i],
+      u1 = upper[i + 1]
+    const l0 = lower[i],
+      l1 = lower[i + 1]
 
     const isBull0 = u0.y <= l0.y
     const isBull1 = u1.y <= l1.y
