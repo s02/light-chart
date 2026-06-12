@@ -18,4 +18,9 @@ defineProps<{ color: string }>()
 <style lang="scss" scoped>
 @use 'btn.scss';
 @use 'DrawingPropLineColor.scss';
+
+svg {
+  width: 16px;
+  height: 16px;
+}
 </style>

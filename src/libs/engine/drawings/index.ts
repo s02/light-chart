@@ -7,6 +7,9 @@ import { HorizontalRay } from '@engine/drawings/HorizontalRay/HorizontalRay'
 import { Ray } from '@engine/drawings/Ray/Ray'
 import { TrendLine } from '@engine/drawings/TrendLine/TrendLine'
 import { VerticalLine } from '@engine/drawings/VerticalLine/VerticalLine'
+import { Cross } from '@engine/drawings/Cross/Cross'
+import { ArrowMarkUp } from '@engine/drawings/ArrowMarkUp/ArrowMarkUp'
+import { ArrowMarkDown } from '@engine/drawings/ArrowMarkDown/ArrowMarkDown'
 import { TextDrawing } from '@engine/drawings/Text/TextDrawing'
 import { AnchoredText } from '@engine/drawings/AnchoredText/AnchoredText'
 import { ParallelChannel } from '@engine/drawings/ParallelChannel/ParallelChannel'
@@ -61,6 +64,12 @@ export const DRAWINGS = [
   },
   {
     group: 'trend-line-tools' as const,
+    subgroup: 'lines',
+    drawing: Cross,
+    icon: icons['./Cross/icon.svg']
+  },
+  {
+    group: 'trend-line-tools' as const,
     subgroup: 'channels',
     drawing: ParallelChannel,
     icon: icons['./ParallelChannel/icon.svg']
@@ -102,6 +111,18 @@ export const DRAWINGS = [
     subgroup: 'arrows',
     drawing: Arrow,
     icon: icons['./Arrow/icon.svg']
+  },
+  {
+    group: 'geometric-shapes' as const,
+    subgroup: 'arrows',
+    drawing: ArrowMarkUp,
+    icon: icons['./ArrowMarkUp/icon.svg']
+  },
+  {
+    group: 'geometric-shapes' as const,
+    subgroup: 'arrows',
+    drawing: ArrowMarkDown,
+    icon: icons['./ArrowMarkDown/icon.svg']
   },
   {
     group: 'geometric-shapes' as const,
