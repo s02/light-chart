@@ -44,6 +44,9 @@ jobs:
           cp -r dist/. target-repo/
 
           cd target-repo
+          echo "Files in target-repo:"
+          ls -la
+          git status
           git add -A
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "build: ${{ github.run_number }}"
