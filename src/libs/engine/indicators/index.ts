@@ -24,6 +24,7 @@ import { WeightedMovingAverage } from './WeightedMovingAverage/WeightedMovingAve
 import { SmoothedMovingAverage } from './SmoothedMovingAverage/SmoothedMovingAverage'
 import { McGinleyDynamic } from './McGinleyDynamic/McGinleyDynamic'
 import { IchimokuCloud } from './IchimokuCloud/IchimokuCloud'
+import { AcceleratorOscillator } from './AcceleratorOscillator/AcceleratorOscillator'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -135,6 +136,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: IchimokuCloud
+  },
+  {
+    indicator: AcceleratorOscillator,
+    separatePane: true
   }
 ] satisfies {
   indicator: {
