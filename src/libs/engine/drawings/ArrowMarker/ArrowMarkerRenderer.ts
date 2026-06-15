@@ -1,7 +1,7 @@
 import { dot } from '@engine/primitives/dot'
 import type { ArrowMarkerParams } from './ArrowMarker'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
-import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
+import type { Coordinate, IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 
 // Arrowhead length as a fraction of total arrow length, capped.
 function headSize(len: number): number {
@@ -50,8 +50,8 @@ export class ArrowMarkerRenderer implements IPrimitivePaneRenderer {
       let adjTailY = tailY
       if (rawLen < MIN_LEN) {
         const inv = 1 / rawLen
-        adjTailX = tipX - dx * inv * MIN_LEN
-        adjTailY = tipY - dy * inv * MIN_LEN
+        adjTailX = (tipX - dx * inv * MIN_LEN) as Coordinate
+        adjTailY = (tipY - dy * inv * MIN_LEN) as Coordinate
         dx = tipX - adjTailX
         dy = tipY - adjTailY
       }
@@ -89,16 +89,46 @@ export class ArrowMarkerRenderer implements IPrimitivePaneRenderer {
       ctx.lineWidth = strokeWidth(arrowLen) * pr
 
       const start = toCanvas(0, 0)
+      const p1 = toCanvas(shoulder, shaftHalf)
+      const p2 = toCanvas(arrowLen - t, wingHalf)
+      const p3 = toCanvas(arrowLen, 0)
+      const p4 = toCanvas(arrowLen - t, -wingHalf)
+      const p5 = toCanvas(shoulder, -shaftHalf)
       ctx.beginPath()
       ctx.moveTo(start.x, start.y)
-      ctx.lineTo(...Object.values(toCanvas(shoulder, shaftHalf)))
-      ctx.lineTo(...Object.values(toCanvas(arrowLen - t, wingHalf)))
-      ctx.lineTo(...Object.values(toCanvas(arrowLen, 0)))
-      ctx.lineTo(...Object.values(toCanvas(arrowLen - t, -wingHalf)))
-      ctx.lineTo(...Object.values(toCanvas(shoulder, -shaftHalf)))
+      ctx.lineTo(p1.x, p1.y)
+      ctx.lineTo(p2.x, p2.y)
+      ctx.lineTo(p3.x, p3.y)
+      ctx.lineTo(p4.x, p4.y)
+      ctx.lineTo(p5.x, p5.y)
       ctx.closePath()
       ctx.stroke()
       ctx.fill()
+
+      // Plain text at anchor[0], positioned away from the arrow direction.
+      if (this.#params.textarea) {
+        // Use original (non-adjusted) direction for alignment decisions.
+        const ndx = (tipX - tailX) / rawLen
+        const ndy = (tipY - tailY) / rawLen
+        const GAP = 10 // logical px between anchor and text
+
+        // Horizontal: if arrow is more horizontal than vertical, place text on opposite side.
+        const tAlign: CanvasTextAlign = Math.abs(ndx) >= Math.abs(ndy) ? (ndx > 0 ? 'right' : 'left') : 'center'
+
+        // Vertical: if arrow is more vertical than horizontal, place text on opposite side.
+        const tBaseline: CanvasTextBaseline = Math.abs(ndy) >= Math.abs(ndx) ? (ndy > 0 ? 'bottom' : 'top') : 'middle'
+
+        // Offset the draw point by GAP in the text direction (away from arrow).
+        const textX = tailX + (tAlign === 'right' ? -GAP : tAlign === 'left' ? GAP : 0)
+        const textY = tailY + (tBaseline === 'bottom' ? -GAP : tBaseline === 'top' ? GAP : 0)
+
+        const fSize = this.#params['font-size'] * pr
+        ctx.font = `${fSize}px sans-serif`
+        ctx.fillStyle = this.#params['text-color']
+        ctx.textAlign = tAlign
+        ctx.textBaseline = tBaseline
+        ctx.fillText(this.#params.textarea, textX * hpr, textY * vpr)
+      }
 
       if (this.#withDots) {
         dot(scope, this.#p1, { color })

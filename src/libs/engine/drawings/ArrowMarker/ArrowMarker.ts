@@ -6,11 +6,15 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import { ArrowMarkerPaneView } from './ArrowMarkerPaneView'
 
 const ARROW_MARKER_SCHEMA = {
-  inputs: [],
+  text: [
+    { type: 'string', key: 'textarea', default: '' },
+    { type: 'number', key: 'font-size', default: 12 },
+    { type: 'color', key: 'text-color', default: 'rgb(255 255 255)' }
+  ],
   style: [{ type: 'color', key: 'line-color', default: 'rgb(255, 152, 0)' }]
 } as const satisfies StudySchema
 
-export type ArrowMarkerParams = InferStudyValues<typeof ARROW_MARKER_SCHEMA.inputs> &
+export type ArrowMarkerParams = InferStudyValues<typeof ARROW_MARKER_SCHEMA.text> &
   InferStudyValues<typeof ARROW_MARKER_SCHEMA.style>
 
 export class ArrowMarker extends BaseDrawing {
@@ -21,11 +25,11 @@ export class ArrowMarker extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(ARROW_MARKER_SCHEMA.inputs, ARROW_MARKER_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(ARROW_MARKER_SCHEMA.text, ARROW_MARKER_SCHEMA.style, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ARROW_MARKER_SCHEMA.inputs, ARROW_MARKER_SCHEMA.style, params)
+    this.#params = resolveStudyParams(ARROW_MARKER_SCHEMA.text, ARROW_MARKER_SCHEMA.style, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }
