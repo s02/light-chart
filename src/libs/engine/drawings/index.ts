@@ -16,6 +16,7 @@ import { TextDrawing } from '@engine/drawings/Text/TextDrawing'
 import { AnchoredText } from '@engine/drawings/AnchoredText/AnchoredText'
 import { SignPost } from '@engine/drawings/SignPost/SignPost'
 import { Callout } from '@engine/drawings/Callout/Callout'
+import { ArrowMarker } from '@engine/drawings/ArrowMarker/ArrowMarker'
 import { ParallelChannel } from '@engine/drawings/ParallelChannel/ParallelChannel'
 import { Path } from '@engine/drawings/Path/Path'
 import { GannSquare } from '@engine/drawings/GannSquare/GannSquare'
@@ -128,6 +129,12 @@ export const DRAWINGS = [
     subgroup: 'arrows',
     drawing: Arrow,
     icon: icons['./Arrow/icon.svg']
+  },
+  {
+    group: 'geometric-shapes' as const,
+    subgroup: 'arrows',
+    drawing: ArrowMarker,
+    icon: icons['./ArrowMarker/icon.svg']
   },
   {
     group: 'geometric-shapes' as const,
