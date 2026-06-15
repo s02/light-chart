@@ -15,6 +15,7 @@ import { ArrowMarkRight } from '@engine/drawings/ArrowMarkRight/ArrowMarkRight'
 import { TextDrawing } from '@engine/drawings/Text/TextDrawing'
 import { AnchoredText } from '@engine/drawings/AnchoredText/AnchoredText'
 import { SignPost } from '@engine/drawings/SignPost/SignPost'
+import { Callout } from '@engine/drawings/Callout/Callout'
 import { ParallelChannel } from '@engine/drawings/ParallelChannel/ParallelChannel'
 import { Path } from '@engine/drawings/Path/Path'
 import { GannSquare } from '@engine/drawings/GannSquare/GannSquare'
@@ -101,6 +102,12 @@ export const DRAWINGS = [
     subgroup: 'text',
     drawing: SignPost,
     icon: icons['./SignPost/icon.svg']
+  },
+  {
+    group: 'annotation-tools' as const,
+    subgroup: 'text',
+    drawing: Callout,
+    icon: icons['./Callout/icon.svg']
   },
   {
     group: 'geometric-shapes' as const,
