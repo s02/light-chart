@@ -50,8 +50,6 @@ export class ArrowMarkLeftRenderer implements IPrimitivePaneRenderer {
       const gap = 2 * hpr
 
       ctx.font = `${fontSize}px sans-serif`
-      const textWidth = ctx.measureText(this.#params.textarea).width
-      const boxW = textWidth + paddingW * 2
       const boxH = fontSize + paddingH * 2
 
       const bx = px + gap
