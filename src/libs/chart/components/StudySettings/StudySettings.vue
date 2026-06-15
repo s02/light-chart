@@ -73,5 +73,5 @@ const tab = ref(tabs[0])
 </template>
 
 <style lang="scss" scoped>
-@import 'StudySettings.scss';
+@use 'StudySettings.scss';
 </style>
