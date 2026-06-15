@@ -50,7 +50,7 @@ export class ArrowMarkUpRenderer implements IPrimitivePaneRenderer {
       const gap = 2 * vpr
 
       ctx.font = `${fontSize}px sans-serif`
-      const textWidth = ctx.measureText(this.#params.text).width
+      const textWidth = ctx.measureText(this.#params.textarea).width
       const boxW = textWidth + paddingW * 2
 
       const bx = px - boxW / 2
@@ -59,7 +59,7 @@ export class ArrowMarkUpRenderer implements IPrimitivePaneRenderer {
       ctx.fillStyle = this.#params['text-color']
       ctx.textAlign = 'left'
       ctx.textBaseline = 'top'
-      ctx.fillText(this.#params.text, bx + paddingW, by + paddingH)
+      ctx.fillText(this.#params.textarea, bx + paddingW, by + paddingH)
     })
   }
 }

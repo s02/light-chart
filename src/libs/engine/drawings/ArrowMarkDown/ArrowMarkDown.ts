@@ -7,17 +7,15 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const ARROW_MARK_DOWN_SCHEMA = {
-  inputs: [
-    { type: 'string', key: 'text', default: '' },
-    { type: 'number', key: 'font-size', default: 12 }
-  ],
-  style: [
-    { type: 'color', key: 'fill', default: 'rgb(239 83 80)' },
+  text: [
+    { type: 'string', key: 'textarea', default: '' },
+    { type: 'number', key: 'font-size', default: 12 },
     { type: 'color', key: 'text-color', default: 'rgb(239 83 80)' }
-  ]
+  ],
+  style: [{ type: 'color', key: 'fill', default: 'rgb(239 83 80)' }]
 } as const satisfies StudySchema
 
-export type ArrowMarkDownParams = InferStudyValues<typeof ARROW_MARK_DOWN_SCHEMA.inputs> &
+export type ArrowMarkDownParams = InferStudyValues<typeof ARROW_MARK_DOWN_SCHEMA.text> &
   InferStudyValues<typeof ARROW_MARK_DOWN_SCHEMA.style>
 
 export class ArrowMarkDown extends BaseDrawing {
@@ -28,11 +26,11 @@ export class ArrowMarkDown extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(ARROW_MARK_DOWN_SCHEMA.inputs, ARROW_MARK_DOWN_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(ARROW_MARK_DOWN_SCHEMA.text, ARROW_MARK_DOWN_SCHEMA.style, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ARROW_MARK_DOWN_SCHEMA.inputs, ARROW_MARK_DOWN_SCHEMA.style, params)
+    this.#params = resolveStudyParams(ARROW_MARK_DOWN_SCHEMA.text, ARROW_MARK_DOWN_SCHEMA.style, params)
     if (this.requestUpdate) this.requestUpdate()
   }
 
@@ -58,7 +56,7 @@ export class ArrowMarkDown extends BaseDrawing {
     const p = viewport.anchorToPoint(this.anchors[0])
     if (!p) return false
 
-    const { width, height } = textLabelBounds(this.#params.text, this.#params['font-size'])
+    const { width, height } = textLabelBounds(this.#params.textarea, this.#params['font-size'])
     const pad = ArrowMarkDown.hitThreashold
     const totalH = ArrowHeadHeight + ArrowTailHeight
     const halfW = Math.max(ArrowHeadWidth / 2, width / 2)

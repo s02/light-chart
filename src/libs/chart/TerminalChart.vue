@@ -4,7 +4,7 @@ import ChartHeader from '@chart/components/ChartHeader.vue'
 import ChartAside from '@chart/components/ChartAside.vue'
 import ModalContainer from '@chart/ModalContainer.vue'
 import ChartLegend from '@chart/components/ChartLegend.vue'
-import DrawingSettings from '@chart/components/DrawingSettings/DrawingSettings.vue'
+import DrawingPanel from '@chart/components/DrawingSettings/DrawingPanel.vue'
 import { useChart } from '@chart/useChart'
 import { useEngineApi } from '@chart/composables/useEngine'
 import type { AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
@@ -60,7 +60,7 @@ onUnmounted(() => {
       <div class="t-chart-legends">
         <ChartLegend :legends="mainPaneLegends" />
       </div>
-      <DrawingSettings class="t-chart-drawings" />
+      <DrawingPanel class="t-chart-drawings" />
       <div ref="chartRef" class="t-chart-plot"></div>
     </div>
     <ModalContainer />

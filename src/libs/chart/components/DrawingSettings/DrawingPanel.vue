@@ -16,21 +16,29 @@ import DrawingPropText from '@chart/components/DrawingSettings/DrawingPropText.v
 import type { DrawingSchema } from '@engine/drawings/types'
 import type { StudyParamDescriptor } from '@engine/schema'
 import { useEngineApi } from '@chart/composables/useEngine'
+import { useModal } from '@chart/composables/useModal'
+import StudySettings from '@chart/components/StudySettings/StudySettings.vue'
 
 type ParamKey = keyof DrawingSchema['params']
 type ParamValue = DrawingSchema['params'][ParamKey]
 type MenuType = 'line' | 'color' | 'font'
+
 const { updateDrawing, removeDrawing, drawingSchema, selectDrawing } = useEngineApi()
+const { open: openModal } = useModal()
 const dwsBtn = useTemplateRef('dws')
 const colorPickerRef = useTemplateRef<HTMLElement>('colorPicker')
 const linesPickerRef = useTemplateRef<HTMLElement>('linesPicker')
 const fontPickerRef = useTemplateRef<HTMLElement>('fontPicker')
 
+const isSettingsOpened = ref(false)
+
 onClickOutside(
   dwsBtn,
   () => {
-    editSettings.value = null
-    selectDrawing(null)
+    if (!isSettingsOpened.value) {
+      editSettings.value = null
+      selectDrawing(null)
+    }
   },
   { ignore: [colorPickerRef, linesPickerRef, fontPickerRef] }
 )
@@ -63,6 +71,30 @@ const open = (el: StudyParamDescriptor, type: MenuType) => {
 const close = () => {
   editSettings.value = null
   closeMenu()
+}
+
+const openSettings = async () => {
+  if (!drawingSchema.value) {
+    return
+  }
+
+  isSettingsOpened.value = true
+
+  try {
+    const p = { ikey: drawingSchema.value.ikey, schema: drawingSchema.value.schema, params: drawingSchema.value.params }
+    const settings = await openModal(StudySettings, { props: p })
+
+    if (!drawingSchema.value || !settings) {
+      return
+    }
+
+    updateDrawing({
+      ...drawingSchema.value.params,
+      ...settings
+    })
+  } finally {
+    isSettingsOpened.value = false
+  }
 }
 
 onUnmounted(() => {
@@ -116,6 +148,14 @@ onUnmounted(() => {
           :color="String(drawingSchema.params[el.key])"
           @click="open(el, 'color')" />
       </template>
+      <div class="drw-btn" @click="openSettings()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 14a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-1 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
+          <path
+            fill-rule="evenodd"
+            d="M8.5 5h11l5 9-5 9h-11l-5-9 5-9Zm-3.86 9L9.1 6h9.82l4.45 8-4.45 8H9.1l-4.45-8Z"></path>
+        </svg>
+      </div>
       <div class="drw-btn" @click="removeDrawing()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
           <path
@@ -154,6 +194,6 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
-@use 'DrawingSettings.scss';
+@use 'DrawingPanel.scss';
 @use 'btn.scss';
 </style>

@@ -32,8 +32,9 @@ export type StudyParamDescriptor = StudyNumberParam | StudyColorParam | StudyStr
 export type StudyParams = Record<string, number | string>
 
 export type StudySchema = {
-  inputs: StudyParamDescriptor[]
-  style: StudyParamDescriptor[]
+  text?: StudyParamDescriptor[]
+  inputs?: StudyParamDescriptor[]
+  style?: StudyParamDescriptor[]
 }
 
 export type InferStudyValues<T extends readonly StudyParamDescriptor[]> = {
