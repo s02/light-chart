@@ -59,9 +59,9 @@ export class CalloutRenderer implements IPrimitivePaneRenderer {
       const a = Math.min(textW, maxBoxWidth - 2 * PAD) + 2 * PAD
       const l = textH + 2 * PAD
 
-      // Box top-left (bubble anchor is box center)
-      const d = this.#bubble.x * hpr - a / 2
-      const h = this.#bubble.y * vpr - l / 2
+      // Anchor is always the top-left corner of the bubble; box extends right and down.
+      const d = this.#bubble.x * hpr
+      const h = this.#bubble.y * vpr
 
       // Tip in LOCAL coords (origin = box top-left)
       const tx = this.#tip.x * hpr - d

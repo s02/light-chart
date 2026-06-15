@@ -60,17 +60,20 @@ export class Callout extends BaseDrawing {
     const fontSize = this.#params['font-size']
     const charWidth = fontSize * 0.6
     const maxWidth = 250
-    const availableWidth = maxWidth - 12
-    const estimatedLines = Math.max(1, Math.ceil((this.#params.textarea.length * charWidth) / availableWidth))
-    const bubbleWidth = Math.min(this.#params.textarea.length * charWidth + 12, maxWidth)
-    const bubbleHeight = fontSize * estimatedLines + 8
+    const estimatedLines = Math.max(1, Math.ceil((this.#params.textarea.length * charWidth) / (maxWidth - 20)))
+    const bubbleWidth = Math.min(this.#params.textarea.length * charWidth + 20, maxWidth)
+    const bubbleHeight = fontSize * estimatedLines + 20
     const pad = Callout.hitThreashold
 
+    // Anchor is always the top-left corner; box extends right and down
+    const bLeft = bubble.x
+    const bTop = bubble.y
+
     const inBubble =
-      point.x >= bubble.x - bubbleWidth / 2 - pad &&
-      point.x <= bubble.x + bubbleWidth / 2 + pad &&
-      point.y >= bubble.y - bubbleHeight / 2 - pad &&
-      point.y <= bubble.y + bubbleHeight / 2 + pad
+      point.x >= bLeft - pad &&
+      point.x <= bLeft + bubbleWidth + pad &&
+      point.y >= bTop - pad &&
+      point.y <= bTop + bubbleHeight + pad
 
     if (inBubble) return true
 
