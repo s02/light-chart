@@ -10,6 +10,8 @@ import { VerticalLine } from '@engine/drawings/VerticalLine/VerticalLine'
 import { Cross } from '@engine/drawings/Cross/Cross'
 import { ArrowMarkUp } from '@engine/drawings/ArrowMarkUp/ArrowMarkUp'
 import { ArrowMarkDown } from '@engine/drawings/ArrowMarkDown/ArrowMarkDown'
+import { ArrowMarkLeft } from '@engine/drawings/ArrowMarkLeft/ArrowMarkLeft'
+import { ArrowMarkRight } from '@engine/drawings/ArrowMarkRight/ArrowMarkRight'
 import { TextDrawing } from '@engine/drawings/Text/TextDrawing'
 import { AnchoredText } from '@engine/drawings/AnchoredText/AnchoredText'
 import { ParallelChannel } from '@engine/drawings/ParallelChannel/ParallelChannel'
@@ -124,6 +126,18 @@ export const DRAWINGS = [
     subgroup: 'arrows',
     drawing: ArrowMarkDown,
     icon: icons['./ArrowMarkDown/icon.svg']
+  },
+  {
+    group: 'geometric-shapes' as const,
+    subgroup: 'arrows',
+    drawing: ArrowMarkLeft,
+    icon: icons['./ArrowMarkLeft/icon.svg']
+  },
+  {
+    group: 'geometric-shapes' as const,
+    subgroup: 'arrows',
+    drawing: ArrowMarkRight,
+    icon: icons['./ArrowMarkRight/icon.svg']
   },
   {
     group: 'geometric-shapes' as const,
