@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import ChartMenu from '@chart/components/ChartMenu.vue'
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 import ChartMenuGroup from '@chart/components/ChartMenuGroup.vue'
-import { provideChartMenu } from '@chart/useChartMenu'
-import { ref, shallowRef, useTemplateRef } from 'vue'
+import { ref } from 'vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import { DRAWINGS } from '@engine/drawings'
 import { i18n } from '@chart/i18n'
+import ChartAsideButton from '@chart/components/ChartAsideButton.vue'
+import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
 import type { DrawingGroup, DrawingName, DrawingScript } from '@engine/drawings/types'
 
 type AsideMenu = Record<DrawingGroup, DrawingScript>
@@ -71,6 +71,7 @@ const init = async (name: DrawingName, manualStop?: boolean) => {
 }
 
 const handleStart = (name: DrawingName) => {
+  currentDrawingGroup.value = null
   if (name === initialized.value) {
     initialized.value = null
     cancelDrawing()
@@ -81,16 +82,6 @@ const handleStart = (name: DrawingName) => {
   }
 }
 
-const open = (group: DrawingGroup, i: number) => {
-  currentDrawingGroup.value = group
-  activeBtn.value = btns.value?.[i] ?? null
-  openMenu()
-}
-
-const btns = useTemplateRef('btn')
-const activeBtn = shallowRef<NonNullable<typeof btns.value>[number] | null>(null)
-const { close: closeMenu, open: openMenu, key: menuKey } = provideChartMenu('line-menu', activeBtn)
-
 const selectDrawing = (script: DrawingScript) => {
   if (!currentDrawingGroup.value) {
     return
@@ -98,29 +89,30 @@ const selectDrawing = (script: DrawingScript) => {
 
   menu.value[currentDrawingGroup.value] = script
   handleStart(script.drawing.ikey)
-  closeMenu()
+  close()
 }
 </script>
 
 <template>
   <div class="chart-aside">
-    <div v-for="(g, i) in groups" :key="g" ref="btn" class="ca-btn">
-      <div
-        class="ca-btn-icon"
-        :class="{ initialized: initialized === menu[g].drawing.ikey }"
-        @click="handleStart(menu[g].drawing.ikey)"
-        v-html="menu[g].icon"></div>
+    <FloatingDropdown
+      v-for="g in groups"
+      :key="g"
+      :open="currentDrawingGroup === g"
+      placement="right-start"
+      @update:open="currentDrawingGroup = null">
+      <template #trigger="{ triggerRef }">
+        <ChartAsideButton
+          :ref="triggerRef"
+          :initialized="initialized === menu[g].drawing.ikey"
+          :opened="currentDrawingGroup === g"
+          :icon="menu[g].icon"
+          @toggle="currentDrawingGroup ? (currentDrawingGroup = null) : (currentDrawingGroup = g)"
+          @click="handleStart(menu[g].drawing.ikey)" />
+      </template>
 
-      <div class="ca-btn-collapse" @click="open(g, i)">
-        <svg class="ca-btn-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" width="4" height="7">
-          <path d="M.6 1.4l1.4-1.4 8 8-8 8-1.4-1.4 6.389-6.532-6.389-6.668z" stroke="currentColor"></path>
-        </svg>
-      </div>
-    </div>
-
-    <ChartMenu :menu-key="menuKey" placement="right-start">
-      <div v-if="currentDrawingGroup" class="ca-drawing-menu">
-        <ChartMenuGroup v-for="subg in getDrawingSubgroups(currentDrawingGroup)" :key="subg" :name="subg">
+      <div class="ca-drawing-menu">
+        <ChartMenuGroup v-for="subg in getDrawingSubgroups(g)" :key="subg" :name="subg">
           <ChartMenuItem
             v-for="item in getDrawingItems(subg)"
             :key="item.drawing.ikey"
@@ -131,7 +123,7 @@ const selectDrawing = (script: DrawingScript) => {
           </ChartMenuItem>
         </ChartMenuGroup>
       </div>
-    </ChartMenu>
+    </FloatingDropdown>
   </div>
 </template>
 
