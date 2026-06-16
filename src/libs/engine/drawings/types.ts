@@ -6,6 +6,7 @@ import type { DRAWINGS } from '@engine/drawings'
 export type DrawingViewport = {
   anchorToPoint: (a: { time: Time; price: number }) => Point | null
   pointToAnchor: (p: Point) => Anchor | null
+  barsBetween: (t1: Time, t2: Time) => number | null
 }
 
 export type DrawingSelectFn = (el: { id: number; ds: DrawingSchema }) => void

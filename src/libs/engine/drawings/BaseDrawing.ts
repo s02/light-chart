@@ -157,6 +157,15 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
           x,
           y
         }
+      },
+      barsBetween: (t1: Time, t2: Time) => {
+        const x1 = this.#chart.timeScale().timeToCoordinate(t1)
+        const x2 = this.#chart.timeScale().timeToCoordinate(t2)
+        if (x1 === null || x2 === null) return null
+        const l1 = this.#chart.timeScale().coordinateToLogical(x1)
+        const l2 = this.#chart.timeScale().coordinateToLogical(x2)
+        if (l1 === null || l2 === null) return null
+        return Math.round(Math.abs((l2 as number) - (l1 as number)))
       }
     }
   }

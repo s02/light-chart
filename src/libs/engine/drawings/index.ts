@@ -23,6 +23,7 @@ import { GannSquare } from '@engine/drawings/GannSquare/GannSquare'
 import { Brush } from '@engine/drawings/Brush/Brush'
 import { Highlighter } from '@engine/drawings/Highlighter/Highlighter'
 import { ElliottDouble } from '@engine/drawings/ElliottDouble/ElliottDouble'
+import { PriceRange } from '@engine/drawings/PriceRange/PriceRange'
 import type { IChartApi } from 'lightweight-charts'
 import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
 
@@ -183,6 +184,12 @@ export const DRAWINGS = [
     subgroup: 'elliott-waves',
     drawing: ElliottDouble,
     icon: icons['./ElliottDouble/icon.svg']
+  },
+  {
+    group: 'forecasting-measuring' as const,
+    subgroup: 'measurer',
+    drawing: PriceRange,
+    icon: icons['./PriceRange/icon.svg']
   }
 ] satisfies {
   group: string
