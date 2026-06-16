@@ -25,6 +25,7 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
   protected anchorsVisible = false
   protected anchors: Anchor[] = []
   protected requestUpdate: (() => void) | null = null
+  protected initialized = false
 
   #series: ISeriesApi<SeriesType> | undefined
   #chart: IChartApi
@@ -118,6 +119,10 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
   attach(series: ISeriesApi<SeriesType>) {
     this.#series = series
     this.#series.attachPrimitive(this)
+  }
+
+  setInitialized() {
+    this.initialized = true
   }
 
   protected getViewport(): DrawingViewport | null {

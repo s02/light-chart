@@ -69,6 +69,7 @@ export class DrawingsManager {
         drawing.setAnchorsVisible(true)
         drawing.setAnchors(params.points)
         if (params.status === 'done') {
+          drawing.setInitialized()
           const id = this.#id++
           const el = { id, drawing }
           this.#drawings.push(el)

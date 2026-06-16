@@ -25,6 +25,7 @@ import { Highlighter } from '@engine/drawings/Highlighter/Highlighter'
 import { ElliottDouble } from '@engine/drawings/ElliottDouble/ElliottDouble'
 import { PriceRange } from '@engine/drawings/PriceRange/PriceRange'
 import { FibRetracement } from '@engine/drawings/FibRetracement/FibRetracement'
+import { EmojiDrawing } from '@engine/drawings/EmojiDrawing/EmojiDrawing'
 import type { IChartApi } from 'lightweight-charts'
 import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
 
@@ -197,6 +198,12 @@ export const DRAWINGS = [
     subgroup: 'measurer',
     drawing: PriceRange,
     icon: icons['./PriceRange/icon.svg']
+  },
+  {
+    group: 'emoji' as const,
+    subgroup: 'emoji',
+    drawing: EmojiDrawing,
+    icon: icons['./EmojiDrawing/icon.svg']
   }
 ] satisfies {
   group: string
