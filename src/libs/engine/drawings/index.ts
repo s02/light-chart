@@ -24,6 +24,7 @@ import { Brush } from '@engine/drawings/Brush/Brush'
 import { Highlighter } from '@engine/drawings/Highlighter/Highlighter'
 import { ElliottDouble } from '@engine/drawings/ElliottDouble/ElliottDouble'
 import { PriceRange } from '@engine/drawings/PriceRange/PriceRange'
+import { FibRetracement } from '@engine/drawings/FibRetracement/FibRetracement'
 import type { IChartApi } from 'lightweight-charts'
 import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
 
@@ -80,6 +81,12 @@ export const DRAWINGS = [
     subgroup: 'channels',
     drawing: ParallelChannel,
     icon: icons['./ParallelChannel/icon.svg']
+  },
+  {
+    group: 'gann-and-fib' as const,
+    subgroup: 'fib',
+    drawing: FibRetracement,
+    icon: icons['./FibRetracement/icon.svg']
   },
   {
     group: 'gann-and-fib' as const,
