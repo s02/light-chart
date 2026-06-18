@@ -29,6 +29,9 @@ export class RiskRewardRenderer implements IPrimitivePaneRenderer {
   #stopPriceOffset: number
   #stopPricePercentOffset: number
   #stopLevelText: string
+  #amountTarget: number
+  #amountStop: number
+  #midText: string
 
   #qtyRisk: number
 
@@ -50,14 +53,17 @@ export class RiskRewardRenderer implements IPrimitivePaneRenderer {
 
     this.#targetPriceOffset = settings.profitPrice - settings.entryPrice
     this.#targetPricePercentOffset = (this.#targetPriceOffset / settings.entryPrice) * 100
-    this.#targetLevelText = `target: ${formatPrice(this.#targetPriceOffset)} (${this.#targetPricePercentOffset.toFixed(2)}%)`
 
     this.#stopPriceOffset = settings.entryPrice - settings.stopPrice
     this.#stopPricePercentOffset = (this.#stopPriceOffset / settings.entryPrice) * 100
 
     this.#qtyRisk = settings.riskSize / Math.abs(this.#stopPriceOffset)
+    this.#amountTarget = settings.account + (settings.profitPrice - settings.entryPrice) * this.#qtyRisk
+    this.#amountStop = settings.account - (settings.entryPrice - settings.stopPrice) * this.#qtyRisk
 
-    this.#stopLevelText = `stop: ${formatPrice(this.#stopPriceOffset)} (${this.#stopPricePercentOffset.toFixed(2)}%) qty: ${this.#qtyRisk}`
+    this.#targetLevelText = `target: ${formatPrice(this.#targetPriceOffset)} (${this.#targetPricePercentOffset.toFixed(2)}%) Amount: ${this.#amountTarget.toFixed(2)}`
+    this.#stopLevelText = `stop: ${formatPrice(this.#stopPriceOffset)} (${this.#stopPricePercentOffset.toFixed(2)}%) Amount: ${this.#amountStop.toFixed(2)}`
+    this.#midText = `qty: ${this.#qtyRisk.toFixed(0)}`
   }
 
   draw(target: CanvasRenderingTarget2D) {
@@ -117,6 +123,14 @@ export class RiskRewardRenderer implements IPrimitivePaneRenderer {
         'text-color': 'rgba(255, 255, 255, 0.9)',
         'font-size': LABEL_FONT_SIZE,
         fill: 'rgba(244, 67, 54, 0.85)'
+      })
+
+      const qtyBoxW = (ctx.measureText(this.#midText).width + paddingW * 2) / hpr
+      textLabel(scope, { x: centerX - qtyBoxW / 2, y: mid + LABEL_GAP } as Point, {
+        text: this.#midText,
+        'text-color': 'rgba(255, 255, 255, 0.9)',
+        'font-size': LABEL_FONT_SIZE,
+        fill: 'rgba(30, 40, 80, 0.85)'
       })
 
       if (this.#withDots) {

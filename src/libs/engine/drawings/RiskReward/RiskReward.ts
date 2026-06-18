@@ -13,6 +13,7 @@ export type RiskRewardSettings = {
   profitPrice: number
   stopPrice: number
   riskSize: number
+  account: number
 }
 
 const RISK_REWARD_SCHEMA = {
@@ -51,7 +52,8 @@ export class RiskReward extends BaseDrawing {
       entryPrice: 0,
       profitPrice: 0,
       stopPrice: 0,
-      riskSize: this.#params['risk']
+      riskSize: this.#params['risk'],
+      account: this.#params['account-size']
     }
   }
 
