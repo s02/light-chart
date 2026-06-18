@@ -26,6 +26,7 @@ import { ElliottDouble } from '@engine/drawings/ElliottDouble/ElliottDouble'
 import { PriceRange } from '@engine/drawings/PriceRange/PriceRange'
 import { FibRetracement } from '@engine/drawings/FibRetracement/FibRetracement'
 import { EmojiDrawing } from '@engine/drawings/EmojiDrawing/EmojiDrawing'
+import { RiskReward } from '@engine/drawings/RiskReward/RiskReward'
 import type { IChartApi } from 'lightweight-charts'
 import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
 
@@ -198,6 +199,12 @@ export const DRAWINGS = [
     subgroup: 'measurer',
     drawing: PriceRange,
     icon: icons['./PriceRange/icon.svg']
+  },
+  {
+    group: 'forecasting-measuring' as const,
+    subgroup: 'measurer',
+    drawing: RiskReward,
+    icon: icons['./RiskReward/icon.svg']
   },
   {
     group: 'emoji' as const,
