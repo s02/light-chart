@@ -77,10 +77,10 @@ export class RiskRewardRenderer implements IPrimitivePaneRenderer {
       const bottom = this.#p2.y
 
       const tl = { x: left, y: top } as Point
-      const tr = { x: right, y: top } as Point
+      //const tr = { x: right, y: top } as Point
       const ml = { x: left, y: mid } as Point
       const mr = { x: right, y: mid } as Point
-      const bl = { x: left, y: bottom } as Point
+      //const bl = { x: left, y: bottom } as Point
       const br = { x: right, y: bottom } as Point
 
       // Top half — profit (green)

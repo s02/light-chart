@@ -120,7 +120,7 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
   #calculate(bars: ChartBar[]) {
     const { length } = this.#params
 
-    const hl2Arr = bars.map(b => (b.high + b.low) / 2)
+    const hl2Arr = bars.map((b) => (b.high + b.low) / 2)
     const hl2Series = Series.fromArray(bars, hl2Arr)
 
     const highestArr = ta.highest(hl2Series, length).toArray()
@@ -145,7 +145,7 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
       let value = 0.66 * ((hl2Arr[i] - lo) / range - 0.5) + 0.67 * prevValue
       value = Math.max(-0.999, Math.min(0.999, value))
 
-      const fisher = 0.5 * Math.log((1 + value) / Math.max(1 - value, 0.001)) + 0.5 * (prevFisher ?? 0)
+      const fisher: number = 0.5 * Math.log((1 + value) / Math.max(1 - value, 0.001)) + 0.5 * (prevFisher ?? 0)
 
       triggerArr.push(prevFisher ?? NaN)
       fisherArr.push(fisher)
