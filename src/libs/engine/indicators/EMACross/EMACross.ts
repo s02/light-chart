@@ -108,8 +108,11 @@ export class EMACross extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const fastArr = ta.ema(source, this.#params.shortLength).toArray()
-    const slowArr = ta.ema(source, this.#params.longLength).toArray()
+    const fastSeries = ta.ema(source, this.#params.shortLength)
+    const slowSeries = ta.ema(source, this.#params.longLength)
+    const fastArr = fastSeries.toArray()
+    const slowArr = slowSeries.toArray()
+    const crossArr = ta.cross(fastSeries, slowSeries).toArray()
 
     const toBar = (value: number, i: number) => ({
       time: bars[i].time,
@@ -118,28 +121,18 @@ export class EMACross extends AbstractIndicator implements Indicator {
 
     const markers: SeriesMarker<Time>[] = []
 
-    for (let i = 1; i < bars.length; i++) {
+    for (let i = 0; i < bars.length; i++) {
+      if (!crossArr[i]) continue
       const fast = fastArr[i]
-      const slow = slowArr[i]
-      const prevFast = fastArr[i - 1]
-      const prevSlow = slowArr[i - 1]
-
-      if (fast == null || slow == null || prevFast == null || prevSlow == null) continue
-
-      const crossover = prevFast <= prevSlow && fast > slow
-      const crossunder = prevFast >= prevSlow && fast < slow
-
-      if (crossover || crossunder) {
-        const price = (fast + slow) / 2
-        markers.push({
-          time: bars[i].time,
-          position: 'atPriceMiddle',
-          shape: 'square',
-          color: this.#params.cross,
-          price,
-          size: 0.6
-        })
-      }
+      if (fast == null) continue
+      markers.push({
+        time: bars[i].time,
+        position: 'atPriceMiddle',
+        shape: 'square',
+        color: this.#params.cross,
+        price: fast,
+        size: 0.6
+      })
     }
 
     return {
