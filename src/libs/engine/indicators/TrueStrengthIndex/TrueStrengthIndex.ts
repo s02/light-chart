@@ -69,7 +69,7 @@ export class TrueStrengthIndex extends AbstractIndicator implements Indicator {
 
   getSchema() {
     return {
-      ikey: TSI.ikey,
+      ikey: TrueStrengthIndex.ikey,
       schema: TSI_SCHEMA,
       params: this.#params
     }

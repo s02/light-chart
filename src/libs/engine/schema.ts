@@ -24,7 +24,7 @@ type StudySelectParam = {
   type: 'select'
   key: string
   default: string
-  values: string[]
+  values: readonly string[]
 }
 
 export type StudyParamDescriptor = StudyNumberParam | StudyColorParam | StudyStringParam | StudySelectParam
@@ -38,7 +38,11 @@ export type StudySchema = {
 }
 
 export type InferStudyValues<T extends readonly StudyParamDescriptor[]> = {
-  [D in T[number] as D['key']]: D['default']
+  [D in T[number] as D['key']]: D extends { type: 'select'; values: readonly (infer V)[] }
+    ? V
+    : D extends { type: 'number' }
+      ? number
+      : D['default']
 }
 
 const studyDefaultValues = <T extends readonly StudyParamDescriptor[]>(descriptors: T): InferStudyValues<T> => {
