@@ -59,6 +59,7 @@
   "indicator-bbb": "Bollinger Bandsd %B",
   "indicator-trend-si": "Trend Strength Index",
   "indicator-adx": "Average Directional Index",
+  "indicator-fisher-transform": "Fisher Transform",
   "indicator-smiio": "SMI Ergodic Indicator",
   "ind-prop-ergodicLine": "Ergodic",
   "ind-prop-hist": "Oscilator",
