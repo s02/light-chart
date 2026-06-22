@@ -40,6 +40,8 @@ import { ADX } from './ADX/ADX'
 import { DMI } from './DMI/DMI'
 import { FisherTransform } from './FisherTransform/FisherTransform'
 import { AdvanceDecline } from './AdvanceDecline/AdvanceDecline'
+import { MACross } from './MACross/MACross'
+import { ArnaudLegouxMA } from './ArnaudLegouxMA/ArnaudLegouxMA'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -215,6 +217,12 @@ export const INDICATOR_SCRIPTS = [
   {
     indicator: AdvanceDecline,
     separatePane: true
+  },
+  {
+    indicator: MACross
+  },
+  {
+    indicator: ArnaudLegouxMA
   }
 ] satisfies {
   indicator: {
