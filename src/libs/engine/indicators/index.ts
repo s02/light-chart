@@ -31,6 +31,7 @@ import { ATR } from './ATR/ATR'
 import { VortexIndicator } from './VortexIndicator/VortexIndicator'
 import { SMIErgodic } from './SMIErgodic/SMIErgodic'
 import { BalanceOfPower } from './BalanceOfPower/BalanceOfPower'
+import { Momentum } from './Momentum/Momentum'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -169,6 +170,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: BalanceOfPower,
+    separatePane: true
+  },
+  {
+    indicator: Momentum,
     separatePane: true
   }
 ] satisfies {
