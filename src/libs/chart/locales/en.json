@@ -64,6 +64,7 @@
   "indicator-smiio": "SMI Ergodic Indicator",
   "indicator-dmi":"Directional Movement Index",
   "indicator-macross": "MA Cross",
+  "indicator-alma": "Arnaud Legoux Moving Average",
   "ind-prop-ergodicLine": "Ergodic",
   "ind-prop-hist": "Oscilator",
   "ind-prop-viPlus": "VI+",
