@@ -37,6 +37,7 @@ import { DPO } from './DPO/DPO'
 import { RelativeVigorIndex } from './RelativeVigorIndex/RelativeVigorIndex'
 import { TrendStrengthIndex } from './TrendStrengthIndex/TrendStrengthIndex'
 import { ADX } from './ADX/ADX'
+import { DMI } from './DMI/DMI'
 import { FisherTransform } from './FisherTransform/FisherTransform'
 import { AdvanceDecline } from './AdvanceDecline/AdvanceDecline'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
@@ -201,6 +202,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: ADX,
+    separatePane: true
+  },
+  {
+    indicator: DMI,
     separatePane: true
   },
   {

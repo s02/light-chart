@@ -62,6 +62,7 @@
   "indicator-advance-decline": "Advance/Decline",
   "indicator-fisher-transform": "Fisher Transform",
   "indicator-smiio": "SMI Ergodic Indicator",
+  "indicator-dmi":"Directional Movement Index",
   "ind-prop-ergodicLine": "Ergodic",
   "ind-prop-hist": "Oscilator",
   "ind-prop-viPlus": "VI+",
