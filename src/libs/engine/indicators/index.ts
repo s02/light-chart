@@ -34,6 +34,7 @@ import { BalanceOfPower } from './BalanceOfPower/BalanceOfPower'
 import { Momentum } from './Momentum/Momentum'
 import { BollingerBandsB } from './BollingerBandsB/BollingerBandsB'
 import { DPO } from './DPO/DPO'
+import { RelativeVigorIndex } from './RelativeVigorIndex/RelativeVigorIndex'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -184,6 +185,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: DPO,
+    separatePane: true
+  },
+  {
+    indicator: RelativeVigorIndex,
     separatePane: true
   }
 ] satisfies {
