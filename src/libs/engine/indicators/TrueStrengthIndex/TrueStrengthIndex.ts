@@ -24,8 +24,8 @@ const TSI_SCHEMA = {
 
 type TSIParams = InferStudyValues<typeof TSI_SCHEMA.inputs> & InferStudyValues<typeof TSI_SCHEMA.style>
 
-export class TSI extends AbstractIndicator implements Indicator {
-  static readonly ikey = 'tsi' as const
+export class TrueStrengthIndex extends AbstractIndicator implements Indicator {
+  static readonly ikey = 'true-si' as const
 
   #chart: IChartApi
   #params: TSIParams
@@ -82,7 +82,7 @@ export class TSI extends AbstractIndicator implements Indicator {
   }
 
   getLegend(seriesData: SeriesMap) {
-    const legend: SeriesLegend = { key: 'TSI', paneIndex: this.paneIndex, data: [] }
+    const legend: SeriesLegend = { key: 'True Strength Index', paneIndex: this.paneIndex, data: [] }
     const entries = [
       [this.#series.tsi, this.#params.tsiLine],
       [this.#series.signal, this.#params.signalLine]

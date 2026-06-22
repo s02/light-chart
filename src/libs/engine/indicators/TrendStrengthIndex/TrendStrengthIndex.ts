@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle } from 'lightweight-charts'
+import { LineSeries } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -17,7 +17,7 @@ const TREND_SCHEMA = {
 type TrendParams = InferStudyValues<typeof TREND_SCHEMA.inputs> & InferStudyValues<typeof TREND_SCHEMA.style>
 
 export class TrendStrengthIndex extends AbstractIndicator implements Indicator {
-  static readonly ikey = 'trend-strength' as const
+  static readonly ikey = 'trend-si' as const
 
   #chart: IChartApi
   #params: TrendParams

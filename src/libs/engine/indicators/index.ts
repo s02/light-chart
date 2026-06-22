@@ -26,7 +26,7 @@ import { McGinleyDynamic } from './McGinleyDynamic/McGinleyDynamic'
 import { IchimokuCloud } from './IchimokuCloud/IchimokuCloud'
 import { AcceleratorOscillator } from './AcceleratorOscillator/AcceleratorOscillator'
 import { CCI } from './CCI/CCI'
-import { TSI } from './TSI/TSI'
+import { TrueStrengthIndex } from './TrueStrengthIndex/TrueStrengthIndex'
 import { ATR } from './ATR/ATR'
 import { VortexIndicator } from './VortexIndicator/VortexIndicator'
 import { SMIErgodic } from './SMIErgodic/SMIErgodic'
@@ -157,7 +157,7 @@ export const INDICATOR_SCRIPTS = [
     separatePane: true
   },
   {
-    indicator: TSI,
+    indicator: TrueStrengthIndex,
     separatePane: true
   },
   {
