@@ -28,6 +28,7 @@
   "indicator-macd":"MACD",
   "indicator-ema": "EMA",
   "indicator-smma": "Smoothed Moving Average",
+  "indicator-dpo": "Detrended Price Oscillator",
   "indicator-stochastic":"Stochastic",
   "indicator-stochastic-rsi":"Stochastic RSI",
   "indicator-pricechannel": "Price Channel",

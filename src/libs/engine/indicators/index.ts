@@ -33,6 +33,7 @@ import { SMIErgodic } from './SMIErgodic/SMIErgodic'
 import { BalanceOfPower } from './BalanceOfPower/BalanceOfPower'
 import { Momentum } from './Momentum/Momentum'
 import { BollingerBandsB } from './BollingerBandsB/BollingerBandsB'
+import { DPO } from './DPO/DPO'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -179,6 +180,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: BollingerBandsB,
+    separatePane: true
+  },
+  {
+    indicator: DPO,
     separatePane: true
   }
 ] satisfies {
