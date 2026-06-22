@@ -38,6 +38,7 @@ import { RelativeVigorIndex } from './RelativeVigorIndex/RelativeVigorIndex'
 import { TrendStrengthIndex } from './TrendStrengthIndex/TrendStrengthIndex'
 import { ADX } from './ADX/ADX'
 import { FisherTransform } from './FisherTransform/FisherTransform'
+import { AdvanceDecline } from './AdvanceDecline/AdvanceDecline'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -204,6 +205,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: FisherTransform,
+    separatePane: true
+  },
+  {
+    indicator: AdvanceDecline,
     separatePane: true
   }
 ] satisfies {
