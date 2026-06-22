@@ -63,6 +63,7 @@
   "indicator-fisher-transform": "Fisher Transform",
   "indicator-smiio": "SMI Ergodic Indicator",
   "indicator-dmi":"Directional Movement Index",
+  "indicator-vzt": "Volatility Zero Trend Close-to-Close",
   "indicator-macross": "MA Cross",
   "indicator-alma": "Arnaud Legoux Moving Average",
   "ind-prop-ergodicLine": "Ergodic",
