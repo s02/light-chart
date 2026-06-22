@@ -36,6 +36,7 @@ import { BollingerBandsB } from './BollingerBandsB/BollingerBandsB'
 import { DPO } from './DPO/DPO'
 import { RelativeVigorIndex } from './RelativeVigorIndex/RelativeVigorIndex'
 import { TrendStrengthIndex } from './TrendStrengthIndex/TrendStrengthIndex'
+import { ADX } from './ADX/ADX'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -194,6 +195,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: TrendStrengthIndex,
+    separatePane: true
+  },
+  {
+    indicator: ADX,
     separatePane: true
   }
 ] satisfies {
