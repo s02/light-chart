@@ -35,6 +35,7 @@ import { Momentum } from './Momentum/Momentum'
 import { BollingerBandsB } from './BollingerBandsB/BollingerBandsB'
 import { DPO } from './DPO/DPO'
 import { RelativeVigorIndex } from './RelativeVigorIndex/RelativeVigorIndex'
+import { TrendStrengthIndex } from './TrendStrengthIndex/TrendStrengthIndex'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -189,6 +190,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: RelativeVigorIndex,
+    separatePane: true
+  },
+  {
+    indicator: TrendStrengthIndex,
     separatePane: true
   }
 ] satisfies {

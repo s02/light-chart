@@ -30,6 +30,7 @@
   "indicator-smma": "Smoothed Moving Average",
   "indicator-dpo": "Detrended Price Oscillator",
   "indicator-rvi": "Relative Vigor Index",
+  "indicator-tsi": "Trend Strength Index",
   "indicator-stochastic":"Stochastic",
   "indicator-stochastic-rsi":"Stochastic RSI",
   "indicator-pricechannel": "Price Channel",
