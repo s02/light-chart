@@ -30,6 +30,7 @@ import { TSI } from './TSI/TSI'
 import { ATR } from './ATR/ATR'
 import { VortexIndicator } from './VortexIndicator/VortexIndicator'
 import { SMIErgodic } from './SMIErgodic/SMIErgodic'
+import { BalanceOfPower } from './BalanceOfPower/BalanceOfPower'
 import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
@@ -164,6 +165,10 @@ export const INDICATOR_SCRIPTS = [
   },
   {
     indicator: SMIErgodic,
+    separatePane: true
+  },
+  {
+    indicator: BalanceOfPower,
     separatePane: true
   }
 ] satisfies {
