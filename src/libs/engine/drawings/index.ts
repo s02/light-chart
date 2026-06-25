@@ -26,9 +26,10 @@ import { ElliottDouble } from '@engine/drawings/ElliottDouble/ElliottDouble'
 import { PriceRange } from '@engine/drawings/PriceRange/PriceRange'
 import { FibRetracement } from '@engine/drawings/FibRetracement/FibRetracement'
 import { EmojiDrawing } from '@engine/drawings/EmojiDrawing/EmojiDrawing'
-import { RiskReward } from '@engine/drawings/RiskReward/RiskReward'
 import type { IChartApi } from 'lightweight-charts'
 import type { BaseDrawing } from '@engine/drawings/BaseDrawing'
+import { LongPositionRiskReward } from '@engine/drawings/LongPositionRiskReward/LongPositionRiskReward'
+import { ShortPositionRiskReward } from '@engine/drawings/ShortPositionRiskReward/ShortPositionRiskReward'
 
 const icons = import.meta.glob('./*/icon.svg', { query: '?raw', import: 'default', eager: true }) as Record<
   string,
@@ -196,15 +197,21 @@ export const DRAWINGS = [
   },
   {
     group: 'forecasting-measuring' as const,
-    subgroup: 'measurer',
-    drawing: PriceRange,
-    icon: icons['./PriceRange/icon.svg']
+    subgroup: 'projection',
+    drawing: LongPositionRiskReward,
+    icon: icons['./LongPositionRiskReward/icon.svg']
+  },
+  {
+    group: 'forecasting-measuring' as const,
+    subgroup: 'projection',
+    drawing: ShortPositionRiskReward,
+    icon: icons['./ShortPositionRiskReward/icon.svg']
   },
   {
     group: 'forecasting-measuring' as const,
     subgroup: 'measurer',
-    drawing: RiskReward,
-    icon: icons['./RiskReward/icon.svg']
+    drawing: PriceRange,
+    icon: icons['./PriceRange/icon.svg']
   },
   {
     group: 'emoji' as const,

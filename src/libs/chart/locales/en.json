@@ -72,6 +72,8 @@
   "ind-prop-viMinus": "VI-",
   "ind-prop-tsiLine": "TSI",
   "draw-line-trend-line": "Trend Line",
+  "draw-line-long-risk-reward": "Long Position",
+  "draw-line-short-risk-reward": "Short Position",
   "draw-line-ray": "Ray",
   "draw-line-vertical-line": "Vertical Line",
   "draw-line-cross": "Cross",

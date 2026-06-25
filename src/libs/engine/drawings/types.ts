@@ -1,7 +1,9 @@
 import type { StudyParams, StudySchema } from '@engine/schema'
-import type { Point, Time } from 'lightweight-charts'
+import type { ISeriesApi, Point, SeriesType, Time } from 'lightweight-charts'
 import type { Anchor } from '@engine/points'
 import type { DRAWINGS } from '@engine/drawings'
+
+export type SeriesData = ReturnType<ISeriesApi<SeriesType>['data']>
 
 export type DrawingViewport = {
   anchorToPoint: (a: { time: Time; price: number }) => Point | null

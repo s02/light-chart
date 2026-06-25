@@ -1,60 +1,39 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
-import { RiskRewardPaneView } from '@engine/drawings/RiskReward/RiskRewardPaneView'
 import type { DrawingOptions } from '@engine/drawings/types'
-import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 import type { Anchor } from '@engine/points'
-import type { IChartApi, Point } from 'lightweight-charts'
+import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
+import type { IChartApi, Point, Time } from 'lightweight-charts'
+
+//https://www.tradingview.com/support/solutions/43000475660-how-to-use-long-and-short-position-drawing-tools/
 
 const INITIAL_WIDTH = 300
 const INITIAL_HEIGHT = 200
 
-export type RiskRewardSettings = {
-  entryPrice: number
-  profitPrice: number
-  stopPrice: number
-  riskSize: number
-  account: number
-}
-
-const RISK_REWARD_SCHEMA = {
+export const RISK_REWARD_SCHEMA = {
   inputs: [
     { type: 'number', key: 'account-size', default: 1000 },
-    { type: 'number', key: 'lot-size', default: 1 },
-    { type: 'number', key: 'risk', default: 250 },
+    { type: 'number', key: 'risk-size', default: 250 },
     { type: 'number', key: 'entry-price', default: 0 },
-    { type: 'number', key: 'profit-price', default: 0 },
     { type: 'number', key: 'stop-price', default: 0 },
-    { type: 'number', key: 'line-width', default: 2 },
-    { type: 'number', key: 'border-width', default: 1 }
+    { type: 'number', key: 'target-price', default: 0 },
+    { type: 'number', key: 'lot-size', default: 1 }
   ],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(255 255 255)' },
-    { type: 'color', key: 'border-color', default: 'rgb(255 255 255 / 50%)' },
-    { type: 'color', key: 'profit-fill', default: 'rgb(76 175 80 / 40%)' },
-    { type: 'color', key: 'loss-fill', default: 'rgb(244 67 54 / 40%)' }
+    { type: 'color', key: 'profit-fill', default: 'rgb(8 153 129 / 20%)' },
+    { type: 'color', key: 'loss-fill', default: 'rgb(242 54 69 / 20%)' }
   ]
 } as const satisfies StudySchema
 
 export type RiskRewardParams = InferStudyValues<typeof RISK_REWARD_SCHEMA.inputs> &
   InferStudyValues<typeof RISK_REWARD_SCHEMA.style>
 
-export class RiskReward extends BaseDrawing {
-  static readonly ikey = 'risk-reward' as const
+export abstract class RiskReward extends BaseDrawing {
   static readonly points = 1
-
-  #params: RiskRewardParams
-  #settings: RiskRewardSettings
+  protected params: RiskRewardParams
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(RISK_REWARD_SCHEMA.inputs, RISK_REWARD_SCHEMA.style, options?.params)
-    this.#settings = {
-      entryPrice: 0,
-      profitPrice: 0,
-      stopPrice: 0,
-      riskSize: this.#params['risk'],
-      account: this.#params['account-size']
-    }
+    this.params = resolveStudyParams(RISK_REWARD_SCHEMA.inputs, RISK_REWARD_SCHEMA.style, options?.params)
   }
 
   override setAnchors(anchors: Anchor[]) {
@@ -69,19 +48,11 @@ export class RiskReward extends BaseDrawing {
         const aMidRight = viewport.pointToAnchor({ x: p0.x + INITIAL_WIDTH, y: p0.y } as Point)
 
         if (aTopLeft && aBottomLeft && aMidRight) {
-          this.#settings.entryPrice = anchors[0].price
-          this.#settings.profitPrice = aTopLeft.price
-          this.#settings.stopPrice = aBottomLeft.price
-
           super.setAnchors([anchors[0], aTopLeft, aBottomLeft, aMidRight])
           return
         }
       }
     } else if (anchors.length === 4) {
-      this.#settings.entryPrice = anchors[0].price
-      this.#settings.profitPrice = anchors[1].price
-      this.#settings.stopPrice = anchors[2].price
-
       super.setAnchors([
         anchors[0],
         { ...anchors[1], time: anchors[0].time, x: anchors[0].x },
@@ -90,29 +61,15 @@ export class RiskReward extends BaseDrawing {
       ])
       return
     }
+
     super.setAnchors(anchors)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(RISK_REWARD_SCHEMA.inputs, RISK_REWARD_SCHEMA.style, params)
-    this.#settings.riskSize = this.#params['risk']
-    if (this.requestUpdate) this.requestUpdate()
-  }
-
-  override getSchema() {
-    return {
-      ikey: RiskReward.ikey,
-      schema: RISK_REWARD_SCHEMA,
-      params: this.#params
+    this.params = resolveStudyParams(RISK_REWARD_SCHEMA.inputs, RISK_REWARD_SCHEMA.style, params)
+    if (this.requestUpdate) {
+      this.requestUpdate()
     }
-  }
-
-  override paneViews() {
-    const viewport = this.getViewport()
-    if (viewport && this.anchors.length === 4) {
-      return [new RiskRewardPaneView(viewport, this.anchors, this.anchorsVisible, this.#params, this.#settings)]
-    }
-    return []
   }
 
   override checkTap(point: Point): boolean {
@@ -132,5 +89,13 @@ export class RiskReward extends BaseDrawing {
     const bottom = Math.max(p1.y, p2.y)
 
     return point.x >= left && point.x <= right && point.y >= top && point.y <= bottom
+  }
+
+  protected barsBetween(t1: Time, t2: Time) {
+    if (!this.series || !this.series.data().length) {
+      return []
+    }
+
+    return this.series.data().filter((d) => d.time >= t1 && d.time <= t2)
   }
 }

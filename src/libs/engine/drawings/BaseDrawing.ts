@@ -26,8 +26,7 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
   protected anchors: Anchor[] = []
   protected requestUpdate: (() => void) | null = null
   protected initialized = false
-
-  #series: ISeriesApi<SeriesType> | undefined
+  protected series: ISeriesApi<SeriesType> | undefined
   #chart: IChartApi
   #draggingAnchors: Anchor[] | null = null
   #selected = false
@@ -110,15 +109,15 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
   }
 
   detach() {
-    if (this.#series) {
-      this.#series.detachPrimitive(this)
-      this.#series = undefined
+    if (this.series) {
+      this.series.detachPrimitive(this)
+      this.series = undefined
     }
   }
 
   attach(series: ISeriesApi<SeriesType>) {
-    this.#series = series
-    this.#series.attachPrimitive(this)
+    this.series = series
+    this.series.attachPrimitive(this)
   }
 
   setInitialized() {
@@ -126,16 +125,16 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
   }
 
   protected getViewport(): DrawingViewport | null {
-    if (!this.#series || !this.#chart) {
+    if (!this.series || !this.#chart) {
       return null
     }
 
     return {
       pointToAnchor: (point: Point) => {
-        assertSeries(this.#series)
+        assertSeries(this.series)
 
         const time = this.#chart.timeScale().coordinateToTime(point.x)
-        const price = this.#series.coordinateToPrice(point.y)
+        const price = this.series.coordinateToPrice(point.y)
 
         if (!time || !price) {
           return null
@@ -149,10 +148,10 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
         }
       },
       anchorToPoint: (anchor: { time: Time; price: number }) => {
-        assertSeries(this.#series)
+        assertSeries(this.series)
 
         const x = this.#chart.timeScale().timeToCoordinate(anchor.time)
-        const y = this.#series.priceToCoordinate(anchor.price)
+        const y = this.series.priceToCoordinate(anchor.price)
 
         if (!x || !y) {
           return null
