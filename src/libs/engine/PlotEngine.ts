@@ -9,7 +9,7 @@ import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeri
 import type { SeriesId, SeriesOverlay } from '@engine/series'
 import type { IndicatorName } from '@engine/indicators'
 import { DrawingsManager } from '@engine/drawings'
-import type { DrawingName, DrawingSelectFn } from '@engine/drawings/types'
+import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { StudyParams } from '@engine/schema'
 
 type Params = {
@@ -122,8 +122,8 @@ export class PlotEngine {
     this.#indicatorsManager.updateParams(id, params)
   }
 
-  addDrawing(key: DrawingName) {
-    return this.#drawingsManager.add(key)
+  addDrawing(key: DrawingName, options?: DrawingOptions) {
+    return this.#drawingsManager.add(key, options)
   }
 
   updateDrawing(id: number, params: StudyParams) {

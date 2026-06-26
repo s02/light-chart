@@ -7,7 +7,8 @@ import { DRAWINGS } from '@engine/drawings'
 import { i18n } from '@chart/i18n'
 import ChartAsideButton from '@chart/components/ChartAsideButton.vue'
 import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
-import type { DrawingGroup, DrawingName, DrawingScript } from '@engine/drawings/types'
+import type { DrawingGroup, DrawingName, DrawingOptions, DrawingScript } from '@engine/drawings/types'
+import EmojiList from '@chart/components/EmojiList.vue'
 
 type AsideMenu = Record<DrawingGroup, DrawingScript>
 
@@ -53,11 +54,11 @@ const menu = ref<AsideMenu>(getDrawingInitials())
 const initialized = ref<DrawingName | null>()
 const currentDrawingGroup = ref<DrawingGroup | null>(null)
 
-const init = async (name: DrawingName, manualStop?: boolean) => {
+const init = async (name: DrawingName, { options, manualStop }: { options?: DrawingOptions; manualStop?: boolean }) => {
   try {
-    await startDrawing(name)
+    await startDrawing(name, options)
     if (manualStop) {
-      init(name, manualStop)
+      init(name, { options, manualStop })
     }
   } catch {
     // cancelled by a subsequent add() call — expected
@@ -70,7 +71,7 @@ const init = async (name: DrawingName, manualStop?: boolean) => {
   }
 }
 
-const handleStart = (name: DrawingName) => {
+const handleStart = (name: DrawingName, options?: DrawingOptions) => {
   currentDrawingGroup.value = null
   if (name === initialized.value) {
     initialized.value = null
@@ -78,7 +79,7 @@ const handleStart = (name: DrawingName) => {
   } else {
     initialized.value = name
     const drawing = DRAWINGS.find((d) => d.drawing.ikey === name)
-    init(name, drawing?.manualStop)
+    init(name, { options, manualStop: drawing?.manualStop })
   }
 }
 
@@ -111,7 +112,10 @@ const selectDrawing = (script: DrawingScript) => {
           @click="handleStart(menu[g].drawing.ikey)" />
       </template>
 
-      <div class="ca-drawing-menu">
+      <div v-if="currentDrawingGroup == 'emoji'" class="ca-emoji-menu">
+        <EmojiList @click="handleStart('emoji', { params: { emoji: $event } })" />
+      </div>
+      <div v-else class="ca-drawing-menu">
         <ChartMenuGroup v-for="subg in getDrawingSubgroups(g)" :key="subg" :name="subg">
           <ChartMenuItem
             v-for="item in getDrawingItems(subg)"

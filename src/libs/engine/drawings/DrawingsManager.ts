@@ -4,7 +4,7 @@ import { DrawingSelectHandler } from '@engine/drawings/DrawingSelectHandler'
 import { POINTS_MODE, type PointsManager } from '@engine/points'
 import { ContinuousPointsCollector } from '@engine/points/ContinuousPointsCollector'
 import { PointsCollector } from '@engine/points/PointsCollector'
-import type { DrawingName, DrawingSelectFn } from '@engine/drawings/types'
+import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { BaseDrawing } from './BaseDrawing'
 import type { StudyParams } from '@engine/schema'
@@ -48,7 +48,7 @@ export class DrawingsManager {
     }
   }
 
-  add(name: DrawingName) {
+  add(name: DrawingName, options?: DrawingOptions) {
     this.cancelCurrent()
 
     const script = findDrawingScript(name)
@@ -56,7 +56,7 @@ export class DrawingsManager {
       throw new Error(`unknown drawing key: ${name}`)
     }
 
-    const drawing = new script.drawing(this.#chart)
+    const drawing = new script.drawing(this.#chart, options)
     drawing.attach(this.#series)
 
     return new Promise<number>((resolve, reject) => {

@@ -8,7 +8,7 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import type { Anchor } from '@engine/points'
 
 const EMOJI_SCHEMA = {
-  inputs: [{ type: 'string', key: 'emoji', default: '🚀' }],
+  inputs: [{ type: 'string', key: 'emoji', default: '😀' }],
   style: []
 } as const satisfies StudySchema
 

@@ -13,7 +13,7 @@ import type {
   ResolutionId,
   SeriesId
 } from '@engine/types'
-import type { DrawingName, DrawingSelectFn } from '@engine/drawings/types'
+import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { DatafeedFactory } from '@chart/types'
 
 type DrawingElement = Parameters<DrawingSelectFn>[0]
@@ -147,9 +147,9 @@ export const useEngineApi = () => {
     }
   }
 
-  const startDrawing = (id: DrawingName) => {
+  const startDrawing = (id: DrawingName, options?: DrawingOptions) => {
     assertEngine(pe)
-    return pe.addDrawing(id)
+    return pe.addDrawing(id, options)
   }
 
   const cancelDrawing = () => {
