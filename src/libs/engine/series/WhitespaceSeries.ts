@@ -3,10 +3,8 @@ import type { IChartApi, ISeriesApi, SeriesType, WhitespaceData } from 'lightwei
 import { RESOLUTION_SETTINGS } from '../constants'
 import type { ChartBar, Datafeed, UTCTimestamp } from '@engine/types'
 
-const WHITESPACE_BARS = 50
-
-const generateWhitespaceData = (lastTime: number, step: number): WhitespaceData[] =>
-  Array.from({ length: WHITESPACE_BARS }, (_, i) => ({
+const generateWhitespaceData = (lastTime: number, step: number, length: number): WhitespaceData[] =>
+  Array.from({ length }, (_, i) => ({
     time: (lastTime + (i + 1) * step) as UTCTimestamp
   }))
 
@@ -62,6 +60,16 @@ export class WhitespaceSeries {
     }
 
     this.#hash = hash
-    this.#series.setData(generateWhitespaceData(lastTime, step))
+    const timeRange = this.#chart.timeScale().getVisibleRange()
+    if (!timeRange) {
+      return
+    }
+
+    const diff = (timeRange.to as number) - (timeRange.from as number)
+    const candlesCount = Math.round((diff / step) * 2)
+
+    if (this.#series.data.length < candlesCount) {
+      this.#series.setData(generateWhitespaceData(lastTime, step, candlesCount))
+    }
   }
 }

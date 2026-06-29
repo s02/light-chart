@@ -19,7 +19,6 @@ export class CandleStoreService {
   }
 
   #mergeStrategy(): CANDLE_MERGE_STRATEGY {
-    console.log('d', this.#resolutionId)
     if (this.#resolutionId === '1S') {
       return 'gap'
     }
