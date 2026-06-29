@@ -1,23 +1,14 @@
 <script lang="ts" setup>
-import ChartMenu from '@chart/components/ChartMenu.vue'
-import ColorPicker from '@chart/components/ColorPicker.vue'
-import LineWidthPicker from '@chart/components/LineWidthPicker.vue'
-import { provideChartMenu } from '@chart/useChartMenu'
 import { onClickOutside } from '@vueuse/core'
-import { onUnmounted, ref, useTemplateRef } from 'vue'
+import { computed, onUnmounted, ref, useTemplateRef } from 'vue'
 import DrawingPropLineColor from '@chart/components/DrawingSettings/DrawingPropLineColor.vue'
 import DrawingPropFontSize from '@chart/components/DrawingSettings/DrawingPropFontSize.vue'
-import DrawingPropFillColor from '@chart/components/DrawingSettings/DrawingPropFillColor.vue'
-import DrawingPropTextColor from '@chart/components/DrawingSettings/DrawingPropTextColor.vue'
 import DrawingPropLineWidth from '@chart/components/DrawingSettings/DrawingPropLineWidth.vue'
-import DrawingPropBrushWidth from '@chart/components/DrawingSettings/DrawingPropBrushWidth.vue'
-import FontSizePicker from '@chart/components/FontSizePicker.vue'
-import DrawingPropText from '@chart/components/DrawingSettings/DrawingPropText.vue'
-import type { DrawingSchema } from '@engine/drawings/types'
-import type { StudyParamDescriptor } from '@engine/schema'
 import { useEngineApi } from '@chart/composables/useEngine'
 import { useModal } from '@chart/composables/useModal'
 import StudySettings from '@chart/components/StudySettings/StudySettings.vue'
+import type { DrawingSchema } from '@engine/drawings/types'
+import type { StudyParamDescriptor } from '@engine/schema'
 
 type ParamKey = keyof DrawingSchema['params']
 type ParamValue = DrawingSchema['params'][ParamKey]
@@ -25,23 +16,24 @@ type MenuType = 'line' | 'color' | 'font'
 
 const { updateDrawing, removeDrawing, drawingSchema, selectDrawing } = useEngineApi()
 const { open: openModal } = useModal()
-const dwsBtn = useTemplateRef('dws')
-const colorPickerRef = useTemplateRef<HTMLElement>('colorPicker')
-const linesPickerRef = useTemplateRef<HTMLElement>('linesPicker')
-const fontPickerRef = useTemplateRef<HTMLElement>('fontPicker')
 
 const isSettingsOpened = ref(false)
+const isPanelMenuOpened = ref(false)
 
-onClickOutside(
-  dwsBtn,
-  () => {
-    if (!isSettingsOpened.value) {
-      editSettings.value = null
-      selectDrawing(null)
-    }
-  },
-  { ignore: [colorPickerRef, linesPickerRef, fontPickerRef] }
-)
+const fastPanel = computed(() => {
+  if (!drawingSchema.value) {
+    return []
+  }
+
+  return (drawingSchema.value.schema.style || []).filter((param) => param.fastPanel)
+})
+
+onClickOutside(useTemplateRef('dws'), () => {
+  if (!isSettingsOpened.value && !isPanelMenuOpened.value) {
+    editSettings.value = null
+    selectDrawing(null)
+  }
+})
 
 const editSettings = ref<{ el: StudyParamDescriptor; type: MenuType } | null>(null)
 
@@ -54,23 +46,6 @@ const apply = (key: string, val: ParamValue) => {
     ...drawingSchema.value.params,
     [key]: val
   })
-}
-
-const { close: closeMenu, open: openMenu, key: menuKey } = provideChartMenu('menu', dwsBtn)
-
-const open = (el: StudyParamDescriptor, type: MenuType) => {
-  if (editSettings.value && el.key === editSettings.value.el.key) {
-    editSettings.value = null
-    return
-  }
-
-  editSettings.value = { el, type }
-  openMenu()
-}
-
-const close = () => {
-  editSettings.value = null
-  closeMenu()
 }
 
 const openSettings = async () => {
@@ -117,36 +92,39 @@ onUnmounted(() => {
         </svg>
       </div>
       <template v-for="el in drawingSchema.schema.inputs" :key="el.key">
-        <DrawingPropText
+        <!-- <DrawingPropText
           v-if="el.key === 'text'"
           :text="String(drawingSchema.params[el.key])"
           @select="apply('text', $event)" />
         <DrawingPropBrushWidth
           v-if="el.key === 'brush-width'"
           :width="Number(drawingSchema.params[el.key])"
-          @click="open(el, 'line')" />
+          @click="open(el, 'line')" /> -->
+      </template>
+      <template v-for="el in fastPanel" :key="el.key">
         <DrawingPropLineWidth
           v-if="el.key === 'line-width'"
           :width="Number(drawingSchema.params[el.key])"
-          @click="open(el, 'line')" />
-      </template>
-      <template v-for="el in drawingSchema.schema.style" :key="el.key">
+          @update:model-value="isPanelMenuOpened = $event"
+          @update="apply(el.key, $event)" />
         <DrawingPropFontSize
-          v-if="el.key === 'font-size'"
-          :width="Number(drawingSchema.params[el.key])"
-          @click="open(el, 'font')" />
+          v-else-if="el.key === 'font-size'"
+          :size="Number(drawingSchema.params[el.key])"
+          @update:model-value="isPanelMenuOpened = $event"
+          @update="apply(el.key, $event)" />
         <DrawingPropLineColor
           v-else-if="el.key === 'line-color'"
           :color="String(drawingSchema.params[el.key])"
-          @click="open(el, 'color')" />
-        <DrawingPropFillColor
+          @update:model-value="isPanelMenuOpened = $event"
+          @update="apply(el.key, $event)" />
+        <!-- <DrawingPropFillColor
           v-else-if="el.key === 'fill'"
           :color="String(drawingSchema.params[el.key])"
           @click="open(el, 'color')" />
         <DrawingPropTextColor
           v-else-if="el.key === 'text-color'"
           :color="String(drawingSchema.params[el.key])"
-          @click="open(el, 'color')" />
+          @click="open(el, 'color')" /> -->
       </template>
       <div class="drw-btn" @click="openSettings()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="currentColor">
@@ -165,7 +143,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <ChartMenu :menu-key="menuKey">
+    <!-- <ChartMenu :menu-key="menuKey">
       <template v-if="editSettings">
         <ColorPicker
           v-if="editSettings.type === 'color'"
@@ -173,23 +151,8 @@ onUnmounted(() => {
           :color="`${drawingSchema.params[editSettings.el.key]}`"
           @select="apply(editSettings.el.key, $event)"
           @close="close()" />
-
-        <LineWidthPicker
-          v-else-if="editSettings.type === 'line'"
-          ref="linesPicker"
-          :width="Number(drawingSchema.params[editSettings.el.key])"
-          :options="editSettings.el.type === 'number' ? editSettings.el.options : undefined"
-          @select="apply(editSettings.el.key, $event)"
-          @close="close()" />
-
-        <FontSizePicker
-          v-else-if="editSettings.type === 'font'"
-          ref="fontPicker"
-          :size="Number(drawingSchema.params[editSettings.el.key])"
-          @select="apply(editSettings.el.key, $event)"
-          @close="close()" />
       </template>
-    </ChartMenu>
+    </ChartMenu> -->
   </div>
 </template>
 

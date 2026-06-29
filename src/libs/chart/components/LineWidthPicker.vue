@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
-
-defineProps<{ width: number; options?: number[] }>()
+defineProps<{ width: number }>()
 
 const emit = defineEmits<{
   (e: 'select', width: number): void
   (e: 'close'): void
 }>()
 
-const WIDTHS = [1, 2, 3, 4, 5]
+const WIDTHS = [1, 2, 3, 4, 5, 6]
 
 const select = (v: number) => {
   emit('select', v)
@@ -17,11 +15,17 @@ const select = (v: number) => {
 </script>
 
 <template>
-  <div class="line-picker">
-    <ChartMenuItem v-for="w of options ?? WIDTHS" :key="w" :active="w === width" @click="select(w)">
-      <div v-if="!options" class="line-picker-w" :style="{ height: `${w}px` }"></div>
-      {{ w }}px</ChartMenuItem
-    >
+  <div class="lp">
+    <button
+      v-for="w of WIDTHS"
+      :key="w"
+      class="lp-button"
+      :active="w === width"
+      :class="{ active: w === width }"
+      @click="select(w)">
+      <span class="lp-line" :style="{ height: `${w}px` }"></span>
+      {{ w }}px
+    </button>
   </div>
 </template>
 

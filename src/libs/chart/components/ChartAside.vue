@@ -7,8 +7,8 @@ import { DRAWINGS } from '@engine/drawings'
 import { i18n } from '@chart/i18n'
 import ChartAsideButton from '@chart/components/ChartAsideButton.vue'
 import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
-import type { DrawingGroup, DrawingName, DrawingOptions, DrawingScript } from '@engine/drawings/types'
 import EmojiList from '@chart/components/EmojiList.vue'
+import type { DrawingGroup, DrawingName, DrawingOptions, DrawingScript } from '@engine/drawings/types'
 
 type AsideMenu = Record<DrawingGroup, DrawingScript>
 

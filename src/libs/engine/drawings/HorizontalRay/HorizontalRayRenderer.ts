@@ -21,7 +21,7 @@ export class HorizontalRayRenderer implements IPrimitivePaneRenderer {
       ray(scope, this.#p, p2, { width: this.#params['line-width'], color: this.#params['line-color'] })
 
       if (this.#withDots) {
-        dot(scope, this.#p, { color: this.#params['line-color'] })
+        dot(scope, this.#p)
       }
     })
   }

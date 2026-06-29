@@ -161,6 +161,7 @@ export const useEngineApi = () => {
     assertEngine(pe)
     assertDrawingElement(selectedDrawingElement.value)
     pe.updateDrawing(selectedDrawingElement.value.id, params)
+    selectedDrawingElement.value.ds.params = params
   }
 
   const removeDrawing = () => {

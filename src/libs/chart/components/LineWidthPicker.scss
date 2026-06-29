@@ -1,4 +1,33 @@
-.line-picker-w {
+.lp-line {
   width: 18px;
   background-color: currentcolor;
+  display: block;
+}
+
+.lp {
+  display: grid;
+  grid-template-columns: repeat(2, 60px);
+}
+
+.lp-button {
+  display: flex;
+  align-items: center;
+  color: inherit;
+  font-family: inherit;
+  background-color: transparent;
+  border: 0;
+  box-shadow: 0;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px;
+
+  &:hover {
+    background-color: #303030;
+    color: #c9c9c9;
+  }
+
+  &.active {
+    background-color: #f2ffff;
+    color: #000;
+  }
 }

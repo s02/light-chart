@@ -1,31 +1,32 @@
+type StudyParam = {
+  key: string
+  fastPanel?: boolean
+}
+
 type StudyNumberParam = {
   type: 'number'
-  key: string
   default: number
   min?: number
   max?: number
   step?: number
   options?: number[]
-}
+} & StudyParam
 
 type StudyColorParam = {
   type: 'color'
-  key: string
   default: string
-}
+} & StudyParam
 
 type StudyStringParam = {
   type: 'string'
-  key: string
   default: string
-}
+} & StudyParam
 
 type StudySelectParam = {
   type: 'select'
-  key: string
   default: string
   values: readonly string[]
-}
+} & StudyParam
 
 export type StudyParamDescriptor = StudyNumberParam | StudyColorParam | StudyStringParam | StudySelectParam
 

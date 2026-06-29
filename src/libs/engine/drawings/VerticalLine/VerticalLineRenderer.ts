@@ -23,7 +23,7 @@ export class VerticalLineRenderer implements IPrimitivePaneRenderer {
       })
 
       if (this.#withDots) {
-        dot(scope, this.#p, { color: this.#params['line-color'] })
+        dot(scope, this.#p)
       }
     })
   }

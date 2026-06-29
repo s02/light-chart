@@ -5,8 +5,11 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 
 const HORIZONTAL_LINE_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(255 152 0)' }]
+  inputs: [],
+  style: [
+    { type: 'color', key: 'line-color', default: 'rgb(255 152 0)', fastPanel: true },
+    { type: 'number', key: 'line-width', default: 2, fastPanel: true }
+  ]
 } as const satisfies StudySchema
 
 export type HorizontalLineParams = InferStudyValues<typeof HORIZONTAL_LINE_SCHEMA.inputs> &

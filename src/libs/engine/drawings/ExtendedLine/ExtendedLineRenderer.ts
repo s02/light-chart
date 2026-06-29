@@ -25,8 +25,8 @@ export class ExtendedLineRenderer implements IPrimitivePaneRenderer {
       })
 
       if (this.#withDots) {
-        dot(scope, this.#p1, { color: this.#params['line-color'] })
-        dot(scope, this.#p2, { color: this.#params['line-color'] })
+        dot(scope, this.#p1)
+        dot(scope, this.#p2)
       }
     })
   }

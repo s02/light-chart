@@ -6,8 +6,11 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const CROSS_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(255 152 0)' }]
+  inputs: [],
+  style: [
+    { type: 'color', key: 'line-color', default: 'rgb(255 152 0)', fastPanel: true },
+    { type: 'number', key: 'line-width', default: 2, fastPanel: true }
+  ]
 } as const satisfies StudySchema
 
 export type CrossParams = InferStudyValues<typeof CROSS_SCHEMA.inputs> & InferStudyValues<typeof CROSS_SCHEMA.style>
