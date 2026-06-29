@@ -63,9 +63,22 @@ const distanceToLine = (point: Point, lineP1: Point, lineP2: Point) => {
   return Math.abs((point.x - lineP1.x) * dy - (point.y - lineP1.y) * dx) / Math.sqrt(lengthSquared)
 }
 
+const pointInPolygon = (point: Point, polygon: Point[]) => {
+  let inside = false
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y
+    const xj = polygon[j].x, yj = polygon[j].y
+    if (yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi) {
+      inside = !inside
+    }
+  }
+  return inside
+}
+
 export const geometry = {
   distanceToLineSegment,
   distanceToRay,
   distanceToLine,
-  distance
+  distance,
+  pointInPolygon
 }

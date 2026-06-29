@@ -33,9 +33,9 @@ export type StudyParamDescriptor = StudyNumberParam | StudyColorParam | StudyStr
 export type StudyParams = Record<string, number | string>
 
 export type StudySchema = {
-  text?: StudyParamDescriptor[]
-  inputs?: StudyParamDescriptor[]
-  style?: StudyParamDescriptor[]
+  text: StudyParamDescriptor[]
+  inputs: StudyParamDescriptor[]
+  style: StudyParamDescriptor[]
 }
 
 export type InferStudyValues<T extends readonly StudyParamDescriptor[]> = {
@@ -52,12 +52,14 @@ const studyDefaultValues = <T extends readonly StudyParamDescriptor[]>(descripto
 
 export const resolveStudyParams = <
   TInputs extends readonly StudyParamDescriptor[],
-  TStyle extends readonly StudyParamDescriptor[]
+  TStyle extends readonly StudyParamDescriptor[],
+  TText extends readonly StudyParamDescriptor[]
 >(
   inputs: TInputs,
   style: TStyle,
+  text: TText,
   incoming?: Record<string, number | string>
-): InferStudyValues<TInputs> & InferStudyValues<TStyle> => {
-  const defaults = { ...studyDefaultValues(inputs), ...studyDefaultValues(style) }
-  return { ...defaults, ...incoming } as InferStudyValues<TInputs> & InferStudyValues<TStyle>
+): InferStudyValues<TInputs> & InferStudyValues<TStyle> & InferStudyValues<TText> => {
+  const defaults = { ...studyDefaultValues(inputs), ...studyDefaultValues(style), ...studyDefaultValues(text) }
+  return { ...defaults, ...incoming } as InferStudyValues<TInputs> & InferStudyValues<TStyle> & InferStudyValues<TText>
 }

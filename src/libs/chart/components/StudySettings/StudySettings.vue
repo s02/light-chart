@@ -19,15 +19,15 @@ const apply = () => {
 const initTabs = () => {
   const result: string[] = []
 
-  if (props.schema.inputs?.length) {
+  if (props.schema.inputs.length) {
     result.push('tab-inputs')
   }
 
-  if (props.schema.style?.length) {
+  if (props.schema.style.length) {
     result.push('tab-style')
   }
 
-  if (props.schema.text?.length) {
+  if (props.schema.text.length) {
     result.push('tab-text')
   }
 
@@ -59,15 +59,15 @@ const tab = ref(tabs[0])
               font-size
             </div>
           </div>
-          <div v-if="props.schema.text?.find((ps) => ps.key === 'textarea')" class="studysett-ctrl-text">
-            <textarea v-model="params['textarea']"></textarea>
+          <div v-if="props.schema.text?.find((ps) => ps.key === 'text')" class="studysett-ctrl-text">
+            <textarea v-model="params['text']"></textarea>
           </div>
         </template>
       </div>
     </div>
 
     <div class="studysett-footer studysett-container">
-      <button @click="apply()">apply</button>
+      <button class="studysett-btn" @click="apply()">Apply</button>
     </div>
   </div>
 </template>

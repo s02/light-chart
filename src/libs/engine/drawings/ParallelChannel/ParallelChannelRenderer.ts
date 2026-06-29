@@ -43,18 +43,18 @@ export class ParallelChannelRenderer implements IPrimitivePaneRenderer {
         shape(scope, [this.#points[0], this.#points[1], this.#points[3], this.#points[2], this.#points[0]], {
           'line-width': 0,
           'line-color': 'transparent',
-          fill: this.#params.fill
+          fill: this.#params['fill-color']
         })
       }
 
       if (this.#withDots) {
         if (this.#points.length > 1) {
-          dot(scope, this.#points[0], { color })
-          dot(scope, this.#points[1], { color })
+          dot(scope, this.#points[0])
+          dot(scope, this.#points[1])
         }
         if (this.#points.length > 2) {
-          dot(scope, this.#points[2], { color })
-          dot(scope, this.#points[3], { color })
+          dot(scope, this.#points[2])
+          dot(scope, this.#points[3])
         }
       }
     })

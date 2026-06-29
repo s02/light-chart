@@ -6,13 +6,14 @@ import { SignPostPaneView } from './SignPostPaneView'
 
 const SIGNPOST_SCHEMA = {
   text: [
-    { type: 'string', key: 'textarea', default: 'Text' },
-    { type: 'number', key: 'font-size', default: 12 },
-    { type: 'color', key: 'text-color', default: 'rgb(255 255 255)' }
+    { type: 'string', key: 'text', default: 'Text' },
+    { type: 'number', key: 'font-size', default: 12, fastPanel: true },
+    { type: 'color', key: 'text-color', default: 'rgb(255 255 255)', fastPanel: true }
   ],
+  inputs: [],
   style: [
-    { type: 'color', key: 'fill', default: 'rgb(0, 188, 212)' },
-    { type: 'number', key: 'line-width', default: 1 }
+    { type: 'color', key: 'fill-color', default: 'rgb(0, 188, 212)', fastPanel: true },
+    { type: 'number', key: 'line-width', default: 1, fastPanel: true }
   ]
 } as const satisfies StudySchema
 
@@ -30,7 +31,12 @@ export class SignPost extends BaseDrawing {
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
     this.#chart = chart
-    this.#params = resolveStudyParams(SIGNPOST_SCHEMA.text, SIGNPOST_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      SIGNPOST_SCHEMA.text,
+      SIGNPOST_SCHEMA.style,
+      SIGNPOST_SCHEMA.text,
+      options?.params
+    )
   }
 
   override attach(series: ISeriesApi<SeriesType>) {
@@ -44,7 +50,7 @@ export class SignPost extends BaseDrawing {
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(SIGNPOST_SCHEMA.text, SIGNPOST_SCHEMA.style, params)
+    this.#params = resolveStudyParams(SIGNPOST_SCHEMA.text, SIGNPOST_SCHEMA.style, SIGNPOST_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }
@@ -110,8 +116,8 @@ export class SignPost extends BaseDrawing {
     const charWidth = fontSize * 0.6
     const maxWidth = 250
     const availableWidth = maxWidth - 12
-    const estimatedLines = Math.max(1, Math.ceil((this.#params.textarea.length * charWidth) / availableWidth))
-    const bubbleWidth = Math.min(this.#params.textarea.length * charWidth + 12, maxWidth)
+    const estimatedLines = Math.max(1, Math.ceil((this.#params.text.length * charWidth) / availableWidth))
+    const bubbleWidth = Math.min(this.#params.text.length * charWidth + 12, maxWidth)
     const bubbleHeight = fontSize * estimatedLines + 8
     const pad = SignPost.hitThreashold
 

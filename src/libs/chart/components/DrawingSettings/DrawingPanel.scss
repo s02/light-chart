@@ -5,6 +5,10 @@
   display: flex;
   align-items: center;
   position: relative;
+
+  &.hidden {
+    visibility: hidden;
+  }
 }
 
 .drawing-settings-handle {

@@ -6,6 +6,7 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const CROSS_SCHEMA = {
+  text: [],
   inputs: [],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(255 152 0)', fastPanel: true },
@@ -23,11 +24,11 @@ export class Cross extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(CROSS_SCHEMA.inputs, CROSS_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(CROSS_SCHEMA.inputs, CROSS_SCHEMA.style, CROSS_SCHEMA.text, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(CROSS_SCHEMA.inputs, CROSS_SCHEMA.style, params)
+    this.#params = resolveStudyParams(CROSS_SCHEMA.inputs, CROSS_SCHEMA.style, CROSS_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }

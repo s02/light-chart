@@ -44,7 +44,7 @@
 .studysett-footer {
   padding-top: 16px;
   padding-bottom: 16px;
-  margin-top: 8px;
+  margin-top: 16px;
   border-top: 1px solid #4a4a4a;
   display: flex;
   justify-content: flex-end;
@@ -82,5 +82,22 @@
     line-height: inherit;
     padding: 2px 5px;
     resize: none;
+  }
+}
+
+.studysett-btn {
+  border-radius: 6px;
+  background-color: #fff;
+  border: 1px solid #fff;
+  color: #001020;
+  font-size: 14px;
+  line-height: 1;
+  padding: 9px 12px;
+  box-shadow: none;
+  cursor: pointer;
+  transition: opacity 200ms ease;
+
+  &:hover {
+    opacity: 0.8;
   }
 }

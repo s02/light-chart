@@ -1,26 +1,19 @@
-.lp-line {
-  width: 18px;
-  background-color: currentcolor;
-  display: block;
-}
-
-.lp {
+.fs {
   display: grid;
-  grid-template-columns: repeat(2, 70px);
+  grid-template-columns: repeat(3, 70px);
 }
 
-.lp-button {
-  display: flex;
+.fs-btn {
+  width: 70px;
+  display: block;
   color: inherit;
   font-family: inherit;
   background-color: transparent;
   border: 0;
   box-shadow: 0;
-  gap: 7px;
+  gap: 5px;
   cursor: pointer;
-  padding: 8px 0;
-  align-items: center;
-  justify-content: center;
+  padding: 8px;
 
   &:hover {
     background-color: #303030;

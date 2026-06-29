@@ -1,18 +1,32 @@
 <script lang="ts" setup>
+import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
+import ColorPicker from '@chart/components/ColorPicker.vue'
+
 defineProps<{ color: string }>()
+
+const isOpened = defineModel<boolean>({ default: false })
+
+const emit = defineEmits<{
+  (e: 'update', color: string): void
+}>()
 </script>
 
 <template>
-  <div class="drw-btn drw-btn-c">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20" fill="none">
-      <path
-        stroke="currentColor"
-        d="M13.5 6.5l-3-3-7 7 7.59 7.59a2 2 0 0 0 2.82 0l4.18-4.18a2 2 0 0 0 0-2.82L13.5 6.5zm0 0v-4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6"></path>
-      <path fill="currentColor" d="M0 16.5C0 15 2.5 12 2.5 12S5 15 5 16.5 4 19 2.5 19 0 18 0 16.5z"></path>
-      <circle fill="currentColor" cx="9.5" cy="9.5" r="1.5"></circle>
-    </svg>
-    <div class="drw-btn-c-line" :style="{ backgroundColor: `${color}` }"></div>
-  </div>
+  <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
+    <template #trigger="{ triggerRef }">
+      <div :ref="triggerRef" class="drw-btn drw-btn-c" @click="isOpened = true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20" fill="none">
+          <path
+            stroke="currentColor"
+            d="M13.5 6.5l-3-3-7 7 7.59 7.59a2 2 0 0 0 2.82 0l4.18-4.18a2 2 0 0 0 0-2.82L13.5 6.5zm0 0v-4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6"></path>
+          <path fill="currentColor" d="M0 16.5C0 15 2.5 12 2.5 12S5 15 5 16.5 4 19 2.5 19 0 18 0 16.5z"></path>
+          <circle fill="currentColor" cx="9.5" cy="9.5" r="1.5"></circle>
+        </svg>
+        <div class="drw-btn-c-line" :style="{ backgroundColor: `${color}` }"></div>
+      </div>
+    </template>
+    <ColorPicker :color="color" @select="emit('update', $event)" @close="isOpened = false" />
+  </FloatingDropdown>
 </template>
 
 <style lang="scss" scoped>

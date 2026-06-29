@@ -20,7 +20,7 @@ export class TextRenderer implements IPrimitivePaneRenderer {
       textLabel(scope, this.#p, this.#params)
 
       if (this.#withDot) {
-        dot(scope, this.#p, { color: this.#params.fill })
+        dot(scope, this.#p)
       }
     })
   }

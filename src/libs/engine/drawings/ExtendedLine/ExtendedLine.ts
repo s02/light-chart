@@ -6,6 +6,7 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
 
 const EXTENDED_LINE_SCHEMA = {
+  text: [],
   inputs: [],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(0, 188, 212)', fastPanel: true },
@@ -23,11 +24,21 @@ export class ExtendedLine extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(EXTENDED_LINE_SCHEMA.inputs, EXTENDED_LINE_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      EXTENDED_LINE_SCHEMA.inputs,
+      EXTENDED_LINE_SCHEMA.style,
+      EXTENDED_LINE_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(EXTENDED_LINE_SCHEMA.inputs, EXTENDED_LINE_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      EXTENDED_LINE_SCHEMA.inputs,
+      EXTENDED_LINE_SCHEMA.style,
+      EXTENDED_LINE_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) {
       this.requestUpdate()
     }

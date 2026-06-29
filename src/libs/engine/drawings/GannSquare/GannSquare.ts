@@ -1,18 +1,16 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { GannSquarePaneView } from '@engine/drawings/GannSquare/GannSquarePaneView'
-import type { DrawingOptions } from '@engine/drawings/types'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
-import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
+import type { IChartApi, Point } from 'lightweight-charts'
+import type { DrawingOptions } from '@engine/drawings/types'
 
 const GANN_SQUARE_SCHEMA = {
-  inputs: [
-    { type: 'number', key: 'line-width', default: 1 },
-    { type: 'number', key: 'divisions', default: 5 }
-  ],
+  text: [],
+  inputs: [{ type: 'number', key: 'divisions', default: 5 }],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(0, 188, 212)' },
-    { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 0%)' }
+    { type: 'number', key: 'line-width', default: 1, fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(0, 188, 212)', fastPanel: true }
   ]
 } as const satisfies StudySchema
 
@@ -26,11 +24,21 @@ export class GannSquare extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(GANN_SQUARE_SCHEMA.inputs, GANN_SQUARE_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      GANN_SQUARE_SCHEMA.inputs,
+      GANN_SQUARE_SCHEMA.style,
+      GANN_SQUARE_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(GANN_SQUARE_SCHEMA.inputs, GANN_SQUARE_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      GANN_SQUARE_SCHEMA.inputs,
+      GANN_SQUARE_SCHEMA.style,
+      GANN_SQUARE_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) {
       this.requestUpdate()
     }

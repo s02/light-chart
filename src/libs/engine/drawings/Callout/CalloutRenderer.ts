@@ -42,7 +42,7 @@ export class CalloutRenderer implements IPrimitivePaneRenderer {
       const vpr = scope.verticalPixelRatio
       const pr = Math.min(hpr, vpr)
 
-      const fill = this.#params.fill
+      const fill = this.#params['fill-color']
       const fontSize = this.#params['font-size'] * pr
       const PAD = 10 * pr // padding on all sides
       const R = 8 * pr // corner radius
@@ -51,7 +51,7 @@ export class CalloutRenderer implements IPrimitivePaneRenderer {
 
       ctx.font = `${fontSize}px sans-serif`
 
-      const lines = wrapText(ctx, this.#params.textarea, maxBoxWidth - 2 * PAD)
+      const lines = wrapText(ctx, this.#params.text, maxBoxWidth - 2 * PAD)
       const textW = Math.max(...lines.map((ln) => ctx.measureText(ln).width))
       const textH = fontSize * lines.length
 

@@ -6,6 +6,7 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
 
 const TREND_LINE_SCHEMA = {
+  text: [],
   inputs: [],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(103 58 183)', fastPanel: true },
@@ -22,11 +23,16 @@ export class TrendLine extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(TREND_LINE_SCHEMA.inputs, TREND_LINE_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      TREND_LINE_SCHEMA.inputs,
+      TREND_LINE_SCHEMA.style,
+      TREND_LINE_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(TREND_LINE_SCHEMA.inputs, TREND_LINE_SCHEMA.style, params)
+    this.#params = resolveStudyParams(TREND_LINE_SCHEMA.inputs, TREND_LINE_SCHEMA.style, TREND_LINE_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }

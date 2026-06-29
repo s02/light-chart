@@ -7,11 +7,12 @@ import { CalloutPaneView } from './CalloutPaneView'
 
 const CALLOUT_SCHEMA = {
   text: [
-    { type: 'string', key: 'textarea', default: 'Text' },
-    { type: 'number', key: 'font-size', default: 12 },
-    { type: 'color', key: 'text-color', default: 'rgb(255 255 255)' }
+    { type: 'string', key: 'text', default: 'Text' },
+    { type: 'number', key: 'font-size', default: 12, fastPanel: true },
+    { type: 'color', key: 'text-color', default: 'rgb(255 255 255)', fastPanel: true }
   ],
-  style: [{ type: 'color', key: 'fill', default: 'rgb(0, 188, 212)' }]
+  inputs: [],
+  style: [{ type: 'color', key: 'fill-color', default: 'rgb(0, 188, 212)', fastPanel: true }]
 } as const satisfies StudySchema
 
 export type CalloutParams = InferStudyValues<typeof CALLOUT_SCHEMA.text> & InferStudyValues<typeof CALLOUT_SCHEMA.style>
@@ -24,11 +25,11 @@ export class Callout extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(CALLOUT_SCHEMA.text, CALLOUT_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(CALLOUT_SCHEMA.text, CALLOUT_SCHEMA.style, CALLOUT_SCHEMA.text, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(CALLOUT_SCHEMA.text, CALLOUT_SCHEMA.style, params)
+    this.#params = resolveStudyParams(CALLOUT_SCHEMA.text, CALLOUT_SCHEMA.style, CALLOUT_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }
@@ -60,8 +61,8 @@ export class Callout extends BaseDrawing {
     const fontSize = this.#params['font-size']
     const charWidth = fontSize * 0.6
     const maxWidth = 250
-    const estimatedLines = Math.max(1, Math.ceil((this.#params.textarea.length * charWidth) / (maxWidth - 20)))
-    const bubbleWidth = Math.min(this.#params.textarea.length * charWidth + 20, maxWidth)
+    const estimatedLines = Math.max(1, Math.ceil((this.#params.text.length * charWidth) / (maxWidth - 20)))
+    const bubbleWidth = Math.min(this.#params.text.length * charWidth + 20, maxWidth)
     const bubbleHeight = fontSize * estimatedLines + 20
     const pad = Callout.hitThreashold
 

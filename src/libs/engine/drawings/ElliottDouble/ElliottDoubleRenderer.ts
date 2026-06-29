@@ -56,7 +56,7 @@ export class ElliottDoubleRenderer implements IPrimitivePaneRenderer {
         }
 
         if (this.#withDots) {
-          dot(scope, p, { color: this.#params['line-color'] })
+          dot(scope, p)
         }
       }
     })

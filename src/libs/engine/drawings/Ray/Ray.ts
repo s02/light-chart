@@ -6,6 +6,7 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
 
 const RAY_SCHEMA = {
+  text: [],
   inputs: [],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(0 188 212)', fastPanel: true },
@@ -13,7 +14,7 @@ const RAY_SCHEMA = {
   ]
 } as const satisfies StudySchema
 
-export type RayParams = InferStudyValues<typeof RAY_SCHEMA.inputs> & InferStudyValues<typeof RAY_SCHEMA.style>
+export type RayParams = InferStudyValues<typeof RAY_SCHEMA.style>
 
 export class Ray extends BaseDrawing {
   static readonly ikey = 'ray' as const
@@ -22,11 +23,11 @@ export class Ray extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(RAY_SCHEMA.inputs, RAY_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(RAY_SCHEMA.inputs, RAY_SCHEMA.style, RAY_SCHEMA.text, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(RAY_SCHEMA.inputs, RAY_SCHEMA.style, params)
+    this.#params = resolveStudyParams(RAY_SCHEMA.inputs, RAY_SCHEMA.style, RAY_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }

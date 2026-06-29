@@ -6,15 +6,17 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const TEXT_SCHEMA = {
-  inputs: [{ type: 'string', key: 'text', default: 'Text' }],
+  text: [{ type: 'string', key: 'text', default: 'Text' }],
+  inputs: [],
   style: [
-    { type: 'color', key: 'text-color', default: 'rgb(255 255 255)' },
-    { type: 'color', key: 'fill', default: 'rgb(0, 188, 212)' },
-    { type: 'number', key: 'font-size', default: 16 }
+    { type: 'color', key: 'text-color', default: 'rgb(255 255 255)', fastPanel: true },
+    { type: 'number', key: 'font-size', default: 16, fastPanel: true }
   ]
 } as const satisfies StudySchema
 
-export type TextParams = InferStudyValues<typeof TEXT_SCHEMA.inputs> & InferStudyValues<typeof TEXT_SCHEMA.style>
+export type TextParams = InferStudyValues<typeof TEXT_SCHEMA.inputs> &
+  InferStudyValues<typeof TEXT_SCHEMA.style> &
+  InferStudyValues<typeof TEXT_SCHEMA.text>
 
 export class TextDrawing extends BaseDrawing {
   static readonly ikey = 'text' as const
@@ -24,11 +26,11 @@ export class TextDrawing extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(TEXT_SCHEMA.inputs, TEXT_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(TEXT_SCHEMA.inputs, TEXT_SCHEMA.style, TEXT_SCHEMA.text, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(TEXT_SCHEMA.inputs, TEXT_SCHEMA.style, params)
+    this.#params = resolveStudyParams(TEXT_SCHEMA.inputs, TEXT_SCHEMA.style, TEXT_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }

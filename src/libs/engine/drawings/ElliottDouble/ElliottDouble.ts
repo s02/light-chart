@@ -6,13 +6,13 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const ELLIOTT_DOUBLE_SCHEMA = {
-  inputs: [
-    { type: 'number', key: 'line-width', default: 1 },
-    { type: 'number', key: 'font-size', default: 11 }
-  ],
+  text: [],
+  inputs: [],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(33 150 243)' },
-    { type: 'color', key: 'text-color', default: 'rgb(33 150 243)' }
+    { type: 'number', key: 'line-width', default: 1, fastPanel: true },
+    { type: 'number', key: 'font-size', default: 16, fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(33 150 243)', fastPanel: true },
+    { type: 'color', key: 'text-color', default: 'rgb(33 150 243)', fastPanel: true }
   ]
 } as const satisfies StudySchema
 
@@ -27,11 +27,21 @@ export class ElliottDouble extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(ELLIOTT_DOUBLE_SCHEMA.inputs, ELLIOTT_DOUBLE_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      ELLIOTT_DOUBLE_SCHEMA.inputs,
+      ELLIOTT_DOUBLE_SCHEMA.style,
+      ELLIOTT_DOUBLE_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ELLIOTT_DOUBLE_SCHEMA.inputs, ELLIOTT_DOUBLE_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      ELLIOTT_DOUBLE_SCHEMA.inputs,
+      ELLIOTT_DOUBLE_SCHEMA.style,
+      ELLIOTT_DOUBLE_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) this.requestUpdate()
   }
 

@@ -44,7 +44,7 @@ export class SignPostRenderer implements IPrimitivePaneRenderer {
       const vpr = scope.verticalPixelRatio
       const pr = Math.min(hpr, vpr)
 
-      const fill = this.#params.fill
+      const fill = this.#params['fill-color']
       const fontSize = this.#params['font-size'] * pr
       const paddingH = 4 * vpr
       const paddingW = 6 * hpr
@@ -53,7 +53,7 @@ export class SignPostRenderer implements IPrimitivePaneRenderer {
 
       ctx.font = `${fontSize}px sans-serif`
 
-      const lines = wrapText(ctx, this.#params.textarea, maxBoxWidth - paddingW * 2)
+      const lines = wrapText(ctx, this.#params.text, maxBoxWidth - paddingW * 2)
       const maxLineWidth = Math.max(...lines.map((l) => ctx.measureText(l).width))
       const boxWidth = Math.min(maxLineWidth + paddingW * 2, maxBoxWidth)
       const boxHeight = fontSize * lines.length + paddingH * 2

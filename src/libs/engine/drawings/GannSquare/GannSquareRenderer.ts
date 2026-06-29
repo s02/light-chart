@@ -1,9 +1,9 @@
-import type { GannSquareParams } from '@engine/drawings/GannSquare/GannSquare'
 import { dot } from '@engine/primitives/dot'
 import { line } from '@engine/primitives/line'
 import { rect } from '@engine/primitives/rect'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
+import type { GannSquareParams } from '@engine/drawings/GannSquare/GannSquare'
 
 export class GannSquareRenderer implements IPrimitivePaneRenderer {
   #p1: Point
@@ -25,7 +25,7 @@ export class GannSquareRenderer implements IPrimitivePaneRenderer {
     const divisions = Math.max(1, Math.round(this.#params['divisions']))
 
     target.useBitmapCoordinateSpace((scope) => {
-      rect(scope, p1, p2, { 'line-color': color, 'line-width': width, fill: this.#params['fill'] })
+      rect(scope, p1, p2, { 'line-color': color, 'line-width': width })
 
       const minX = Math.min(p1.x, p2.x)
       const maxX = Math.max(p1.x, p2.x)
@@ -45,8 +45,8 @@ export class GannSquareRenderer implements IPrimitivePaneRenderer {
       }
 
       if (this.#withDots) {
-        dot(scope, p1, { color })
-        dot(scope, p2, { color })
+        dot(scope, p1)
+        dot(scope, p2)
       }
     })
   }

@@ -184,5 +184,6 @@
   "ind-prop-senkouB": "Lead 2",
   "ind-prop-chikou": "Lagging Span",
   "ind-prop-cloudBull": "Cloud Up",
-  "ind-prop-cloudBear": "Cloud Down"
+  "ind-prop-cloudBear": "Cloud Down",
+  "study-text": "Text"
 }

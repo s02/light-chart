@@ -5,6 +5,7 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
 
 const HORIZONTAL_RAY_SCHEMA = {
+  text: [],
   inputs: [],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(242 54 69)', fastPanel: true },
@@ -22,11 +23,21 @@ export class HorizontalRay extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(HORIZONTAL_RAY_SCHEMA.inputs, HORIZONTAL_RAY_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      HORIZONTAL_RAY_SCHEMA.inputs,
+      HORIZONTAL_RAY_SCHEMA.style,
+      HORIZONTAL_RAY_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(HORIZONTAL_RAY_SCHEMA.inputs, HORIZONTAL_RAY_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      HORIZONTAL_RAY_SCHEMA.inputs,
+      HORIZONTAL_RAY_SCHEMA.style,
+      HORIZONTAL_RAY_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) {
       this.requestUpdate()
     }

@@ -5,8 +5,6 @@ import { resolveStudyParams, type InferStudyValues, type StudyParams, type Study
 import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
 
-// Levels ordered 0→1. p1=anchor1=level1, p2=anchor2=level0.
-// levelY(r) = p2.y + r*(p1.y - p2.y)
 export const FIB_LEVELS = [
   { ratio: 0, key: 'c0' as const, label: '0' },
   { ratio: 0.236, key: 'c236' as const, label: '0.236' },
@@ -22,8 +20,12 @@ export const FIB_LEVELS = [
 ] as const
 
 const FIB_SCHEMA = {
-  inputs: [{ type: 'number', key: 'font-size', default: 11 }],
+  text: [],
+  inputs: [],
   style: [
+    { type: 'color', key: 'fill-color', default: 'rgb(255 241 118 / 10%)', fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(255 241 118)', fastPanel: true },
+    { type: 'number', key: 'font-size', default: 12 },
     { type: 'color', key: 'c0', default: 'rgb(255 241 118)' },
     { type: 'color', key: 'c236', default: 'rgb(255 241 118)' },
     { type: 'color', key: 'c383', default: 'rgb(255 241 118)' },
@@ -34,10 +36,7 @@ const FIB_SCHEMA = {
     { type: 'color', key: 'c1618', default: 'rgb(255 241 118)' },
     { type: 'color', key: 'c2618', default: 'rgb(255 241 118)' },
     { type: 'color', key: 'c3618', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c4236', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'fill-color', default: 'rgb(255 241 118 / 10%)' },
-    { type: 'color', key: 'text-color', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'trend-color', default: 'rgb(255 241 118)' }
+    { type: 'color', key: 'c4236', default: 'rgb(255 241 118)' }
   ]
 } as const satisfies StudySchema
 
@@ -51,11 +50,11 @@ export class FibRetracement extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(FIB_SCHEMA.inputs, FIB_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(FIB_SCHEMA.inputs, FIB_SCHEMA.style, FIB_SCHEMA.text, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(FIB_SCHEMA.inputs, FIB_SCHEMA.style, params)
+    this.#params = resolveStudyParams(FIB_SCHEMA.inputs, FIB_SCHEMA.style, FIB_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }

@@ -10,10 +10,12 @@ import type { IChartApi, Point } from 'lightweight-charts'
 // TODO: Добавить настройку для расширения влево или вправо
 
 const PARALLEL_CHANNEL_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
+  text: [],
+  inputs: [],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(156 39 176)' },
-    { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 5%)' }
+    { type: 'color', key: 'line-color', default: 'rgb(156 39 176)', fastPanel: true },
+    { type: 'color', key: 'fill-color', default: 'rgb(41 98 255 / 5%)', fastPanel: true },
+    { type: 'number', key: 'line-width', default: 2, fastPanel: true }
   ]
 } as const satisfies StudySchema
 
@@ -28,11 +30,21 @@ export class ParallelChannel extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(PARALLEL_CHANNEL_SCHEMA.inputs, PARALLEL_CHANNEL_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      PARALLEL_CHANNEL_SCHEMA.inputs,
+      PARALLEL_CHANNEL_SCHEMA.style,
+      PARALLEL_CHANNEL_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(PARALLEL_CHANNEL_SCHEMA.inputs, PARALLEL_CHANNEL_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      PARALLEL_CHANNEL_SCHEMA.inputs,
+      PARALLEL_CHANNEL_SCHEMA.style,
+      PARALLEL_CHANNEL_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) {
       this.requestUpdate()
     }
@@ -126,19 +138,25 @@ export class ParallelChannel extends BaseDrawing {
       return false
     }
 
-    for (let i = 0; i < this.anchors.length - 1; i++) {
-      const start = viewport.anchorToPoint(this.anchors[i])
-      const end = viewport.anchorToPoint(this.anchors[i + 1])
-
+    if (this.anchors.length < 4) {
+      const start = viewport.anchorToPoint(this.anchors[0])
+      const end = viewport.anchorToPoint(this.anchors[1])
       if (start && end) {
-        const distance = geometry.distanceToLineSegment(point, start, end)
-        if (distance < ParallelChannel.hitThreashold) {
-          return true
-        }
+        return geometry.distanceToLineSegment(point, start, end) < ParallelChannel.hitThreashold
       }
+      return false
     }
 
-    return false
+    const p0 = viewport.anchorToPoint(this.anchors[0])
+    const p1 = viewport.anchorToPoint(this.anchors[1])
+    const p2 = viewport.anchorToPoint(this.anchors[2])
+    const p3 = viewport.anchorToPoint(this.anchors[3])
+
+    if (!p0 || !p1 || !p2 || !p3) {
+      return false
+    }
+
+    return geometry.pointInPolygon(point, [p0, p1, p3, p2])
   }
 
   #createLine(anchors: Anchor[], delta: { price: number; length: number }) {

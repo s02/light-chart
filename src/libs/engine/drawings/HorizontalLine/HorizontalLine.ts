@@ -5,6 +5,7 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 
 const HORIZONTAL_LINE_SCHEMA = {
+  text: [],
   inputs: [],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(255 152 0)', fastPanel: true },
@@ -23,11 +24,21 @@ export class HorizontalLine extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(HORIZONTAL_LINE_SCHEMA.inputs, HORIZONTAL_LINE_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      HORIZONTAL_LINE_SCHEMA.inputs,
+      HORIZONTAL_LINE_SCHEMA.style,
+      HORIZONTAL_LINE_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(HORIZONTAL_LINE_SCHEMA.inputs, HORIZONTAL_LINE_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      HORIZONTAL_LINE_SCHEMA.inputs,
+      HORIZONTAL_LINE_SCHEMA.style,
+      HORIZONTAL_LINE_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) {
       this.requestUpdate()
     }

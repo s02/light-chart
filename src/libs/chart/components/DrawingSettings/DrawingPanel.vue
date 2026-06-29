@@ -4,11 +4,13 @@ import { computed, onUnmounted, ref, useTemplateRef } from 'vue'
 import DrawingPropLineColor from '@chart/components/DrawingSettings/DrawingPropLineColor.vue'
 import DrawingPropFontSize from '@chart/components/DrawingSettings/DrawingPropFontSize.vue'
 import DrawingPropLineWidth from '@chart/components/DrawingSettings/DrawingPropLineWidth.vue'
+import DrawingPropFillColor from '@chart/components/DrawingSettings/DrawingPropFillColor.vue'
+import DrawingPropTextColor from '@chart/components/DrawingSettings/DrawingPropTextColor.vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import { useModal } from '@chart/composables/useModal'
 import StudySettings from '@chart/components/StudySettings/StudySettings.vue'
 import type { DrawingSchema } from '@engine/drawings/types'
-import type { StudyParamDescriptor } from '@engine/schema'
+import type { StudyParamDescriptor, StudySchema } from '@engine/schema'
 
 type ParamKey = keyof DrawingSchema['params']
 type ParamValue = DrawingSchema['params'][ParamKey]
@@ -25,8 +27,34 @@ const fastPanel = computed(() => {
     return []
   }
 
-  return (drawingSchema.value.schema.style || []).filter((param) => param.fastPanel)
+  return [
+    ...drawingSchema.value.schema.style.filter((param) => param.fastPanel),
+    ...drawingSchema.value.schema.text.filter((param) => param.fastPanel)
+  ]
 })
+
+const availableSettings = computed(() => {
+  const result: StudySchema = {
+    inputs: [],
+    text: [],
+    style: []
+  }
+
+  if (!drawingSchema.value) {
+    return result
+  }
+
+  result.inputs = drawingSchema.value.schema.inputs.filter((p) => !p.fastPanel)
+  result.text = drawingSchema.value.schema.text.filter((p) => !p.fastPanel)
+  result.style = drawingSchema.value.schema.style.filter((p) => !p.fastPanel)
+
+  return result
+})
+
+const hasSettings = computed(
+  () =>
+    availableSettings.value.inputs.length || availableSettings.value.text.length || availableSettings.value.style.length
+)
 
 onClickOutside(useTemplateRef('dws'), () => {
   if (!isSettingsOpened.value && !isPanelMenuOpened.value) {
@@ -56,7 +84,7 @@ const openSettings = async () => {
   isSettingsOpened.value = true
 
   try {
-    const p = { ikey: drawingSchema.value.ikey, schema: drawingSchema.value.schema, params: drawingSchema.value.params }
+    const p = { ikey: drawingSchema.value.ikey, schema: availableSettings.value, params: drawingSchema.value.params }
     const settings = await openModal(StudySettings, { props: p })
 
     if (!drawingSchema.value || !settings) {
@@ -80,7 +108,7 @@ onUnmounted(() => {
 
 <template>
   <div v-if="drawingSchema">
-    <div ref="dws" class="drawing-settings">
+    <div ref="dws" class="drawing-settings" :class="{ hidden: isSettingsOpened }">
       <div class="drawing-settings-handle">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 12" width="8" height="12" fill="currentColor">
           <rect width="2" height="2" rx="1"></rect>
@@ -91,16 +119,6 @@ onUnmounted(() => {
           <rect width="2" height="2" rx="1" x="6" y="10"></rect>
         </svg>
       </div>
-      <template v-for="el in drawingSchema.schema.inputs" :key="el.key">
-        <!-- <DrawingPropText
-          v-if="el.key === 'text'"
-          :text="String(drawingSchema.params[el.key])"
-          @select="apply('text', $event)" />
-        <DrawingPropBrushWidth
-          v-if="el.key === 'brush-width'"
-          :width="Number(drawingSchema.params[el.key])"
-          @click="open(el, 'line')" /> -->
-      </template>
       <template v-for="el in fastPanel" :key="el.key">
         <DrawingPropLineWidth
           v-if="el.key === 'line-width'"
@@ -117,16 +135,18 @@ onUnmounted(() => {
           :color="String(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
-        <!-- <DrawingPropFillColor
-          v-else-if="el.key === 'fill'"
+        <DrawingPropFillColor
+          v-else-if="el.key === 'fill-color'"
           :color="String(drawingSchema.params[el.key])"
-          @click="open(el, 'color')" />
+          @update:model-value="isPanelMenuOpened = $event"
+          @update="apply(el.key, $event)" />
         <DrawingPropTextColor
           v-else-if="el.key === 'text-color'"
           :color="String(drawingSchema.params[el.key])"
-          @click="open(el, 'color')" /> -->
+          @update:model-value="isPanelMenuOpened = $event"
+          @update="apply(el.key, $event)" />
       </template>
-      <div class="drw-btn" @click="openSettings()">
+      <div v-if="hasSettings" class="drw-btn" @click="openSettings()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="currentColor">
           <path fill-rule="evenodd" d="M18 14a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-1 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
           <path
@@ -142,17 +162,6 @@ onUnmounted(() => {
         </svg>
       </div>
     </div>
-
-    <!-- <ChartMenu :menu-key="menuKey">
-      <template v-if="editSettings">
-        <ColorPicker
-          v-if="editSettings.type === 'color'"
-          ref="colorPicker"
-          :color="`${drawingSchema.params[editSettings.el.key]}`"
-          @select="apply(editSettings.el.key, $event)"
-          @close="close()" />
-      </template>
-    </ChartMenu> -->
   </div>
 </template>
 
