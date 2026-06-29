@@ -8,7 +8,7 @@ type CANDLE_MERGE_STRATEGY = 'continuous' | 'gap'
 export class CandleStoreService {
   #data: ChartBar[] = []
   #resolutionId: ResolutionId
-  #mergeStrategy: CANDLE_MERGE_STRATEGY = 'continuous'
+  #mergeStrategyName: CANDLE_MERGE_STRATEGY = 'continuous'
 
   constructor(resolutionId: ResolutionId) {
     this.#resolutionId = resolutionId
@@ -18,12 +18,21 @@ export class CandleStoreService {
     return this.#data
   }
 
+  #mergeStrategy(): CANDLE_MERGE_STRATEGY {
+    console.log('d', this.#resolutionId)
+    if (this.#resolutionId === '1S') {
+      return 'gap'
+    }
+
+    return this.#mergeStrategyName
+  }
+
   updateWithQuote(quote: Quote) {
     if (!this.#data.length) {
       throw 'Nothing to update'
     }
 
-    if (this.#mergeStrategy === 'continuous') {
+    if (this.#mergeStrategy() === 'continuous') {
       return this.#updateContinuously(quote)
     }
 
@@ -69,7 +78,7 @@ export class CandleStoreService {
   }
 
   addHistory(candles: ChartBar[]) {
-    if (this.#mergeStrategy === 'continuous') {
+    if (this.#mergeStrategyName === 'continuous') {
       candleHelpers.smoothify(candles)
     }
 
