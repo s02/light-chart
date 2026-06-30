@@ -6,6 +6,7 @@ import type { Anchor } from '@engine/points'
 import type { Coordinate, IPrimitivePaneView, Point } from 'lightweight-charts'
 import type { DrawingViewport, SeriesData } from '@engine/drawings/types'
 import type { RiskRewardParams } from '@engine/drawings/RiskReward/RiskReward'
+import { helpers } from '@chart/helpers'
 
 const LABEL_GAP = 10
 
@@ -51,22 +52,25 @@ export class LongPositionRiskRewardPaneView extends RiskRewardPaneView implement
 
     return new RiskRewardRenderers(
       new RwRectangleRenderer(p0, p1, p2, p3, this.#withDots, {
-        upColor: 'rgb(8 153 129 / 20%)',
-        downColor: 'rgb(242 54 69 / 20%)'
+        upColor: this.params['profit-fill'],
+        downColor: this.params['loss-fill']
       }),
       new RwTextRenderer([this.targetText()], { x: centerX, y: p1.y - LABEL_GAP } as Point, {
         origin: 'bottom',
         color: `rgb(255 255 255)`,
-        fill: 'rgb(8 153 129)'
+        fill: helpers.parseColor(this.params['profit-fill']).baseColor
       }),
       new RwTextRenderer(this.pnlText(), { x: centerX, y: p0.y + LABEL_GAP } as Point, {
         color: `rgb(255 255 255)`,
-        fill: this.pnl() > 0 ? 'rgb(8 153 129)' : 'rgb(242 54 69)',
+        fill:
+          this.pnl() > 0
+            ? helpers.parseColor(this.params['profit-fill']).baseColor
+            : helpers.parseColor(this.params['loss-fill']).baseColor,
         stroke: `rgb(255 255 255)`
       }),
       new RwTextRenderer([this.stopText()], { x: centerX, y: p2.y + LABEL_GAP } as Point, {
         color: `rgb(255 255 255)`,
-        fill: 'rgb(242 54 69)'
+        fill: helpers.parseColor(this.params['loss-fill']).baseColor
       })
     )
   }

@@ -1,5 +1,5 @@
 .studysett {
-  background-color: #001020;
+  background-color: #262626;
   width: 380px;
   color: #dbdbdb;
   border-radius: 6px;
@@ -101,4 +101,35 @@
   &:hover {
     opacity: 0.8;
   }
+}
+
+.studysett-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.studysett-group {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 16px;
+  display: inline-grid;
+}
+
+label {
+  font-size: 14px;
+}
+
+input {
+  display: block;
+  background-color: transparent;
+  box-shadow: none;
+  border: 1px solid #575757;
+  border-radius: 6px;
+  font-family: inherit;
+  color: inherit;
+  outline: none;
+  padding: 7px 6px;
+  width: 100px;
 }

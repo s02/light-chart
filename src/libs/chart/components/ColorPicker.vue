@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { helpers } from '@chart/helpers'
 import { DRAWING_COLORS } from '@engine/drawings'
 import { computed, ref } from 'vue'
 
@@ -9,30 +10,12 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const parseColor = (color: string) => {
-  const inner = color.slice(4, -1)
-  const slashIdx = inner.indexOf('/')
-  if (slashIdx === -1) {
-    return { baseColor: color, opacity: 100 }
-  }
-
-  const base = inner.slice(0, slashIdx).trim()
-  const alphaStr = inner.slice(slashIdx + 1).trim()
-  const isPercent = alphaStr.endsWith('%')
-  const value = parseFloat(alphaStr)
-
-  return {
-    baseColor: `rgb(${base})`,
-    opacity: Math.round(isPercent ? value : value * 100)
-  }
-}
-
 const mergedColor = computed(() => {
   const { baseColor, opacity } = colorValue.value
   return baseColor.replace(')', ` / ${opacity}%)`)
 })
 
-const colorValue = ref<{ baseColor: string; opacity: number }>(parseColor(props.color))
+const colorValue = ref<{ baseColor: string; opacity: number }>(helpers.parseColor(props.color))
 
 const selectBaseColor = (color: string) => {
   colorValue.value = {

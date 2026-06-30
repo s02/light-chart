@@ -1,0 +1,20 @@
+.study-line-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #575757;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.study-line-w {
+  width: 24px;
+  border-radius: 3px;
+  display: block;
+  flex-shrink: 0;
+  background-color: #fff;
+}

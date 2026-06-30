@@ -9,7 +9,7 @@ import DrawingPropFillColor from '@chart/components/DrawingSettings/DrawingPropF
 import DrawingPropTextColor from '@chart/components/DrawingSettings/DrawingPropTextColor.vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import { useModal } from '@chart/composables/useModal'
-import StudySettings from '@chart/components/StudySettings/StudySettings.vue'
+import StudySettings from '@chart/components/Study/StudySettings.vue'
 import type { DrawingSchema } from '@engine/drawings/types'
 import type { StudyParamDescriptor, StudySchema } from '@engine/schema'
 
@@ -108,7 +108,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="drawingSchema">
+  <div v-if="drawingSchema && drawingSchema.ikey !== 'emoji'">
     <div ref="dws" class="drawing-settings" :class="{ hidden: isSettingsOpened }">
       <div class="drawing-settings-handle">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 12" width="8" height="12" fill="currentColor">

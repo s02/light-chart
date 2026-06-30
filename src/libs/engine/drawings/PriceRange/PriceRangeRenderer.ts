@@ -65,7 +65,7 @@ export class PriceRangeRenderer implements IPrimitivePaneRenderer {
 
       // Background fill
       rect(scope, { x: minX, y: minY } as Point, { x: maxX, y: maxY } as Point, {
-        fill: this.#params.fill
+        'fill-color': this.#params['fill-color']
       })
 
       // Border
@@ -106,7 +106,7 @@ export class PriceRangeRenderer implements IPrimitivePaneRenderer {
 
       const labelLines = line2 ? [line1, line2] : [line1]
 
-      const fontSize = this.#params['font-size'] * pr
+      const fontSize = this.#params['label-font-size'] * pr
       const lineSpacing = 2 * pr
       const padH = 4 * vpr
       const padW = 6 * hpr
@@ -134,7 +134,7 @@ export class PriceRangeRenderer implements IPrimitivePaneRenderer {
       ctx.fillStyle = this.#params['label-fill']
       ctx.fill()
 
-      ctx.fillStyle = this.#params['text-color']
+      ctx.fillStyle = this.#params['label-color']
       ctx.textAlign = 'center'
       ctx.textBaseline = 'top'
       const centerX = bx + boxW / 2

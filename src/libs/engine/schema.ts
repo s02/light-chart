@@ -28,7 +28,23 @@ type StudySelectParam = {
   values: readonly string[]
 } & StudyParam
 
-export type StudyParamDescriptor = StudyNumberParam | StudyColorParam | StudyStringParam | StudySelectParam
+type StudyLineWidthParam = {
+  type: 'line-width'
+  default: number
+} & StudyParam
+
+type StudyFontSizeParam = {
+  type: 'font-size'
+  default: number
+} & StudyParam
+
+export type StudyParamDescriptor =
+  | StudyNumberParam
+  | StudyColorParam
+  | StudyStringParam
+  | StudySelectParam
+  | StudyLineWidthParam
+  | StudyFontSizeParam
 
 export type StudyParams = Record<string, number | string>
 

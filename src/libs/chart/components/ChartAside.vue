@@ -115,6 +115,7 @@ const selectDrawing = (script: DrawingScript) => {
       <div v-if="currentDrawingGroup == 'emoji'" class="ca-emoji-menu">
         <EmojiList @click="handleStart('emoji', { params: { emoji: $event } })" />
       </div>
+
       <div v-else class="ca-drawing-menu">
         <ChartMenuGroup v-for="subg in getDrawingSubgroups(g)" :key="subg" :name="subg">
           <ChartMenuItem

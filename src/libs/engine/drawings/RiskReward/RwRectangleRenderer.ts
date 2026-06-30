@@ -39,8 +39,8 @@ export class RwRectangleRenderer implements IPrimitivePaneRenderer {
       const mr = { x: right, y: mid } as Point
       const br = { x: right, y: bottom } as Point
 
-      rect(scope, tl, mr, { fill: this.#params.upColor })
-      rect(scope, ml, br, { fill: this.#params.downColor })
+      rect(scope, tl, mr, { 'fill-color': this.#params.upColor })
+      rect(scope, ml, br, { 'fill-color': this.#params.downColor })
       line(scope, ml, mr, { width: 1, color: 'rgb(255 255 255 / 50%)' })
 
       if (this.#withDots) {

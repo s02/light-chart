@@ -10,13 +10,15 @@ const INITIAL_WIDTH = 300
 const INITIAL_HEIGHT = 200
 
 export const RISK_REWARD_SCHEMA = {
+  text: [],
   inputs: [
     { type: 'number', key: 'account-size', default: 1000 },
     { type: 'number', key: 'risk-size', default: 250 },
-    { type: 'number', key: 'entry-price', default: 0 },
-    { type: 'number', key: 'stop-price', default: 0 },
-    { type: 'number', key: 'target-price', default: 0 },
-    { type: 'number', key: 'lot-size', default: 1 }
+    { type: 'number', key: 'lot-size', default: 1 },
+
+    { type: 'number', key: 'entry-price', default: 0, step: 0.01 },
+    { type: 'number', key: 'stop-price', default: 0, step: 0.01 },
+    { type: 'number', key: 'target-price', default: 0, step: 0.01 }
   ],
   style: [
     { type: 'color', key: 'profit-fill', default: 'rgb(8 153 129 / 20%)' },
@@ -33,7 +35,26 @@ export abstract class RiskReward extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.params = resolveStudyParams(RISK_REWARD_SCHEMA.inputs, RISK_REWARD_SCHEMA.style, options?.params)
+    this.params = resolveStudyParams(
+      RISK_REWARD_SCHEMA.inputs,
+      RISK_REWARD_SCHEMA.style,
+      RISK_REWARD_SCHEMA.text,
+      options?.params
+    )
+  }
+
+  updateAnchorPrice(anchor: Anchor, price: number) {
+    const viewport = this.getViewport()
+    if (!viewport) {
+      return null
+    }
+
+    const point = viewport.anchorToPoint({ time: anchor.time, price })
+    return {
+      ...anchor,
+      price,
+      ...point
+    }
   }
 
   override setAnchors(anchors: Anchor[]) {
@@ -63,13 +84,6 @@ export abstract class RiskReward extends BaseDrawing {
     }
 
     super.setAnchors(anchors)
-  }
-
-  override setParams(params: StudyParams) {
-    this.params = resolveStudyParams(RISK_REWARD_SCHEMA.inputs, RISK_REWARD_SCHEMA.style, params)
-    if (this.requestUpdate) {
-      this.requestUpdate()
-    }
   }
 
   override checkTap(point: Point): boolean {

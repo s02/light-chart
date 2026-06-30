@@ -7,7 +7,10 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 import type { Anchor } from '@engine/points'
 
+const DEFAULT_WIDTH = 50
+
 const EMOJI_SCHEMA = {
+  text: [],
   inputs: [{ type: 'string', key: 'emoji', default: '😀' }],
   style: []
 } as const satisfies StudySchema
@@ -25,7 +28,7 @@ function emojiToTwemojiUrl(emoji: string): string {
 
 export class EmojiDrawing extends BaseDrawing {
   static readonly ikey = 'emoji' as const
-  static readonly points = 2
+  static readonly points = 1
   #params: EmojiParams
   #image: HTMLImageElement | null = null
   #loadedEmoji = ''
@@ -34,12 +37,20 @@ export class EmojiDrawing extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(EMOJI_SCHEMA.inputs, EMOJI_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(EMOJI_SCHEMA.inputs, EMOJI_SCHEMA.style, EMOJI_SCHEMA.text, options?.params)
     this.#fetchImage(this.#params.emoji)
   }
 
   override setAnchors(anchors: Anchor[]) {
-    if (anchors.length < EmojiDrawing.points) {
+    if (anchors.length === 1) {
+      const viewport = this.getViewport()
+      if (viewport) {
+        const p = viewport.pointToAnchor({ x: anchors[0].x + DEFAULT_WIDTH, y: anchors[0].y } as Point)
+        if (p) {
+          this.setAnchors([anchors[0], p])
+        }
+      }
+
       return
     }
 
@@ -55,7 +66,7 @@ export class EmojiDrawing extends BaseDrawing {
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(EMOJI_SCHEMA.inputs, EMOJI_SCHEMA.style, params)
+    this.#params = resolveStudyParams(EMOJI_SCHEMA.inputs, EMOJI_SCHEMA.style, EMOJI_SCHEMA.style, params)
     this.#fetchImage(this.#params.emoji)
     if (this.requestUpdate) {
       this.requestUpdate()

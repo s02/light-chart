@@ -192,5 +192,11 @@
   "study-arrow-mark-up": "Arrow Up",
   "study-arrow-mark-down": "Arrow Down",
   "study-arrow-mark-left": "Arrow Left",
-  "study-arrow-mark-right": "Arrow Right"
+  "study-arrow-mark-right": "Arrow Right",
+  "study-price-range": "Price Range",
+  "study-prop-label-font-size": "Label Font Size",
+  "study-prop-label-color": "Label Color",
+  "study-prop-label-fill": "Label Fill Color",
+  "study-prop-border-color": "Border Color",
+  "study-prop-border-width": "Border Width"
 }

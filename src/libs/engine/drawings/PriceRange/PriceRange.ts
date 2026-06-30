@@ -6,16 +6,17 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
 
 const PRICE_RANGE_SCHEMA = {
-  inputs: [
-    { type: 'number', key: 'line-width', default: 2 },
-    { type: 'number', key: 'border-width', default: 1 },
-    { type: 'number', key: 'font-size', default: 12 }
-  ],
+  text: [],
+  inputs: [],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(76 175 80)' },
-    { type: 'color', key: 'border-color', default: 'rgb(76 175 80)' },
-    { type: 'color', key: 'fill', default: 'rgb(76 175 80 / 15%)' },
-    { type: 'color', key: 'text-color', default: 'rgb(255 255 255)' },
+    { type: 'number', key: 'line-width', default: 2, fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(76 175 80)', fastPanel: true },
+    { type: 'color', key: 'fill-color', default: 'rgb(76 175 80 / 15%)', fastPanel: true },
+
+    { type: 'line-width', key: 'border-width', default: 1 },
+    { type: 'color', key: 'border-color', default: 'rgb(76 175 80 / 0%)' },
+    { type: 'font-size', key: 'label-font-size', default: 12 },
+    { type: 'color', key: 'label-color', default: 'rgb(255 255 255)' },
     { type: 'color', key: 'label-fill', default: 'rgb(76 175 80)' }
   ]
 } as const satisfies StudySchema
@@ -30,11 +31,22 @@ export class PriceRange extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(PRICE_RANGE_SCHEMA.inputs, PRICE_RANGE_SCHEMA.style, options?.params)
+
+    this.#params = resolveStudyParams(
+      PRICE_RANGE_SCHEMA.inputs,
+      PRICE_RANGE_SCHEMA.style,
+      PRICE_RANGE_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(PRICE_RANGE_SCHEMA.inputs, PRICE_RANGE_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      PRICE_RANGE_SCHEMA.inputs,
+      PRICE_RANGE_SCHEMA.style,
+      PRICE_RANGE_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) {
       this.requestUpdate()
     }
