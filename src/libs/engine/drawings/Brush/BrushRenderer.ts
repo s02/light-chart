@@ -28,17 +28,28 @@ export class BrushRenderer implements IPrimitivePaneRenderer {
         return
       }
 
-      ctx.beginPath()
-      ctx.moveTo(pts[0].x * hpr, pts[0].y * vpr)
+      const buildCurve = () => {
+        ctx.beginPath()
+        ctx.moveTo(pts[0].x * hpr, pts[0].y * vpr)
 
-      for (let i = 1; i < pts.length - 1; i++) {
-        const midX = ((pts[i].x + pts[i + 1].x) / 2) * hpr
-        const midY = ((pts[i].y + pts[i + 1].y) / 2) * vpr
-        ctx.quadraticCurveTo(pts[i].x * hpr, pts[i].y * vpr, midX, midY)
+        for (let i = 1; i < pts.length - 1; i++) {
+          const midX = ((pts[i].x + pts[i + 1].x) / 2) * hpr
+          const midY = ((pts[i].y + pts[i + 1].y) / 2) * vpr
+          ctx.quadraticCurveTo(pts[i].x * hpr, pts[i].y * vpr, midX, midY)
+        }
+
+        ctx.lineTo(pts[pts.length - 1].x * hpr, pts[pts.length - 1].y * vpr)
       }
 
-      ctx.lineTo(pts[pts.length - 1].x * hpr, pts[pts.length - 1].y * vpr)
+      const fillColor = this.#params['fill-color']
+      if (fillColor) {
+        buildCurve()
+        ctx.closePath()
+        ctx.fillStyle = fillColor
+        ctx.fill()
+      }
 
+      buildCurve()
       ctx.strokeStyle = this.#params['line-color']
       ctx.lineWidth = this.#params['line-width'] * hpr
       ctx.lineCap = 'round'

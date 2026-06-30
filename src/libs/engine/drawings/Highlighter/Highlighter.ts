@@ -6,12 +6,17 @@ import { resolveStudyParams, type InferStudyValues, type StudyParams, type Study
 import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
 
+const DEFAULTS = {
+  'brush-width': 20,
+  'line-color': 'rgb(255 255 255 / 25%)'
+}
+
 const HIGHLIGHTER_SCHEMA = {
   text: [],
   inputs: [],
   style: [
-    { type: 'number', key: 'brush-width', default: 20, fastPanel: true },
-    { type: 'color', key: 'line-color', default: 'rgb(255 255 255 / 25%)', fastPanel: true }
+    { type: 'number', key: 'brush-width', default: DEFAULTS['brush-width'], fastPanel: true },
+    { type: 'color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true }
   ]
 } as const satisfies StudySchema
 
@@ -24,7 +29,7 @@ export class Highlighter extends BaseDrawing {
   static readonly points = POINTS_MODE.BRUSH
   #params: HighlighterParams
 
-  constructor(chart: IChartApi, options?: DrawingOptions) {
+  constructor(chart: IChartApi, options: DrawingOptions = { params: DEFAULTS }) {
     super(chart)
     this.#params = resolveStudyParams(
       HIGHLIGHTER_SCHEMA.inputs,
@@ -41,6 +46,10 @@ export class Highlighter extends BaseDrawing {
       HIGHLIGHTER_SCHEMA.text,
       params
     )
+
+    DEFAULTS['line-color'] = this.#params['line-color']
+    DEFAULTS['brush-width'] = this.#params['brush-width']
+
     if (this.requestUpdate) {
       this.requestUpdate()
     }

@@ -8,7 +8,8 @@ import type { DrawingOptions } from '@engine/drawings/types'
 
 const DEFAULTS = {
   'line-width': 3,
-  'line-color': 'rgb(255 152 0)'
+  'line-color': 'rgb(255 152 0)',
+  'fill-color': 'rgb(255 152 0 / 10%)'
 }
 
 const BRUSH_SCHEMA = {
@@ -16,7 +17,8 @@ const BRUSH_SCHEMA = {
   inputs: [],
   style: [
     { type: 'number', key: 'line-width', default: DEFAULTS['line-width'], fastPanel: true },
-    { type: 'color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true }
+    { type: 'color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true },
+    { type: 'color', key: 'fill-color', default: DEFAULTS['fill-color'], fastPanel: true }
   ]
 } as const satisfies StudySchema
 
@@ -39,6 +41,7 @@ export class Brush extends BaseDrawing {
 
     DEFAULTS['line-color'] = this.#params['line-color']
     DEFAULTS['line-width'] = this.#params['line-width']
+    DEFAULTS['fill-color'] = this.#params['fill-color']
 
     if (this.requestUpdate) {
       this.requestUpdate()
