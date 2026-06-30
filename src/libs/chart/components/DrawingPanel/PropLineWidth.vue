@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
-import FontSizePicker from '@chart/components/FontSizePicker.vue'
+import LineWidthPicker from '@chart/components/LineWidthPicker.vue'
 
-defineProps<{ size: number }>()
+defineProps<{ width: number }>()
 
 const isOpened = defineModel<boolean>({ default: false })
 
 const emit = defineEmits<{
-  (e: 'update', size: number): void
+  (e: 'update', width: number): void
 }>()
 
-const update = (size: number) => {
-  emit('update', size)
+const update = (width: number) => {
+  emit('update', width)
   isOpened.value = false
 }
 </script>
@@ -20,15 +20,15 @@ const update = (size: number) => {
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
       <div :ref="triggerRef" class="drw-btn drw-btn-w" @click="isOpened = true">
-        <div class="drw-btn-w-label">{{ size }}px</div>
+        <div class="drw-btn-w-line" :style="{ height: `${width}px` }"></div>
+        <div class="drw-btn-w-label">{{ width }}px</div>
       </div>
     </template>
-
-    <FontSizePicker :values="[8, 10, 11, 12, 14, 16, 18, 20, 22, 28, 32, 40]" :size="size" @select="update" />
+    <LineWidthPicker :values="[1, 2, 3, 4, 5, 6]" :width="width" @select="update" />
   </FloatingDropdown>
 </template>
 
 <style lang="scss" scoped>
 @use 'btn.scss';
-@use 'DrawingPropLineWidth.scss';
+@use 'PropLineWidth.scss';
 </style>

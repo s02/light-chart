@@ -29,5 +29,5 @@ const emit = defineEmits<{
 
 <style lang="scss" scoped>
 @use 'btn.scss';
-@use 'DrawingPropLineColor.scss';
+@use 'PropLineColor.scss';
 </style>

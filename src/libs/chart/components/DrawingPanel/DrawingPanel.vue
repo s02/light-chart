@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { onClickOutside } from '@vueuse/core'
 import { computed, onUnmounted, ref, useTemplateRef } from 'vue'
-import DrawingPropLineColor from '@chart/components/DrawingSettings/DrawingPropLineColor.vue'
-import DrawingPropFontSize from '@chart/components/DrawingSettings/DrawingPropFontSize.vue'
-import DrawingPropLineWidth from '@chart/components/DrawingSettings/DrawingPropLineWidth.vue'
-import DrawingPropBrushWidth from '@chart/components/DrawingSettings/DrawingPropBrushWidth.vue'
-import DrawingPropFillColor from '@chart/components/DrawingSettings/DrawingPropFillColor.vue'
-import DrawingPropTextColor from '@chart/components/DrawingSettings/DrawingPropTextColor.vue'
+import PropLineColor from '@chart/components/DrawingPanel/PropLineColor.vue'
+import PropFontSize from '@chart/components/DrawingPanel/PropFontSize.vue'
+import PropLineWidth from '@chart/components/DrawingPanel/PropLineWidth.vue'
+import PropBrushWidth from '@chart/components/DrawingPanel/PropBrushWidth.vue'
+import PropFillColor from '@chart/components/DrawingPanel/PropFillColor.vue'
+import PropTextColor from '@chart/components/DrawingPanel/PropTextColor.vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import { useModal } from '@chart/composables/useModal'
 import StudySettings from '@chart/components/Study/StudySettings.vue'
@@ -121,32 +121,32 @@ onUnmounted(() => {
         </svg>
       </div>
       <template v-for="el in fastPanel" :key="el.key">
-        <DrawingPropLineWidth
-          v-if="el.key === 'line-width'"
+        <PropLineWidth
+          v-if="el.type === 'line-width'"
           :width="Number(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
-        <DrawingPropBrushWidth
+        <PropBrushWidth
           v-else-if="el.key === 'brush-width'"
           :width="Number(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
-        <DrawingPropFontSize
+        <PropFontSize
           v-else-if="el.key === 'font-size'"
           :size="Number(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
-        <DrawingPropLineColor
+        <PropLineColor
           v-else-if="el.key === 'line-color'"
           :color="String(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
-        <DrawingPropFillColor
+        <PropFillColor
           v-else-if="el.key === 'fill-color'"
           :color="String(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
-        <DrawingPropTextColor
+        <PropTextColor
           v-else-if="el.key === 'text-color'"
           :color="String(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"

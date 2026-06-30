@@ -34,5 +34,5 @@ const update = (width: number) => {
 
 <style lang="scss" scoped>
 @use 'btn.scss';
-@use 'DrawingPropBrushWidth.scss';
+@use 'PropBrushWidth.scss';
 </style>
