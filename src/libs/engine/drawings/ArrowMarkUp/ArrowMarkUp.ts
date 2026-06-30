@@ -8,11 +8,12 @@ import type { IChartApi, Point } from 'lightweight-charts'
 
 const ARROW_MARK_UP_SCHEMA = {
   text: [
-    { type: 'string', key: 'textarea', default: '' },
+    { type: 'string', key: 'text', default: '' },
     { type: 'number', key: 'font-size', default: 12 },
     { type: 'color', key: 'text-color', default: 'rgb(38 166 154)' }
   ],
-  style: [{ type: 'color', key: 'fill', default: 'rgb(38 166 154)' }]
+  inputs: [],
+  style: [{ type: 'color', key: 'fill-color', default: 'rgb(38 166 154)', fastPanel: true }]
 } as const satisfies StudySchema
 
 export type ArrowMarkUpParams = InferStudyValues<typeof ARROW_MARK_UP_SCHEMA.text> &
@@ -26,11 +27,21 @@ export class ArrowMarkUp extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(ARROW_MARK_UP_SCHEMA.text, ARROW_MARK_UP_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      ARROW_MARK_UP_SCHEMA.text,
+      ARROW_MARK_UP_SCHEMA.style,
+      ARROW_MARK_UP_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ARROW_MARK_UP_SCHEMA.text, ARROW_MARK_UP_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      ARROW_MARK_UP_SCHEMA.text,
+      ARROW_MARK_UP_SCHEMA.style,
+      ARROW_MARK_UP_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) this.requestUpdate()
   }
 
@@ -56,7 +67,7 @@ export class ArrowMarkUp extends BaseDrawing {
     const p = viewport.anchorToPoint(this.anchors[0])
     if (!p) return false
 
-    const { width, height } = textLabelBounds(this.#params.textarea, this.#params['font-size'])
+    const { width, height } = textLabelBounds(this.#params.text, this.#params['font-size'])
     const pad = ArrowMarkUp.hitThreashold
     const totalH = ArrowHeadHeight + ArrowTailHeight
     const halfW = Math.max(ArrowHeadWidth / 2, width / 2)

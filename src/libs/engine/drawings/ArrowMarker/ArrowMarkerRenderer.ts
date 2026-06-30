@@ -3,12 +3,9 @@ import type { ArrowMarkerParams } from './ArrowMarker'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { Coordinate, IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 
-// Arrowhead length as a fraction of total arrow length, capped.
 function headSize(len: number): number {
   return Math.max(Math.min(len * 0.55, 100), 10)
 }
-
-// Stroke width: ~2% of length, clamped to [2, 5] logical px.
 function strokeWidth(len: number): number {
   return Math.max(Math.min(Math.round(0.02 * len), 5), 2)
 }
@@ -33,7 +30,6 @@ export class ArrowMarkerRenderer implements IPrimitivePaneRenderer {
       const vpr = scope.verticalPixelRatio
       const pr = Math.min(hpr, vpr)
 
-      // Work in logical pixel space for all geometry.
       const tailX = this.#p1.x
       const tailY = this.#p1.y
       const tipX = this.#p2.x
@@ -44,7 +40,6 @@ export class ArrowMarkerRenderer implements IPrimitivePaneRenderer {
       const rawLen = Math.sqrt(dx * dx + dy * dy)
       if (rawLen === 0) return
 
-      // Enforce minimum visual length of 22 logical px by moving the tail.
       const MIN_LEN = 22
       let adjTailX = tailX
       let adjTailY = tailY
@@ -58,30 +53,24 @@ export class ArrowMarkerRenderer implements IPrimitivePaneRenderer {
 
       const arrowLen = Math.max(rawLen, MIN_LEN)
 
-      // Normalised axis and perpendicular vectors (in logical px space).
-      // Perp = (i.y, -i.x).normalised() per TradingView — 90° clockwise from axis.
       const ux = dx / arrowLen
       const uy = dy / arrowLen
       const perpX = uy
       const perpY = -ux
 
-      // Arrow geometry constants (in logical px).
       const t = headSize(arrowLen)
-      const n = arrowLen >= 35 ? 0.1 : 0 // shoulder notch for longer arrows
+      const n = arrowLen >= 35 ? 0.1 : 0
 
-      // Map local (along-axis, perp) → bitmap canvas coords.
       const toCanvas = (along: number, perp: number) => ({
         x: (adjTailX + ux * along + perpX * perp) * hpr,
         y: (adjTailY + uy * along + perpY * perp) * vpr
       })
 
-      // Six path points (tail + upper half + tip + lower half):
-      // upper shoulder, upper wing, tip, lower wing, lower shoulder
       const shoulder = arrowLen - t + t * n
       const shaftHalf = (1.22 * t) / 4
       const wingHalf = (1.22 * t) / 2
 
-      const color = this.#params['line-color']
+      const color = this.#params['fill-color']
       ctx.fillStyle = color
       ctx.strokeStyle = color
       ctx.lineJoin = 'round'
@@ -105,20 +94,14 @@ export class ArrowMarkerRenderer implements IPrimitivePaneRenderer {
       ctx.stroke()
       ctx.fill()
 
-      // Plain text at anchor[0], positioned away from the arrow direction.
-      if (this.#params.textarea) {
-        // Use original (non-adjusted) direction for alignment decisions.
+      if (this.#params.text) {
         const ndx = (tipX - tailX) / rawLen
         const ndy = (tipY - tailY) / rawLen
-        const GAP = 10 // logical px between anchor and text
+        const GAP = 10
 
-        // Horizontal: if arrow is more horizontal than vertical, place text on opposite side.
         const tAlign: CanvasTextAlign = Math.abs(ndx) >= Math.abs(ndy) ? (ndx > 0 ? 'right' : 'left') : 'center'
-
-        // Vertical: if arrow is more vertical than horizontal, place text on opposite side.
         const tBaseline: CanvasTextBaseline = Math.abs(ndy) >= Math.abs(ndx) ? (ndy > 0 ? 'bottom' : 'top') : 'middle'
 
-        // Offset the draw point by GAP in the text direction (away from arrow).
         const textX = tailX + (tAlign === 'right' ? -GAP : tAlign === 'left' ? GAP : 0)
         const textY = tailY + (tBaseline === 'bottom' ? -GAP : tBaseline === 'top' ? GAP : 0)
 
@@ -127,12 +110,12 @@ export class ArrowMarkerRenderer implements IPrimitivePaneRenderer {
         ctx.fillStyle = this.#params['text-color']
         ctx.textAlign = tAlign
         ctx.textBaseline = tBaseline
-        ctx.fillText(this.#params.textarea, textX * hpr, textY * vpr)
+        ctx.fillText(this.#params.text, textX * hpr, textY * vpr)
       }
 
       if (this.#withDots) {
-        dot(scope, this.#p1, { color })
-        dot(scope, this.#p2, { color })
+        dot(scope, this.#p1)
+        dot(scope, this.#p2)
       }
     })
   }

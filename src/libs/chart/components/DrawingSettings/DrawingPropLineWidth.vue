@@ -24,7 +24,7 @@ const update = (width: number) => {
         <div class="drw-btn-w-label">{{ width }}px</div>
       </div>
     </template>
-    <LineWidthPicker :width="width" @select="update" />
+    <LineWidthPicker :values="[1, 2, 3, 4, 5, 6]" :width="width" @select="update" />
   </FloatingDropdown>
 </template>
 

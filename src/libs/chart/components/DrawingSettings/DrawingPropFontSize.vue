@@ -24,7 +24,7 @@ const update = (size: number) => {
       </div>
     </template>
 
-    <FontSizePicker :size="size" @select="update" />
+    <FontSizePicker :values="[8, 10, 11, 12, 14, 16, 18, 20, 22, 28, 32, 40]" :size="size" @select="update" />
   </FloatingDropdown>
 </template>
 

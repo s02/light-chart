@@ -4,6 +4,7 @@ import { computed, onUnmounted, ref, useTemplateRef } from 'vue'
 import DrawingPropLineColor from '@chart/components/DrawingSettings/DrawingPropLineColor.vue'
 import DrawingPropFontSize from '@chart/components/DrawingSettings/DrawingPropFontSize.vue'
 import DrawingPropLineWidth from '@chart/components/DrawingSettings/DrawingPropLineWidth.vue'
+import DrawingPropBrushWidth from '@chart/components/DrawingSettings/DrawingPropBrushWidth.vue'
 import DrawingPropFillColor from '@chart/components/DrawingSettings/DrawingPropFillColor.vue'
 import DrawingPropTextColor from '@chart/components/DrawingSettings/DrawingPropTextColor.vue'
 import { useEngineApi } from '@chart/composables/useEngine'
@@ -122,6 +123,11 @@ onUnmounted(() => {
       <template v-for="el in fastPanel" :key="el.key">
         <DrawingPropLineWidth
           v-if="el.key === 'line-width'"
+          :width="Number(drawingSchema.params[el.key])"
+          @update:model-value="isPanelMenuOpened = $event"
+          @update="apply(el.key, $event)" />
+        <DrawingPropBrushWidth
+          v-else-if="el.key === 'brush-width'"
           :width="Number(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />

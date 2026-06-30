@@ -2,6 +2,8 @@
 import { i18n } from '@chart/i18n'
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import ChartTabs from '@chart/components/ChartTabs.vue'
+import DrawingPropTextColor from '@chart/components/DrawingSettings/DrawingPropTextColor.vue'
+import DrawingPropFontSize from '@chart/components/DrawingSettings/DrawingPropFontSize.vue'
 import { ref } from 'vue'
 import type { StudyParams, StudySchema } from '@engine/schema'
 
@@ -53,10 +55,10 @@ const tab = ref(tabs[0])
         <template v-if="tab === 'tab-text'">
           <div class="stydysett-group">
             <div v-if="props.schema.text?.find((ps) => ps.key === 'text-color')" class="studysett-ctrl-color">
-              color
+              <DrawingPropTextColor :color="String(params['text-color'])" @update="params['text-color'] = $event" />
             </div>
             <div v-if="props.schema.text?.find((ps) => ps.key === 'font-size')" class="studysett-ctrl-font">
-              font-size
+              <DrawingPropFontSize :size="Number(params['font-size'])" @update="params['font-size'] = $event" />
             </div>
           </div>
           <div v-if="props.schema.text?.find((ps) => ps.key === 'text')" class="studysett-ctrl-text">

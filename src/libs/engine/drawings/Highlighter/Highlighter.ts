@@ -1,18 +1,23 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { HighlighterPaneView } from '@engine/drawings/Highlighter/HighlighterPaneView'
-import type { DrawingOptions } from '@engine/drawings/types'
-import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
-import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
 import { POINTS_MODE } from '@engine/points'
+import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
+import type { IChartApi, Point } from 'lightweight-charts'
+import type { DrawingOptions } from '@engine/drawings/types'
 
 const HIGHLIGHTER_SCHEMA = {
-  inputs: [{ type: 'number', key: 'brush-width', default: 20, options: [8, 12, 20, 32, 48, 64, 80, 96] }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(255 255 255 / 25%)' }]
+  text: [],
+  inputs: [],
+  style: [
+    { type: 'number', key: 'brush-width', default: 20, fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(255 255 255 / 25%)', fastPanel: true }
+  ]
 } as const satisfies StudySchema
 
 export type HighlighterParams = InferStudyValues<typeof HIGHLIGHTER_SCHEMA.inputs> &
-  InferStudyValues<typeof HIGHLIGHTER_SCHEMA.style>
+  InferStudyValues<typeof HIGHLIGHTER_SCHEMA.style> &
+  InferStudyValues<typeof HIGHLIGHTER_SCHEMA.text>
 
 export class Highlighter extends BaseDrawing {
   static readonly ikey = 'highlighter' as const
@@ -21,11 +26,21 @@ export class Highlighter extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(HIGHLIGHTER_SCHEMA.inputs, HIGHLIGHTER_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      HIGHLIGHTER_SCHEMA.inputs,
+      HIGHLIGHTER_SCHEMA.style,
+      HIGHLIGHTER_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(HIGHLIGHTER_SCHEMA.inputs, HIGHLIGHTER_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      HIGHLIGHTER_SCHEMA.inputs,
+      HIGHLIGHTER_SCHEMA.style,
+      HIGHLIGHTER_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) {
       this.requestUpdate()
     }

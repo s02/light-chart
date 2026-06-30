@@ -11,12 +11,13 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const ARROW_MARK_RIGHT_SCHEMA = {
+  inputs: [],
   text: [
-    { type: 'string', key: 'textarea', default: '' },
+    { type: 'string', key: 'text', default: '' },
     { type: 'number', key: 'font-size', default: 12 },
     { type: 'color', key: 'text-color', default: 'rgb(41 98 255)' }
   ],
-  style: [{ type: 'color', key: 'fill', default: 'rgb(41 98 255)' }]
+  style: [{ type: 'color', key: 'fill-color', default: 'rgb(41 98 255)', fastPanel: true }]
 } as const satisfies StudySchema
 
 export type ArrowMarkRightParams = InferStudyValues<typeof ARROW_MARK_RIGHT_SCHEMA.text> &
@@ -30,11 +31,21 @@ export class ArrowMarkRight extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(ARROW_MARK_RIGHT_SCHEMA.text, ARROW_MARK_RIGHT_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      ARROW_MARK_RIGHT_SCHEMA.text,
+      ARROW_MARK_RIGHT_SCHEMA.style,
+      ARROW_MARK_RIGHT_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ARROW_MARK_RIGHT_SCHEMA.text, ARROW_MARK_RIGHT_SCHEMA.style, params)
+    this.#params = resolveStudyParams(
+      ARROW_MARK_RIGHT_SCHEMA.text,
+      ARROW_MARK_RIGHT_SCHEMA.style,
+      ARROW_MARK_RIGHT_SCHEMA.text,
+      params
+    )
     if (this.requestUpdate) this.requestUpdate()
   }
 
@@ -60,7 +71,7 @@ export class ArrowMarkRight extends BaseDrawing {
     const p = viewport.anchorToPoint(this.anchors[0])
     if (!p) return false
 
-    const { width, height } = textLabelBounds(this.#params.textarea, this.#params['font-size'])
+    const { width, height } = textLabelBounds(this.#params.text, this.#params['font-size'])
     const pad = ArrowMarkRight.hitThreashold
     const totalW = ArrowHeadHeight + ArrowTailHeight
     const halfH = Math.max(ArrowHeadWidth / 2, height / 2)

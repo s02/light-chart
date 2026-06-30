@@ -185,5 +185,12 @@
   "ind-prop-chikou": "Lagging Span",
   "ind-prop-cloudBull": "Cloud Up",
   "ind-prop-cloudBear": "Cloud Down",
-  "study-text": "Text"
+  "study-text": "Text",
+  "study-anchored-text": "Anchored Text",
+  "study-sign-post": "Signpost",
+  "study-callout": "Callout",
+  "study-arrow-mark-up": "Arrow Up",
+  "study-arrow-mark-down": "Arrow Down",
+  "study-arrow-mark-left": "Arrow Left",
+  "study-arrow-mark-right": "Arrow Right"
 }

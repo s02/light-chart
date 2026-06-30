@@ -7,11 +7,17 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import { POINTS_MODE } from '@engine/points'
 
 const PATH_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(233 30 99)' }]
+  text: [],
+  inputs: [],
+  style: [
+    { type: 'number', key: 'line-width', default: 2, fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(233 30 99)', fastPanel: true }
+  ]
 } as const satisfies StudySchema
 
-export type PathParams = InferStudyValues<typeof PATH_SCHEMA.inputs> & InferStudyValues<typeof PATH_SCHEMA.style>
+export type PathParams = InferStudyValues<typeof PATH_SCHEMA.inputs> &
+  InferStudyValues<typeof PATH_SCHEMA.style> &
+  InferStudyValues<typeof PATH_SCHEMA.text>
 
 export class Path extends BaseDrawing {
   static readonly ikey = 'path' as const
@@ -20,11 +26,11 @@ export class Path extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(PATH_SCHEMA.inputs, PATH_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(PATH_SCHEMA.inputs, PATH_SCHEMA.style, PATH_SCHEMA.text, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(PATH_SCHEMA.inputs, PATH_SCHEMA.style, params)
+    this.#params = resolveStudyParams(PATH_SCHEMA.inputs, PATH_SCHEMA.style, PATH_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }

@@ -6,14 +6,18 @@ import { resolveStudyParams, type InferStudyValues, type StudyParams, type Study
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const CIRCLE_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
+  text: [],
+  inputs: [],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(144 41 255)' },
-    { type: 'color', key: 'fill', default: 'rgb(144 41 255 / 0%)' }
+    { type: 'number', key: 'line-width', default: 2, fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(144 41 255)', fastPanel: true },
+    { type: 'color', key: 'fill-color', default: 'rgb(144 41 255 / 0%)', fastPanel: true }
   ]
 } as const satisfies StudySchema
 
-export type CircleParams = InferStudyValues<typeof CIRCLE_SCHEMA.inputs> & InferStudyValues<typeof CIRCLE_SCHEMA.style>
+export type CircleParams = InferStudyValues<typeof CIRCLE_SCHEMA.inputs> &
+  InferStudyValues<typeof CIRCLE_SCHEMA.style> &
+  InferStudyValues<typeof CIRCLE_SCHEMA.text>
 
 export class Circle extends BaseDrawing {
   static readonly ikey = 'circle' as const
@@ -22,11 +26,11 @@ export class Circle extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(CIRCLE_SCHEMA.inputs, CIRCLE_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(CIRCLE_SCHEMA.inputs, CIRCLE_SCHEMA.style, CIRCLE_SCHEMA.text, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(CIRCLE_SCHEMA.inputs, CIRCLE_SCHEMA.style, params)
+    this.#params = resolveStudyParams(CIRCLE_SCHEMA.inputs, CIRCLE_SCHEMA.style, CIRCLE_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }

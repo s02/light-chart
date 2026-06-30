@@ -4,7 +4,7 @@ import type { Point } from 'lightweight-charts'
 
 type Params = {
   radius: number
-  fill?: string
+  'fill-color'?: string
   'line-color'?: string
   'line-width'?: number
 }
@@ -34,8 +34,8 @@ export const circle = (scope: BitmapCoordinatesRenderingScope, p: Point, params:
     ctx.stroke()
   }
 
-  if (params.fill && params.fill !== 'none') {
-    ctx.fillStyle = params.fill
+  if (params['fill-color'] && params['fill-color'] !== 'none') {
+    ctx.fillStyle = params['fill-color']
     ctx.fill()
   }
 }

@@ -4,7 +4,7 @@ import type { Point } from 'lightweight-charts'
 type Params = {
   'line-width'?: number
   'line-color'?: string
-  fill?: string
+  'fill-color'?: string
 }
 
 export const rect = (scope: BitmapCoordinatesRenderingScope, p1: Point, p2: Point, params: Params) => {
@@ -22,8 +22,8 @@ export const rect = (scope: BitmapCoordinatesRenderingScope, p1: Point, p2: Poin
 
   ctx.lineWidth = (params['line-width'] ?? 1) * hpr
 
-  if (params.fill && params.fill !== 'none') {
-    ctx.fillStyle = params.fill
+  if (params['fill-color'] && params['fill-color'] !== 'none') {
+    ctx.fillStyle = params['fill-color']
     ctx.fill()
   }
 

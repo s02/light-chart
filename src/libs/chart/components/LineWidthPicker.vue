@@ -1,12 +1,10 @@
 <script setup lang="ts">
-defineProps<{ width: number }>()
+defineProps<{ width: number; values: number[] }>()
 
 const emit = defineEmits<{
   (e: 'select', width: number): void
   (e: 'close'): void
 }>()
-
-const WIDTHS = [1, 2, 3, 4, 5, 6]
 
 const select = (v: number) => {
   emit('select', v)
@@ -17,7 +15,7 @@ const select = (v: number) => {
 <template>
   <div class="lp">
     <button
-      v-for="w of WIDTHS"
+      v-for="w of values"
       :key="w"
       class="lp-button"
       :active="w === width"

@@ -22,8 +22,8 @@ export class RectangleRenderer implements IPrimitivePaneRenderer {
       rect(scope, this.#p1, this.#p2, this.#params)
 
       if (this.#withDots) {
-        dot(scope, this.#p1, { color: this.#params['line-color'] })
-        dot(scope, this.#p2, { color: this.#params['line-color'] })
+        dot(scope, this.#p1)
+        dot(scope, this.#p2)
       }
     })
   }

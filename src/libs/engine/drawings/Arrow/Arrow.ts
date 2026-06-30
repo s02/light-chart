@@ -6,8 +6,12 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
 
 const ARROW_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(103 58 183)' }]
+  text: [],
+  inputs: [],
+  style: [
+    { type: 'color', key: 'line-color', default: 'rgb(103 58 183)', fastPanel: true },
+    { type: 'number', key: 'line-width', default: 2, fastPanel: true }
+  ]
 } as const satisfies StudySchema
 
 export type ArrowParams = InferStudyValues<typeof ARROW_SCHEMA.inputs> & InferStudyValues<typeof ARROW_SCHEMA.style>
@@ -19,11 +23,11 @@ export class Arrow extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(ARROW_SCHEMA.inputs, ARROW_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(ARROW_SCHEMA.inputs, ARROW_SCHEMA.style, ARROW_SCHEMA.text, options?.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ARROW_SCHEMA.inputs, ARROW_SCHEMA.style, params)
+    this.#params = resolveStudyParams(ARROW_SCHEMA.inputs, ARROW_SCHEMA.style, ARROW_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }

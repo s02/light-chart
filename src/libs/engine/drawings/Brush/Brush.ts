@@ -1,30 +1,45 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { BrushPaneView } from '@engine/drawings/Brush/BrushPaneView'
-import type { DrawingOptions } from '@engine/drawings/types'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
-import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
 import { POINTS_MODE } from '@engine/points'
+import type { IChartApi, Point } from 'lightweight-charts'
+import type { DrawingOptions } from '@engine/drawings/types'
+
+const DEFAULTS = {
+  'line-width': 3,
+  'line-color': 'rgb(255 152 0)'
+}
 
 const BRUSH_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 3 }],
-  style: [{ type: 'color', key: 'line-color', default: 'rgb(255 152 0)' }]
+  text: [],
+  inputs: [],
+  style: [
+    { type: 'number', key: 'line-width', default: DEFAULTS['line-width'], fastPanel: true },
+    { type: 'color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true }
+  ]
 } as const satisfies StudySchema
 
-export type BrushParams = InferStudyValues<typeof BRUSH_SCHEMA.inputs> & InferStudyValues<typeof BRUSH_SCHEMA.style>
+export type BrushParams = InferStudyValues<typeof BRUSH_SCHEMA.inputs> &
+  InferStudyValues<typeof BRUSH_SCHEMA.style> &
+  InferStudyValues<typeof BRUSH_SCHEMA.text>
 
 export class Brush extends BaseDrawing {
   static readonly ikey = 'brush' as const
   static readonly points = POINTS_MODE.BRUSH
   #params: BrushParams
 
-  constructor(chart: IChartApi, options?: DrawingOptions) {
+  constructor(chart: IChartApi, options: DrawingOptions = { params: DEFAULTS }) {
     super(chart)
-    this.#params = resolveStudyParams(BRUSH_SCHEMA.inputs, BRUSH_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(BRUSH_SCHEMA.inputs, BRUSH_SCHEMA.style, BRUSH_SCHEMA.text, options.params)
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(BRUSH_SCHEMA.inputs, BRUSH_SCHEMA.style, params)
+    this.#params = resolveStudyParams(BRUSH_SCHEMA.inputs, BRUSH_SCHEMA.style, BRUSH_SCHEMA.text, params)
+
+    DEFAULTS['line-color'] = this.#params['line-color']
+    DEFAULTS['line-width'] = this.#params['line-width']
+
     if (this.requestUpdate) {
       this.requestUpdate()
     }

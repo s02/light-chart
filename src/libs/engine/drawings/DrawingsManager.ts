@@ -92,6 +92,10 @@ export class DrawingsManager {
   updateParams(id: DrawingElement['id'], params: StudyParams) {
     const el = this.#findElement(id)
     el.drawing.setParams(params)
+
+    if (this.#pendingAdd) {
+      this.#pendingAdd.drawing.setParams(params)
+    }
   }
 
   remove(id: DrawingElement['id']) {

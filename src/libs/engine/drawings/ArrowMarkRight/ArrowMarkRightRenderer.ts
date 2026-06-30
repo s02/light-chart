@@ -41,7 +41,7 @@ export class ArrowMarkRightRenderer implements IPrimitivePaneRenderer {
       ctx.lineTo(shoulder, py + headHalfH)
       ctx.closePath()
 
-      ctx.fillStyle = this.#params.fill
+      ctx.fillStyle = this.#params['fill-color']
       ctx.fill('evenodd')
 
       const fontSize = this.#params['font-size'] * pr
@@ -50,7 +50,7 @@ export class ArrowMarkRightRenderer implements IPrimitivePaneRenderer {
       const gap = 2 * hpr
 
       ctx.font = `${fontSize}px sans-serif`
-      const textWidth = ctx.measureText(this.#params.textarea).width
+      const textWidth = ctx.measureText(this.#params.text).width
       const boxW = textWidth + paddingW * 2
       const boxH = fontSize + paddingH * 2
 
@@ -60,7 +60,7 @@ export class ArrowMarkRightRenderer implements IPrimitivePaneRenderer {
       ctx.fillStyle = this.#params['text-color']
       ctx.textAlign = 'left'
       ctx.textBaseline = 'top'
-      ctx.fillText(this.#params.textarea, bx + paddingW, by + paddingH)
+      ctx.fillText(this.#params.text, bx + paddingW, by + paddingH)
     })
   }
 }

@@ -6,15 +6,18 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
 
 const RECTANGLE_SCHEMA = {
-  inputs: [{ type: 'number', key: 'line-width', default: 2 }],
+  text: [],
+  inputs: [],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(76 175 80)' },
-    { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 0%)' }
+    { type: 'number', key: 'line-width', default: 2, fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(76 175 80)', fastPanel: true },
+    { type: 'color', key: 'fill-color', default: 'rgb(41 98 255 / 0%)', fastPanel: true }
   ]
 } as const satisfies StudySchema
 
 export type RectangleParams = InferStudyValues<typeof RECTANGLE_SCHEMA.inputs> &
-  InferStudyValues<typeof RECTANGLE_SCHEMA.style>
+  InferStudyValues<typeof RECTANGLE_SCHEMA.style> &
+  InferStudyValues<typeof RECTANGLE_SCHEMA.text>
 
 export class Rectangle extends BaseDrawing {
   static readonly ikey = 'rectangle' as const
@@ -23,11 +26,16 @@ export class Rectangle extends BaseDrawing {
 
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
-    this.#params = resolveStudyParams(RECTANGLE_SCHEMA.inputs, RECTANGLE_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      RECTANGLE_SCHEMA.inputs,
+      RECTANGLE_SCHEMA.style,
+      RECTANGLE_SCHEMA.text,
+      options?.params
+    )
   }
 
   override setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(RECTANGLE_SCHEMA.inputs, RECTANGLE_SCHEMA.style, params)
+    this.#params = resolveStudyParams(RECTANGLE_SCHEMA.inputs, RECTANGLE_SCHEMA.style, RECTANGLE_SCHEMA.text, params)
     if (this.requestUpdate) {
       this.requestUpdate()
     }
