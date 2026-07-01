@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
-import LineWidthPicker from '@chart/components/LineWidthPicker.vue'
+import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
+import LineWidthPicker from '@chart/components/Pickers/LineWidthPicker.vue'
 
 defineProps<{ width: number }>()
 

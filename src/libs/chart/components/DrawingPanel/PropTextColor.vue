@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
-import ColorPicker from '@chart/components/ColorPicker.vue'
+import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
+import ColorPicker from '@chart/components/Pickers/ColorPicker.vue'
 
 defineProps<{ color: string }>()
 

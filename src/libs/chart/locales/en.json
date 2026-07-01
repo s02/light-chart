@@ -208,5 +208,17 @@
   "study-prop-label-color": "Label Color",
   "study-prop-label-fill": "Label Fill Color",
   "study-prop-border-color": "Border Color",
-  "study-prop-border-width": "Border Width"
+  "study-prop-border-width": "Border Width",
+
+  "study-bb": "Bollinger Bands",
+  "study-prop-bb-length": "Length",
+  "study-prop-bb-mul": "Mult",
+  "study-prop-bb-upper": "Upper",
+  "study-prop-bb-middle": "Median",
+  "study-prop-bb-lower": "Lower",
+  "study-prop-bb-fill-color": "Plot Background",
+
+  "study-sma": "Simple Moving Average",
+  "study-prop-sma-length": "Length",
+  "study-prop-sma-color": "Color"
 }

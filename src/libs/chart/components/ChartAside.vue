@@ -6,7 +6,7 @@ import { useEngineApi } from '@chart/composables/useEngine'
 import { DRAWINGS } from '@engine/drawings'
 import { i18n } from '@chart/i18n'
 import ChartAsideButton from '@chart/components/ChartAsideButton.vue'
-import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
+import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import EmojiList from '@chart/components/EmojiList.vue'
 import type { DrawingGroup, DrawingName, DrawingOptions, DrawingScript } from '@engine/drawings/types'
 

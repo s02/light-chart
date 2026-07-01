@@ -7,6 +7,7 @@ import type { StudyParams, StudySchema } from '@engine/schema'
 import StudyColor from './StudyColor.vue'
 import StudyLineWidth from './StudyLineWidth.vue'
 import StudyFontSize from './StudyFontSize.vue'
+import StudyInput from '@chart/components/Study/StudyInput.vue'
 
 const emit = defineEmits<{
   (e: 'close', result?: StudyParams): void
@@ -89,13 +90,14 @@ const tab = ref(tabs[0])
           <div class="studysett-group">
             <template v-for="el in schema.inputs" :key="el.key">
               <label>{{ i18n.translate(`study-prop-${el.key}`) }}</label>
-              <input
+              <StudyInput
                 v-if="el.type === 'number'"
                 v-model="params[el.key]"
                 type="number"
                 :min="el.min"
                 :max="el.max"
-                :step="el.step || 1" />
+                :step="el.step || 1"
+                class="studysett-input" />
             </template>
           </div>
         </template>

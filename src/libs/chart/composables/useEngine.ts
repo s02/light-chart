@@ -2,7 +2,6 @@ import type { IndicatorName } from '@engine/indicators'
 import { PlotEngine } from '@engine/PlotEngine'
 import type { StudyParams } from '@engine/schema'
 import PaneLegend from '@chart/components/PaneLegend.vue'
-import ModalIndicatorSettings from '@chart/components/ModalIndicatorSettings.vue'
 import { computed, h, ref, render, watch, type Ref } from 'vue'
 import { useModal } from '@chart/composables/useModal'
 import type {
@@ -15,6 +14,7 @@ import type {
 } from '@engine/types'
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { DatafeedFactory } from '@chart/types'
+import StudySettings from '@chart/components/Study/StudySettings.vue'
 
 type DrawingElement = Parameters<DrawingSelectFn>[0]
 
@@ -141,7 +141,7 @@ export const useEngineApi = () => {
     assertEngine(pe)
 
     const schema = pe.getIndicatorSchema(id)
-    const params = await openModal<StudyParams | undefined>(ModalIndicatorSettings, { props: schema })
+    const params = await openModal<StudyParams | undefined>(StudySettings, { props: schema })
     if (params) {
       pe.updateIndicator(id, params)
     }

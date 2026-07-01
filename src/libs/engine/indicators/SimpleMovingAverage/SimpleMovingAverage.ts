@@ -11,11 +11,14 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const SMA_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', default: 9, min: 1 }],
-  style: [{ type: 'color', key: 'color', default: 'rgb(41 98 255)' }]
+  text: [],
+  inputs: [{ type: 'number', key: 'sma-length', default: 9, min: 1, max: 9999 }],
+  style: [{ type: 'color', key: 'sma-color', default: 'rgb(41 98 255)' }]
 } as const satisfies StudySchema
 
-type SMAParams = InferStudyValues<typeof SMA_SCHEMA.inputs> & InferStudyValues<typeof SMA_SCHEMA.style>
+type SMAParams = InferStudyValues<typeof SMA_SCHEMA.inputs> &
+  InferStudyValues<typeof SMA_SCHEMA.style> &
+  InferStudyValues<typeof SMA_SCHEMA.text>
 
 export class SimpleMovingAverage extends AbstractIndicator implements Indicator {
   static readonly ikey = 'sma' as const
@@ -27,18 +30,18 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
     super(datafeed, options?.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, SMA_SCHEMA.style, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['sma-color'], priceLineVisible: false },
       this.paneIndex
     )
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, SMA_SCHEMA.style, params)
+    this.#series.applyOptions({ color: this.#params['sma-color'] })
   }
 
   getSchema() {
@@ -52,9 +55,13 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: SimpleMovingAverage.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
+
+    legend.data.push({ value: this.#params['sma-length'].toString(), color: `rgb(140, 140, 140)` })
+
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['sma-color'] })
     }
+
     return legend
   }
 
@@ -75,7 +82,7 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const smaResult = ta.sma(source, this.#params.length)
+    const smaResult = ta.sma(source, this.#params['sma-length'])
 
     const toBar = (value: number, i: number) => {
       const time = bars[i].time

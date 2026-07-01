@@ -4,7 +4,7 @@ import { i18n } from '@chart/i18n'
 import { ref, shallowRef } from 'vue'
 import ChartTabs from '@chart/components/ChartTabs.vue'
 import ChartMenu from '@chart/components/ChartMenu.vue'
-import ColorPicker from '@chart/components/ColorPicker.vue'
+import ColorPicker from '@chart/components/Pickers/ColorPicker.vue'
 import type { StudyParams, StudySchema } from '@engine/schema'
 import { provideChartMenu } from '@chart/useChartMenu'
 

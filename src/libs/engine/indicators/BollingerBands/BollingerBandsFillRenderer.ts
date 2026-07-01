@@ -44,7 +44,7 @@ export class BollingerBandsFillRenderer implements IPrimitivePaneRenderer {
       }
 
       ctx.closePath()
-      ctx.fillStyle = this.#params.fill
+      ctx.fillStyle = this.#params['bb-fill-color']
       ctx.fill()
     })
   }

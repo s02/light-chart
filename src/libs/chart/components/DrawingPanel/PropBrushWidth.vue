@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import FloatingDropdown from '@chart/components/Dropdown/FloatingDropdown.vue'
-import FontSizePicker from '@chart/components/FontSizePicker.vue'
+import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
+import FontSizePicker from '@chart/components/Pickers/FontSizePicker.vue'
 
 defineProps<{ width: number }>()
 
