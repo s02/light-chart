@@ -1,10 +1,10 @@
-import { dateToEpoch } from '@chart/helpers'
+import { helpers } from '@chart/helpers'
 import type { Bar, Quote } from './transport/types'
 import type { ChartBar, UTCTimestamp } from '@chart/types'
 
 const transform = (candle: Bar): ChartBar => ({
   ...candle,
-  time: dateToEpoch(candle.time)
+  time: helpers.dateToEpoch(candle.time)
 })
 
 const smoothify = (bar: ChartBar[]): void => {

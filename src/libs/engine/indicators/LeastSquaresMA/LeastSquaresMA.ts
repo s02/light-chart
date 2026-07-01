@@ -11,14 +11,17 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const LSMA_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'length', default: 25, min: 1 },
-    { type: 'number', key: 'offset', default: 0, min: 0 }
+    { type: 'number', key: 'lsma-length', default: 25, min: 1, max: 9999 },
+    { type: 'number', key: 'lsma-offset', default: 0, min: 0, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 109 0)' }]
+  style: [{ type: 'color', key: 'lsma-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
 
-type LSMAParams = InferStudyValues<typeof LSMA_SCHEMA.inputs> & InferStudyValues<typeof LSMA_SCHEMA.style>
+type LSMAParams = InferStudyValues<typeof LSMA_SCHEMA.inputs> &
+  InferStudyValues<typeof LSMA_SCHEMA.style> &
+  InferStudyValues<typeof LSMA_SCHEMA.text>
 
 export class LeastSquaresMA extends AbstractIndicator implements Indicator {
   static readonly ikey = 'lsma' as const
@@ -30,11 +33,11 @@ export class LeastSquaresMA extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(LSMA_SCHEMA.inputs, LSMA_SCHEMA.style, options.params)
+    this.#params = resolveStudyParams(LSMA_SCHEMA.inputs, LSMA_SCHEMA.style, LSMA_SCHEMA.text, options.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['lsma-color'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -48,15 +51,19 @@ export class LeastSquaresMA extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(LSMA_SCHEMA.inputs, LSMA_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(LSMA_SCHEMA.inputs, LSMA_SCHEMA.style, LSMA_SCHEMA.text, params)
+    this.#series.applyOptions({ color: this.#params['lsma-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'LSMA', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
+    legend.data.push(
+      { value: this.#params['lsma-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['lsma-offset'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['lsma-color'] })
     }
     return legend
   }
@@ -71,7 +78,7 @@ export class LeastSquaresMA extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const values = ta.linreg(source, this.#params.length, this.#params.offset).toArray()
+    const values = ta.linreg(source, this.#params['lsma-length'], this.#params['lsma-offset']).toArray()
 
     const toBar = (value: number, i: number) => ({
       time: bars[i].time,

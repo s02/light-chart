@@ -10,11 +10,14 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const BOP_SCHEMA = {
+  text: [],
   inputs: [],
-  style: [{ type: 'color', key: 'color', default: 'rgb(126 87 194)' }]
+  style: [{ type: 'color', key: 'bop-color', default: 'rgb(126 87 194)' }]
 } as const satisfies StudySchema
 
-type BOPParams = InferStudyValues<typeof BOP_SCHEMA.inputs> & InferStudyValues<typeof BOP_SCHEMA.style>
+type BOPParams = InferStudyValues<typeof BOP_SCHEMA.inputs> &
+  InferStudyValues<typeof BOP_SCHEMA.style> &
+  InferStudyValues<typeof BOP_SCHEMA.text>
 
 export class BalanceOfPower extends AbstractIndicator implements Indicator {
   static readonly ikey = 'bop' as const
@@ -30,12 +33,12 @@ export class BalanceOfPower extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(BOP_SCHEMA.inputs, BOP_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(BOP_SCHEMA.inputs, BOP_SCHEMA.style, BOP_SCHEMA.text, options?.params)
 
     this.#series = {
       bop: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['bop-color'], priceLineVisible: false },
         this.paneIndex
       ),
       zeroLine: this.#chart.addSeries(
@@ -62,15 +65,15 @@ export class BalanceOfPower extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(BOP_SCHEMA.inputs, BOP_SCHEMA.style, params)
-    this.#series.bop.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(BOP_SCHEMA.inputs, BOP_SCHEMA.style, BOP_SCHEMA.text, params)
+    this.#series.bop.applyOptions({ color: this.#params['bop-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'BOP', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.bop)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
-    legend.data.push({ value, color: this.#params.color })
+    legend.data.push({ value, color: this.#params['bop-color'] })
     return legend
   }
 

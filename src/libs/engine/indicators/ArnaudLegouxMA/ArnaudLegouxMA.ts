@@ -11,15 +11,18 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const ALMA_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'length', default: 9, min: 1 },
-    { type: 'number', key: 'offset', default: 0.85, min: 0, max: 1 },
-    { type: 'number', key: 'sigma', default: 6, min: 1 }
+    { type: 'number', key: 'alma-length', default: 9, min: 1 },
+    { type: 'number', key: 'alma-offset', default: 0.85, min: 0, max: 1 },
+    { type: 'number', key: 'alma-sigma', default: 6, min: 1 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 109 0)' }]
+  style: [{ type: 'color', key: 'alma-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
 
-type ALMAParams = InferStudyValues<typeof ALMA_SCHEMA.inputs> & InferStudyValues<typeof ALMA_SCHEMA.style>
+type ALMAParams = InferStudyValues<typeof ALMA_SCHEMA.inputs> &
+  InferStudyValues<typeof ALMA_SCHEMA.style> &
+  InferStudyValues<typeof ALMA_SCHEMA.text>
 
 export class ArnaudLegouxMA extends AbstractIndicator implements Indicator {
   static readonly ikey = 'alma' as const
@@ -31,18 +34,18 @@ export class ArnaudLegouxMA extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
     super(datafeed, options?.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(ALMA_SCHEMA.inputs, ALMA_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(ALMA_SCHEMA.inputs, ALMA_SCHEMA.style, ALMA_SCHEMA.text, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['alma-color'], priceLineVisible: false },
       this.paneIndex
     )
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ALMA_SCHEMA.inputs, ALMA_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(ALMA_SCHEMA.inputs, ALMA_SCHEMA.style, ALMA_SCHEMA.text, params)
+    this.#series.applyOptions({ color: this.#params['alma-color'] })
   }
 
   getSchema() {
@@ -56,8 +59,13 @@ export class ArnaudLegouxMA extends AbstractIndicator implements Indicator {
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'ALMA', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
+    legend.data.push(
+      { value: this.#params['alma-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['alma-offset'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['alma-sigma'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['alma-color'] })
     }
     return legend
   }
@@ -72,7 +80,7 @@ export class ArnaudLegouxMA extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const almaArr = ta.alma(source, this.#params.length, this.#params.offset, this.#params.sigma, true).toArray()
+    const almaArr = ta.alma(source, this.#params['alma-length'], this.#params['alma-offset'], this.#params['alma-sigma'], true).toArray()
 
     const toBar = (value: number, i: number) => ({
       time: bars[i].time,

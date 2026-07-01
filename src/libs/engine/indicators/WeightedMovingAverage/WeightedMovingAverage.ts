@@ -11,15 +11,17 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const WMA_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'length', default: 9, min: 1 },
-    { type: 'number', key: 'offset', default: 0, min: 0 },
-    { type: 'select', key: 'source', default: 'close', values: ['open', 'close', 'high', 'low'] }
+    { type: 'number', key: 'wma-length', default: 9, min: 1, max: 9999 },
+    { type: 'number', key: 'wma-offset', default: 0, min: 0, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 109 0)' }]
+  style: [{ type: 'color', key: 'wma-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
 
-type WMAParams = InferStudyValues<typeof WMA_SCHEMA.inputs> & InferStudyValues<typeof WMA_SCHEMA.style>
+type WMAParams = InferStudyValues<typeof WMA_SCHEMA.inputs> &
+  InferStudyValues<typeof WMA_SCHEMA.style> &
+  InferStudyValues<typeof WMA_SCHEMA.text>
 
 export class WeightedMovingAverage extends AbstractIndicator implements Indicator {
   static readonly ikey = 'wma' as const
@@ -31,11 +33,11 @@ export class WeightedMovingAverage extends AbstractIndicator implements Indicato
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(WMA_SCHEMA.inputs, WMA_SCHEMA.style, options.params)
+    this.#params = resolveStudyParams(WMA_SCHEMA.inputs, WMA_SCHEMA.style, WMA_SCHEMA.text, options.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['wma-color'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -49,15 +51,20 @@ export class WeightedMovingAverage extends AbstractIndicator implements Indicato
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(WMA_SCHEMA.inputs, WMA_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(WMA_SCHEMA.inputs, WMA_SCHEMA.style, WMA_SCHEMA.text, params)
+    this.#series.applyOptions({ color: this.#params['wma-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'WMA', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
+    legend.data.push(
+      { value: this.#params['wma-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['wma-offset'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: 'close', color: 'rgb(140, 140, 140)' }
+    )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['wma-color'] })
     }
     return legend
   }
@@ -71,8 +78,8 @@ export class WeightedMovingAverage extends AbstractIndicator implements Indicato
   }
 
   #calculate(bars: ChartBar[]) {
-    const source = getSourceSeries(bars, this.#params.source)
-    const shifted = this.applyOffset(ta.wma(source, this.#params.length).toArray(), this.#params.offset)
+    const source = getSourceSeries(bars, 'close')
+    const shifted = this.applyOffset(ta.wma(source, this.#params['wma-length']).toArray(), this.#params['wma-offset'])
 
     const toBar = (value: number, i: number) => ({
       time: bars[i].time,

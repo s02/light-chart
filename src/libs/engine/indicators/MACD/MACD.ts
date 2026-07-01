@@ -11,20 +11,25 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const MACD_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'fast', default: 12, min: 1 },
-    { type: 'number', key: 'slow', default: 26, min: 1 },
-    { type: 'number', key: 'signal', default: 9, min: 1 }
+    { type: 'number', key: 'macd-fast', default: 12, min: 1, max: 9999 },
+    { type: 'number', key: 'macd-slow', default: 26, min: 1, max: 9999 },
+    { type: 'number', key: 'macd-signal', default: 9, min: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'macdLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'signalLine', default: 'rgb(255 109 0)' },
-    { type: 'color', key: 'histUp', default: 'rgb(38 166 154)' },
-    { type: 'color', key: 'histDown', default: 'rgb(239 83 80)' }
+    { type: 'color', key: 'macd-macdLine', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'macd-signalLine', default: 'rgb(255 109 0)' },
+    { type: 'color', key: 'macd-hist-0', default: 'rgb(34, 171, 148)' },
+    { type: 'color', key: 'macd-hist-1', default: 'rgb(172, 229, 220)' },
+    { type: 'color', key: 'macd-hist-2', default: 'rgb(252, 203, 205)' },
+    { type: 'color', key: 'macd-hist-3', default: 'rgb(255, 82, 82)' }
   ]
 } as const satisfies StudySchema
 
-type MACDParams = InferStudyValues<typeof MACD_SCHEMA.inputs> & InferStudyValues<typeof MACD_SCHEMA.style>
+type MACDParams = InferStudyValues<typeof MACD_SCHEMA.inputs> &
+  InferStudyValues<typeof MACD_SCHEMA.style> &
+  InferStudyValues<typeof MACD_SCHEMA.text>
 
 export class MACD extends AbstractIndicator implements Indicator {
   static readonly ikey = 'macd' as const
@@ -41,22 +46,22 @@ export class MACD extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(MACD_SCHEMA.inputs, MACD_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(MACD_SCHEMA.inputs, MACD_SCHEMA.style, MACD_SCHEMA.text, options?.params)
 
     this.#series = {
       hist: this.#chart.addSeries(
         HistogramSeries,
-        { ...COMMON_SERIES_SETTINGS, color: this.#params.histUp, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, color: this.#params['macd-hist-0'], priceLineVisible: false },
         this.paneIndex
       ),
       macd: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.macdLine, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['macd-macdLine'], priceLineVisible: false },
         this.paneIndex
       ),
       signal: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.signalLine, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['macd-signalLine'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -71,9 +76,9 @@ export class MACD extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(MACD_SCHEMA.inputs, MACD_SCHEMA.style, params)
-    this.#series.macd.applyOptions({ color: this.#params.macdLine })
-    this.#series.signal.applyOptions({ color: this.#params.signalLine })
+    this.#params = resolveStudyParams(MACD_SCHEMA.inputs, MACD_SCHEMA.style, MACD_SCHEMA.text, params)
+    this.#series.macd.applyOptions({ color: this.#params['macd-macdLine'] })
+    this.#series.signal.applyOptions({ color: this.#params['macd-signalLine'] })
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -81,12 +86,20 @@ export class MACD extends AbstractIndicator implements Indicator {
     const macdData = seriesData.get(this.#series.macd)
     const signalData = seriesData.get(this.#series.signal)
     const histData = seriesData.get(this.#series.hist)
+    legend.data.push(
+      { value: this.#params['macd-fast'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['macd-slow'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['macd-signal'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     if (macdData && signalData && histData) {
       const histValue = (histData as HistogramData<Time>).value
       legend.data.push(
-        { value: formatPrice(histValue), color: histValue >= 0 ? this.#params.histUp : this.#params.histDown },
-        { value: formatPrice((macdData as LineData<Time>).value), color: this.#params.macdLine },
-        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params.signalLine }
+        {
+          value: formatPrice(histValue),
+          color: histValue >= 0 ? this.#params['macd-hist-0'] : this.#params['macd-hist-3']
+        },
+        { value: formatPrice((macdData as LineData<Time>).value), color: this.#params['macd-macdLine'] },
+        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params['macd-signalLine'] }
       )
     }
     return legend
@@ -108,10 +121,10 @@ export class MACD extends AbstractIndicator implements Indicator {
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
 
-    const fastEMA = ta.ema(source, this.#params.fast)
-    const slowEMA = ta.ema(source, this.#params.slow)
+    const fastEMA = ta.ema(source, this.#params['macd-fast'])
+    const slowEMA = ta.ema(source, this.#params['macd-slow'])
     const macdLine = fastEMA.sub(slowEMA)
-    const signalLine = ta.ema(macdLine, this.#params.signal)
+    const signalLine = ta.ema(macdLine, this.#params['macd-signal'])
     const histogram = macdLine.sub(signalLine)
 
     const histArr = histogram.toArray()
@@ -127,9 +140,9 @@ export class MACD extends AbstractIndicator implements Indicator {
       const prev = i > 0 ? (histArr[i - 1] ?? NaN) : NaN
       let color: string
       if (value >= 0) {
-        color = prev < value ? '#26A69A' : '#B2DFDB'
+        color = prev < value ? this.#params['macd-hist-0'] : this.#params['macd-hist-1']
       } else {
-        color = prev < value ? '#FFCDD2' : '#FF5252'
+        color = prev < value ? this.#params['macd-hist-2'] : this.#params['macd-hist-3']
       }
 
       return { time, value, color }

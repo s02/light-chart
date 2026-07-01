@@ -11,18 +11,21 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const TSI_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'long', default: 25, min: 1 },
-    { type: 'number', key: 'short', default: 13, min: 1 },
-    { type: 'number', key: 'signal', default: 13, min: 1 }
+    { type: 'number', key: 'true-si-long', default: 25, min: 1 },
+    { type: 'number', key: 'true-si-short', default: 13, min: 1 },
+    { type: 'number', key: 'true-si-signal', default: 13, min: 1 }
   ],
   style: [
-    { type: 'color', key: 'tsiLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'signalLine', default: 'rgb(255 109 0)' }
+    { type: 'color', key: 'true-si-tsiLine', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'true-si-signalLine', default: 'rgb(255 109 0)' }
   ]
 } as const satisfies StudySchema
 
-type TSIParams = InferStudyValues<typeof TSI_SCHEMA.inputs> & InferStudyValues<typeof TSI_SCHEMA.style>
+type TSIParams = InferStudyValues<typeof TSI_SCHEMA.inputs> &
+  InferStudyValues<typeof TSI_SCHEMA.style> &
+  InferStudyValues<typeof TSI_SCHEMA.text>
 
 export class TrueStrengthIndex extends AbstractIndicator implements Indicator {
   static readonly ikey = 'true-si' as const
@@ -39,17 +42,17 @@ export class TrueStrengthIndex extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(TSI_SCHEMA.inputs, TSI_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(TSI_SCHEMA.inputs, TSI_SCHEMA.style, TSI_SCHEMA.text, options?.params)
 
     this.#series = {
       tsi: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.tsiLine, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['true-si-tsiLine'], priceLineVisible: false },
         this.paneIndex
       ),
       signal: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.signalLine, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['true-si-signalLine'], priceLineVisible: false },
         this.paneIndex
       ),
       zeroLine: this.#chart.addSeries(
@@ -76,16 +79,21 @@ export class TrueStrengthIndex extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(TSI_SCHEMA.inputs, TSI_SCHEMA.style, params)
-    this.#series.tsi.applyOptions({ color: this.#params.tsiLine })
-    this.#series.signal.applyOptions({ color: this.#params.signalLine })
+    this.#params = resolveStudyParams(TSI_SCHEMA.inputs, TSI_SCHEMA.style, TSI_SCHEMA.text, params)
+    this.#series.tsi.applyOptions({ color: this.#params['true-si-tsiLine'] })
+    this.#series.signal.applyOptions({ color: this.#params['true-si-signalLine'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'True Strength Index', paneIndex: this.paneIndex, data: [] }
+    legend.data.push(
+      { value: this.#params['true-si-long'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['true-si-short'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['true-si-signal'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     const entries = [
-      [this.#series.tsi, this.#params.tsiLine],
-      [this.#series.signal, this.#params.signalLine]
+      [this.#series.tsi, this.#params['true-si-tsiLine']],
+      [this.#series.signal, this.#params['true-si-signalLine']]
     ] as const
     for (const [series, color] of entries) {
       const data = seriesData.get(series)
@@ -115,8 +123,8 @@ export class TrueStrengthIndex extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const close = getSourceSeries(bars, 'close')
-    const tsiSeries = ta.tsi(close, this.#params.short, this.#params.long)
-    const signalSeries = ta.ema(tsiSeries, this.#params.signal)
+    const tsiSeries = ta.tsi(close, this.#params['true-si-short'], this.#params['true-si-long'])
+    const signalSeries = ta.ema(tsiSeries, this.#params['true-si-signal'])
 
     const tsiArr = tsiSeries.toArray()
     const signalArr = signalSeries.toArray()

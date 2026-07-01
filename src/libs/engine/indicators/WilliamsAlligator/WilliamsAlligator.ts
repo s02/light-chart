@@ -11,23 +11,25 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const ALLIGATOR_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'jawLength', default: 21, min: 1 },
-    { type: 'number', key: 'jawOffset', default: 8, min: 0 },
-    { type: 'number', key: 'teethLength', default: 8, min: 1 },
-    { type: 'number', key: 'teethOffset', default: 5, min: 0 },
-    { type: 'number', key: 'lipsLength', default: 8, min: 1 },
-    { type: 'number', key: 'lipsOffset', default: 3, min: 0 }
+    { type: 'number', key: 'alligator-jawLength', default: 21, min: 1, max: 9999 },
+    { type: 'number', key: 'alligator-jawOffset', default: 8, min: 0, max: 9999 },
+    { type: 'number', key: 'alligator-teethLength', default: 13, min: 1, max: 9999 },
+    { type: 'number', key: 'alligator-teethOffset', default: 5, min: 0, max: 9999 },
+    { type: 'number', key: 'alligator-lipsLength', default: 8, min: 1, max: 9999 },
+    { type: 'number', key: 'alligator-lipsOffset', default: 3, min: 0, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'jaw', default: 'rgb(33 150 243)' },
-    { type: 'color', key: 'teeth', default: 'rgb(242 54 69)' },
-    { type: 'color', key: 'lips', default: 'rgb(76 175 80)' }
+    { type: 'color', key: 'alligator-jaw', default: 'rgb(33 150 243)' },
+    { type: 'color', key: 'alligator-teeth', default: 'rgb(242 54 69)' },
+    { type: 'color', key: 'alligator-lips', default: 'rgb(76 175 80)' }
   ]
 } as const satisfies StudySchema
 
 type AlligatorParams = InferStudyValues<typeof ALLIGATOR_SCHEMA.inputs> &
-  InferStudyValues<typeof ALLIGATOR_SCHEMA.style>
+  InferStudyValues<typeof ALLIGATOR_SCHEMA.style> &
+  InferStudyValues<typeof ALLIGATOR_SCHEMA.text>
 
 export class WilliamsAlligator extends AbstractIndicator implements Indicator {
   static readonly ikey = 'alligator' as const
@@ -44,22 +46,27 @@ export class WilliamsAlligator extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(ALLIGATOR_SCHEMA.inputs, ALLIGATOR_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      ALLIGATOR_SCHEMA.inputs,
+      ALLIGATOR_SCHEMA.style,
+      ALLIGATOR_SCHEMA.text,
+      options?.params
+    )
 
     this.#series = {
       jaw: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.jaw, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['alligator-jaw'], priceLineVisible: false },
         this.paneIndex
       ),
       teeth: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.teeth, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['alligator-teeth'], priceLineVisible: false },
         this.paneIndex
       ),
       lips: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.lips, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['alligator-lips'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -74,10 +81,10 @@ export class WilliamsAlligator extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ALLIGATOR_SCHEMA.inputs, ALLIGATOR_SCHEMA.style, params)
-    this.#series.jaw.applyOptions({ color: this.#params.jaw })
-    this.#series.teeth.applyOptions({ color: this.#params.teeth })
-    this.#series.lips.applyOptions({ color: this.#params.lips })
+    this.#params = resolveStudyParams(ALLIGATOR_SCHEMA.inputs, ALLIGATOR_SCHEMA.style, ALLIGATOR_SCHEMA.text, params)
+    this.#series.jaw.applyOptions({ color: this.#params['alligator-jaw'] })
+    this.#series.teeth.applyOptions({ color: this.#params['alligator-teeth'] })
+    this.#series.lips.applyOptions({ color: this.#params['alligator-lips'] })
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -85,13 +92,24 @@ export class WilliamsAlligator extends AbstractIndicator implements Indicator {
     const jawData = seriesData.get(this.#series.jaw)
     const teethData = seriesData.get(this.#series.teeth)
     const lipsData = seriesData.get(this.#series.lips)
+
+    legend.data.push(
+      { value: this.#params['alligator-jawLength'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['alligator-teethLength'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['alligator-lipsLength'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['alligator-jawOffset'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['alligator-teethOffset'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['alligator-lipsOffset'].toString(), color: 'rgb(140, 140, 140)' }
+    )
+
     if (jawData && teethData && lipsData) {
       legend.data.push(
-        { value: formatPrice((jawData as LineData<Time>).value), color: this.#params.jaw },
-        { value: formatPrice((teethData as LineData<Time>).value), color: this.#params.teeth },
-        { value: formatPrice((lipsData as LineData<Time>).value), color: this.#params.lips }
+        { value: formatPrice((jawData as LineData<Time>).value), color: this.#params['alligator-jaw'] },
+        { value: formatPrice((teethData as LineData<Time>).value), color: this.#params['alligator-teeth'] },
+        { value: formatPrice((lipsData as LineData<Time>).value), color: this.#params['alligator-lips'] }
       )
     }
+
     return legend
   }
 
@@ -112,15 +130,15 @@ export class WilliamsAlligator extends AbstractIndicator implements Indicator {
     const hl2 = getSourceSeries(bars, 'hl2')
 
     const smma = {
-      jaw: ta.rma(hl2, this.#params.jawLength).toArray(),
-      teeth: ta.rma(hl2, this.#params.teethLength).toArray(),
-      lips: ta.rma(hl2, this.#params.lipsLength).toArray()
+      jaw: ta.rma(hl2, this.#params['alligator-jawLength']).toArray(),
+      teeth: ta.rma(hl2, this.#params['alligator-teethLength']).toArray(),
+      lips: ta.rma(hl2, this.#params['alligator-lipsLength']).toArray()
     }
 
     const shifted = {
-      jaw: this.applyOffset(smma.jaw, this.#params.jawOffset),
-      teeth: this.applyOffset(smma.teeth, this.#params.teethOffset),
-      lips: this.applyOffset(smma.lips, this.#params.lipsOffset)
+      jaw: this.applyOffset(smma.jaw, this.#params['alligator-jawOffset']),
+      teeth: this.applyOffset(smma.teeth, this.#params['alligator-teethOffset']),
+      lips: this.applyOffset(smma.lips, this.#params['alligator-lipsOffset'])
     }
 
     const toBar = (value: number, i: number) => ({

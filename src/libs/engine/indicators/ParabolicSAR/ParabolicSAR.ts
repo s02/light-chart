@@ -11,15 +11,18 @@ import type { SeriesLegend } from '@engine/series'
 import { ta } from 'oakscriptjs'
 
 const SAR_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'start', default: 0.02, min: 0.001, step: 0.01 },
-    { type: 'number', key: 'inc', default: 0.02, min: 0.001, step: 0.01 },
-    { type: 'number', key: 'max', default: 0.2, min: 0.01, step: 0.01 }
+    { type: 'number', key: 'sar-start', default: 0.02, min: 0.001, step: 0.01, max: 9999 },
+    { type: 'number', key: 'sar-inc', default: 0.02, min: 0.001, step: 0.01, max: 9999 },
+    { type: 'number', key: 'sar-max', default: 0.2, min: 0.01, step: 0.01, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 255 255)' }]
+  style: [{ type: 'color', key: 'sar-color', default: 'rgb(255 255 255)' }]
 } as const satisfies StudySchema
 
-type SARParams = InferStudyValues<typeof SAR_SCHEMA.inputs> & InferStudyValues<typeof SAR_SCHEMA.style>
+type SARParams = InferStudyValues<typeof SAR_SCHEMA.inputs> &
+  InferStudyValues<typeof SAR_SCHEMA.style> &
+  InferStudyValues<typeof SAR_SCHEMA.text>
 
 export class ParabolicSAR extends AbstractIndicator implements Indicator {
   static readonly ikey = 'sar' as const
@@ -32,7 +35,7 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(SAR_SCHEMA.inputs, SAR_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(SAR_SCHEMA.inputs, SAR_SCHEMA.style, SAR_SCHEMA.text, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
@@ -50,7 +53,7 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(SAR_SCHEMA.inputs, SAR_SCHEMA.style, params)
+    this.#params = resolveStudyParams(SAR_SCHEMA.inputs, SAR_SCHEMA.style, SAR_SCHEMA.text, params)
     if (this.#lastBars.length) {
       this.#series.setData(this.#calculate(this.#lastBars))
     }
@@ -59,8 +62,13 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: ParabolicSAR.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series) as LineData<Time> | undefined
+    legend.data.push(
+      { value: this.#params['sar-start'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['sar-inc'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['sar-max'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     if (data) {
-      legend.data.push({ value: formatPrice(data.value), color: this.#params.color })
+      legend.data.push({ value: formatPrice(data.value), color: this.#params['sar-color'] })
     }
     return legend
   }
@@ -75,7 +83,7 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const sarArr = ta.sar(bars, this.#params.start, this.#params.inc, this.#params.max).toArray()
+    const sarArr = ta.sar(bars, this.#params['sar-start'], this.#params['sar-inc'], this.#params['sar-max']).toArray()
 
     return sarArr.map((value, i) => {
       const time = bars[i].time
@@ -93,7 +101,7 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
       return {
         time,
         value,
-        color: dirChanged ? 'transparent' : this.#params.color
+        color: dirChanged ? 'transparent' : this.#params['sar-color']
       }
     })
   }

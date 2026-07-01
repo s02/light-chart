@@ -10,14 +10,17 @@ import type { SeriesLegend } from '@engine/series'
 import { formatPrice } from '@engine/helpers'
 
 const WF_SCHEMA = {
-  inputs: [{ type: 'number', key: 'periods', default: 2, min: 2 }],
+  text: [],
+  inputs: [{ type: 'number', key: 'fractal-periods', default: 2, min: 2, max: 9999 }],
   style: [
-    { type: 'color', key: 'bear', default: 'rgb(239 83 80)' },
-    { type: 'color', key: 'bull', default: 'rgb(38 166 154)' }
+    { type: 'color', key: 'fractal-bear', default: 'rgb(239 83 80)' },
+    { type: 'color', key: 'fractal-bull', default: 'rgb(38 166 154)' }
   ]
 } as const satisfies StudySchema
 
-type WFParams = InferStudyValues<typeof WF_SCHEMA.inputs> & InferStudyValues<typeof WF_SCHEMA.style>
+type WFParams = InferStudyValues<typeof WF_SCHEMA.inputs> &
+  InferStudyValues<typeof WF_SCHEMA.style> &
+  InferStudyValues<typeof WF_SCHEMA.text>
 
 export class WilliamsFractal extends AbstractIndicator implements Indicator {
   static readonly ikey = 'fractal' as const
@@ -30,7 +33,7 @@ export class WilliamsFractal extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(WF_SCHEMA.inputs, WF_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(WF_SCHEMA.inputs, WF_SCHEMA.style, WF_SCHEMA.text, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
@@ -56,20 +59,21 @@ export class WilliamsFractal extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(WF_SCHEMA.inputs, WF_SCHEMA.style, params)
+    this.#params = resolveStudyParams(WF_SCHEMA.inputs, WF_SCHEMA.style, WF_SCHEMA.text, params)
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'Fractals', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
+    legend.data.push({ value: this.#params['fractal-periods'].toString(), color: 'rgb(140, 140, 140)' })
     if (data) {
       const t = data.time
       const markers = this.#markers.markers()
       const hasBear = markers.some((m) => m.time === t && m.position === 'atPriceTop')
       const hasBull = markers.some((m) => m.time === t && m.position === 'atPriceBottom')
       legend.data.push(
-        { value: hasBear ? formatPrice(1) : formatPrice(0), color: this.#params.bull },
-        { value: hasBull ? formatPrice(1) : formatPrice(0), color: this.#params.bear }
+        { value: hasBear ? formatPrice(1) : formatPrice(0), color: this.#params['fractal-bull'] },
+        { value: hasBull ? formatPrice(1) : formatPrice(0), color: this.#params['fractal-bear'] }
       )
     }
     return legend
@@ -87,7 +91,7 @@ export class WilliamsFractal extends AbstractIndicator implements Indicator {
 
   #checkLeft(bars: ChartBar[], c: number, ties: number, field: 'high' | 'low') {
     const base = bars[c][field]
-    const n = this.#params.periods
+    const n = this.#params['fractal-periods']
 
     for (let k = 1; k <= ties; k++) {
       if (c - k < 0) return false
@@ -106,7 +110,7 @@ export class WilliamsFractal extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const n = this.#params.periods
+    const n = this.#params['fractal-periods']
     const markers: SeriesMarker<Time>[] = []
 
     for (let t = n; t < bars.length; t++) {
@@ -134,7 +138,7 @@ export class WilliamsFractal extends AbstractIndicator implements Indicator {
             time: bars[c].time,
             position: 'atPriceTop',
             shape: 'arrowUp',
-            color: this.#params.bull,
+            color: this.#params['fractal-bull'],
             price: bars[c].high,
             size: 0.5
           })
@@ -154,7 +158,7 @@ export class WilliamsFractal extends AbstractIndicator implements Indicator {
             time: bars[c].time,
             position: 'atPriceBottom',
             shape: 'arrowDown',
-            color: this.#params.bear,
+            color: this.#params['fractal-bear'],
             price: bars[c].low,
             size: 0.5
           })

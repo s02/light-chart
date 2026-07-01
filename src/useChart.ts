@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue'
 import { useExpirations } from './useExpirations'
-import { dateToEpoch } from '@chart/helpers'
+import { helpers } from '@chart/helpers'
 import { ASSETS, PROFITABILITY } from './constants'
 import type { AppExpiration, ChartState, ChartUserState, ProfitabilityType } from './types'
 import type { AssetSymbol } from '@chart/types'
@@ -44,8 +44,8 @@ export const useChart = () => {
         expiration,
         chartExpiration: {
           ...expiration,
-          lock: dateToEpoch(expiration.lock),
-          close: dateToEpoch(expiration.close)
+          lock: helpers.dateToEpoch(expiration.lock),
+          close: helpers.dateToEpoch(expiration.close)
         }
       }
     }

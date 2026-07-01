@@ -9,14 +9,17 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const VZT_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'period', default: 10, min: 1 },
-    { type: 'number', key: 'daysPerYear', default: 252, min: 1 }
+    { type: 'number', key: 'vzt-period', default: 10, min: 1 },
+    { type: 'number', key: 'vzt-daysPerYear', default: 252, min: 1 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 109 0)' }]
+  style: [{ type: 'color', key: 'vzt-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
 
-type VZTParams = InferStudyValues<typeof VZT_SCHEMA.inputs> & InferStudyValues<typeof VZT_SCHEMA.style>
+type VZTParams = InferStudyValues<typeof VZT_SCHEMA.inputs> &
+  InferStudyValues<typeof VZT_SCHEMA.style> &
+  InferStudyValues<typeof VZT_SCHEMA.text>
 
 export class VolatilityZeroTrend extends AbstractIndicator implements Indicator {
   static readonly ikey = 'vzt' as const
@@ -28,11 +31,11 @@ export class VolatilityZeroTrend extends AbstractIndicator implements Indicator 
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(VZT_SCHEMA.inputs, VZT_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(VZT_SCHEMA.inputs, VZT_SCHEMA.style, VZT_SCHEMA.text, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['vzt-color'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -46,15 +49,19 @@ export class VolatilityZeroTrend extends AbstractIndicator implements Indicator 
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(VZT_SCHEMA.inputs, VZT_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(VZT_SCHEMA.inputs, VZT_SCHEMA.style, VZT_SCHEMA.text, params)
+    this.#series.applyOptions({ color: this.#params['vzt-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'VZT', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
     const value = data ? `${(data as LineData<Time>).value.toFixed(2)}%` : '∅'
-    legend.data.push({ value, color: this.#params.color })
+    legend.data.push(
+      { value: this.#params['vzt-period'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['vzt-daysPerYear'].toString(), color: 'rgb(140, 140, 140)' }
+    )
+    legend.data.push({ value, color: this.#params['vzt-color'] })
     return legend
   }
 
@@ -67,7 +74,8 @@ export class VolatilityZeroTrend extends AbstractIndicator implements Indicator 
   }
 
   #calculate(bars: ChartBar[]) {
-    const { period, daysPerYear } = this.#params
+    const period = this.#params['vzt-period']
+    const daysPerYear = this.#params['vzt-daysPerYear']
     const normRetSq: number[] = new Array(bars.length).fill(NaN)
 
     for (let i = 1; i < bars.length; i++) {

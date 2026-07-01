@@ -10,11 +10,14 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const TREND_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', default: 14, min: 2 }],
-  style: [{ type: 'color', key: 'color', default: 'rgb(126 87 194)' }]
+  text: [],
+  inputs: [{ type: 'number', key: 'trend-si-length', default: 14, min: 2 }],
+  style: [{ type: 'color', key: 'trend-si-color', default: 'rgb(126 87 194)' }]
 } as const satisfies StudySchema
 
-type TrendParams = InferStudyValues<typeof TREND_SCHEMA.inputs> & InferStudyValues<typeof TREND_SCHEMA.style>
+type TrendParams = InferStudyValues<typeof TREND_SCHEMA.inputs> &
+  InferStudyValues<typeof TREND_SCHEMA.style> &
+  InferStudyValues<typeof TREND_SCHEMA.text>
 
 export class TrendStrengthIndex extends AbstractIndicator implements Indicator {
   static readonly ikey = 'trend-si' as const
@@ -29,12 +32,12 @@ export class TrendStrengthIndex extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(TREND_SCHEMA.inputs, TREND_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(TREND_SCHEMA.inputs, TREND_SCHEMA.style, TREND_SCHEMA.text, options?.params)
 
     this.#series = {
       tsi: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['trend-si-color'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -49,15 +52,16 @@ export class TrendStrengthIndex extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(TREND_SCHEMA.inputs, TREND_SCHEMA.style, params)
-    this.#series.tsi.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(TREND_SCHEMA.inputs, TREND_SCHEMA.style, TREND_SCHEMA.text, params)
+    this.#series.tsi.applyOptions({ color: this.#params['trend-si-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'Trend Strength Index', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.tsi)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
-    legend.data.push({ value, color: this.#params.color })
+    legend.data.push({ value: this.#params['trend-si-length'].toString(), color: 'rgb(140, 140, 140)' })
+    legend.data.push({ value, color: this.#params['trend-si-color'] })
     return legend
   }
 
@@ -71,7 +75,7 @@ export class TrendStrengthIndex extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const { length } = this.#params
+    const length = this.#params['trend-si-length']
     const sumX = ((length - 1) * length) / 2
     const sumXX = ((length - 1) * length * (2 * length - 1)) / 6
     const invN = 1 / length

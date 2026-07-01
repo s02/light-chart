@@ -11,17 +11,20 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const AC_SCHEMA = {
+  text: [],
   inputs: [],
   style: [
-    { type: 'color', key: 'histUp', default: 'rgb(38 166 154)' },
-    { type: 'color', key: 'histDown', default: 'rgb(239 83 80)' }
+    { type: 'color', key: 'ao-histUp', default: 'rgb(38 166 154)' },
+    { type: 'color', key: 'ao-histDown', default: 'rgb(239 83 80)' }
   ]
 } as const satisfies StudySchema
 
-type ACParams = InferStudyValues<typeof AC_SCHEMA.inputs> & InferStudyValues<typeof AC_SCHEMA.style>
+type ACParams = InferStudyValues<typeof AC_SCHEMA.inputs> &
+  InferStudyValues<typeof AC_SCHEMA.style> &
+  InferStudyValues<typeof AC_SCHEMA.text>
 
 export class AcceleratorOscillator extends AbstractIndicator implements Indicator {
-  static readonly ikey = 'ao' as const
+  static readonly ikey = 'aco' as const
 
   #chart: IChartApi
   #params: ACParams
@@ -33,12 +36,12 @@ export class AcceleratorOscillator extends AbstractIndicator implements Indicato
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(AC_SCHEMA.inputs, AC_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(AC_SCHEMA.inputs, AC_SCHEMA.style, AC_SCHEMA.text, options?.params)
 
     this.#series = {
       hist: this.#chart.addSeries(
         HistogramSeries,
-        { ...COMMON_SERIES_SETTINGS, color: this.#params.histUp, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, color: this.#params['ao-histUp'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -53,7 +56,7 @@ export class AcceleratorOscillator extends AbstractIndicator implements Indicato
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(AC_SCHEMA.inputs, AC_SCHEMA.style, params)
+    this.#params = resolveStudyParams(AC_SCHEMA.inputs, AC_SCHEMA.style, AC_SCHEMA.text, params)
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -61,7 +64,7 @@ export class AcceleratorOscillator extends AbstractIndicator implements Indicato
     const histData = seriesData.get(this.#series.hist)
     if (histData) {
       const value = (histData as HistogramData<Time>).value
-      const color = value >= 0 ? this.#params.histUp : this.#params.histDown
+      const color = value >= 0 ? this.#params['ao-histUp'] : this.#params['ao-histDown']
       legend.data.push({ value: formatPrice(value), color })
     }
     return legend
@@ -84,7 +87,7 @@ export class AcceleratorOscillator extends AbstractIndicator implements Indicato
       const time = bars[i].time
       if (value == null || Number.isNaN(value)) return { time }
       const prev = i > 0 ? (acValues[i - 1] ?? NaN) : NaN
-      const color = value >= prev ? this.#params.histUp : this.#params.histDown
+      const color = value >= prev ? this.#params['ao-histUp'] : this.#params['ao-histDown']
       return { time, value, color }
     })
   }

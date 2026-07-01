@@ -10,11 +10,14 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const MOM_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', default: 10, min: 1 }],
-  style: [{ type: 'color', key: 'color', default: 'rgb(126 87 194)' }]
+  text: [],
+  inputs: [{ type: 'number', key: 'mom-length', default: 10, min: 1 }],
+  style: [{ type: 'color', key: 'mom-color', default: 'rgb(126 87 194)' }]
 } as const satisfies StudySchema
 
-type MOMParams = InferStudyValues<typeof MOM_SCHEMA.inputs> & InferStudyValues<typeof MOM_SCHEMA.style>
+type MOMParams = InferStudyValues<typeof MOM_SCHEMA.inputs> &
+  InferStudyValues<typeof MOM_SCHEMA.style> &
+  InferStudyValues<typeof MOM_SCHEMA.text>
 
 export class Momentum extends AbstractIndicator implements Indicator {
   static readonly ikey = 'mom' as const
@@ -30,12 +33,12 @@ export class Momentum extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(MOM_SCHEMA.inputs, MOM_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(MOM_SCHEMA.inputs, MOM_SCHEMA.style, MOM_SCHEMA.text, options?.params)
 
     this.#series = {
       mom: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['mom-color'], priceLineVisible: false },
         this.paneIndex
       ),
       zeroLine: this.#chart.addSeries(
@@ -62,15 +65,16 @@ export class Momentum extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(MOM_SCHEMA.inputs, MOM_SCHEMA.style, params)
-    this.#series.mom.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(MOM_SCHEMA.inputs, MOM_SCHEMA.style, MOM_SCHEMA.text, params)
+    this.#series.mom.applyOptions({ color: this.#params['mom-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'MOM', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.mom)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
-    legend.data.push({ value, color: this.#params.color })
+    legend.data.push({ value: this.#params['mom-length'].toString(), color: 'rgb(140, 140, 140)' })
+    legend.data.push({ value, color: this.#params['mom-color'] })
     return legend
   }
 
@@ -92,7 +96,7 @@ export class Momentum extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const { length } = this.#params
+    const length = this.#params['mom-length']
     const mapped = bars.map((b, i) => ({
       time: b.time,
       value: i < length ? NaN : b.close - bars[i - length].close

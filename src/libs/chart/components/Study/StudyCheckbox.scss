@@ -1,0 +1,40 @@
+span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #575757;
+  border-radius: 3px;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  color: rgb(48 48 48);
+
+  svg {
+    opacity: 0;
+  }
+}
+
+label {
+  position: relative;
+  display: block;
+  height: 18px;
+  width: 18px;
+}
+
+input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+
+input:checked + span {
+  background-color: #fff;
+  border: 1px solid #fff;
+
+  svg {
+    opacity: 1;
+  }
+}

@@ -27,7 +27,7 @@ export class OptionPluginRenderer implements IPrimitivePaneRenderer {
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
       if (this.#openPoint.x && this.#openPoint.y) {
-        circle(scope, this.#openPoint, { radius: 3, fill: '#999' })
+        circle(scope, this.#openPoint, { radius: 3, 'fill-color': '#999' })
       }
 
       if (this.#closePoint.x) {

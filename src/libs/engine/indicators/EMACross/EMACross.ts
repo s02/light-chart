@@ -19,18 +19,21 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const EMA_CROSS_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'shortLength', default: 9, min: 1 },
-    { type: 'number', key: 'longLength', default: 26, min: 1 }
+    { type: 'number', key: 'emacross-shortLength', default: 9, min: 1, max: 9999 },
+    { type: 'number', key: 'emacross-longLength', default: 26, min: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'short', default: 'rgb(255 109 0)' },
-    { type: 'color', key: 'long', default: 'rgb(67 160 71)' },
-    { type: 'color', key: 'cross', default: 'rgb(33 150 243)' }
+    { type: 'color', key: 'emacross-short', default: 'rgb(255 109 0)' },
+    { type: 'color', key: 'emacross-long', default: 'rgb(67 160 71)' },
+    { type: 'color', key: 'emacross-cross', default: 'rgb(33 150 243)' }
   ]
 } as const satisfies StudySchema
 
-type EMACrossParams = InferStudyValues<typeof EMA_CROSS_SCHEMA.inputs> & InferStudyValues<typeof EMA_CROSS_SCHEMA.style>
+type EMACrossParams = InferStudyValues<typeof EMA_CROSS_SCHEMA.inputs> &
+  InferStudyValues<typeof EMA_CROSS_SCHEMA.style> &
+  InferStudyValues<typeof EMA_CROSS_SCHEMA.text>
 
 export class EMACross extends AbstractIndicator implements Indicator {
   static readonly ikey = 'emacross' as const
@@ -48,17 +51,22 @@ export class EMACross extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(EMA_CROSS_SCHEMA.inputs, EMA_CROSS_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(
+      EMA_CROSS_SCHEMA.inputs,
+      EMA_CROSS_SCHEMA.style,
+      EMA_CROSS_SCHEMA.text,
+      options?.params
+    )
 
     this.#series = {
       fast: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.short, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['emacross-short'], priceLineVisible: false },
         this.paneIndex
       ),
       slow: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.long, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['emacross-long'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -75,19 +83,23 @@ export class EMACross extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(EMA_CROSS_SCHEMA.inputs, EMA_CROSS_SCHEMA.style, params)
-    this.#series.fast.applyOptions({ color: this.#params.short })
-    this.#series.slow.applyOptions({ color: this.#params.long })
+    this.#params = resolveStudyParams(EMA_CROSS_SCHEMA.inputs, EMA_CROSS_SCHEMA.style, EMA_CROSS_SCHEMA.text, params)
+    this.#series.fast.applyOptions({ color: this.#params['emacross-short'] })
+    this.#series.slow.applyOptions({ color: this.#params['emacross-long'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'EMA CROSS', paneIndex: this.paneIndex, data: [] }
     const fastData = seriesData.get(this.#series.fast)
     const slowData = seriesData.get(this.#series.slow)
+    legend.data.push(
+      { value: this.#params['emacross-shortLength'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['emacross-longLength'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     if (fastData && slowData) {
       legend.data.push(
-        { value: formatPrice((fastData as LineData<Time>).value), color: this.#params.short },
-        { value: formatPrice((slowData as LineData<Time>).value), color: this.#params.long }
+        { value: formatPrice((fastData as LineData<Time>).value), color: this.#params['emacross-short'] },
+        { value: formatPrice((slowData as LineData<Time>).value), color: this.#params['emacross-long'] }
       )
     }
     return legend
@@ -108,8 +120,8 @@ export class EMACross extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const fastSeries = ta.ema(source, this.#params.shortLength)
-    const slowSeries = ta.ema(source, this.#params.longLength)
+    const fastSeries = ta.ema(source, this.#params['emacross-shortLength'])
+    const slowSeries = ta.ema(source, this.#params['emacross-longLength'])
     const fastArr = fastSeries.toArray()
     const slowArr = slowSeries.toArray()
     const crossArr = ta.cross(fastSeries, slowSeries).toArray()
@@ -129,7 +141,7 @@ export class EMACross extends AbstractIndicator implements Indicator {
         time: bars[i].time,
         position: 'atPriceMiddle',
         shape: 'square',
-        color: this.#params.cross,
+        color: this.#params['emacross-cross'],
         price: fast,
         size: 0.6
       })

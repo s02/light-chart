@@ -12,27 +12,30 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const KC_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'useTrueRange', default: 1, options: [1, 0] },
-    { type: 'number', key: 'length', default: 20, min: 1 },
-    { type: 'number', key: 'mul', default: 1, min: 0.1, step: 0.1 }
+    { type: 'bool', key: 'kc-useTrueRange', default: true },
+    { type: 'number', key: 'kc-length', default: 20, min: 1 },
+    { type: 'number', key: 'kc-mul', default: 1, min: 0.1, step: 0.1 }
   ],
   style: [
-    { type: 'color', key: 'upper', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'middle', default: 'rgb(255 171 64)' },
-    { type: 'color', key: 'lower', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'fill', default: 'rgb(41 98 255 / 10%)' }
+    { type: 'color', key: 'kc-upper', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'kc-middle', default: 'rgb(255 171 64)' },
+    { type: 'color', key: 'kc-lower', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'kc-fill', default: 'rgb(41 98 255 / 10%)' }
   ]
 } as const satisfies StudySchema
 
-export type KCParams = InferStudyValues<typeof KC_SCHEMA.inputs> & InferStudyValues<typeof KC_SCHEMA.style>
+export type KCParams = InferStudyValues<typeof KC_SCHEMA.inputs> &
+  InferStudyValues<typeof KC_SCHEMA.style> &
+  InferStudyValues<typeof KC_SCHEMA.text>
 
 export class KeltnerChannels extends AbstractIndicator implements Indicator {
   static readonly ikey = 'kc' as const
 
   #chart: IChartApi
-  #params: KCParams = resolveStudyParams(KC_SCHEMA.inputs, KC_SCHEMA.style)
-  #fill = new KeltnerChannelsFill(this.#params.fill)
+  #params: KCParams = resolveStudyParams(KC_SCHEMA.inputs, KC_SCHEMA.style, KC_SCHEMA.text)
+  #fill = new KeltnerChannelsFill(this.#params['kc-fill'])
 
   #series: {
     upper: ISeriesApi<SeriesType>
@@ -43,22 +46,22 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(KC_SCHEMA.inputs, KC_SCHEMA.style, options.params)
+    this.#params = resolveStudyParams(KC_SCHEMA.inputs, KC_SCHEMA.style, KC_SCHEMA.text, options.params)
 
     this.#series = {
       upper: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.upper, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['kc-upper'], priceLineVisible: false },
         this.paneIndex
       ),
       middle: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.middle, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['kc-middle'], priceLineVisible: false },
         this.paneIndex
       ),
       lower: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.lower, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['kc-lower'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -75,12 +78,12 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(KC_SCHEMA.inputs, KC_SCHEMA.style, params)
+    this.#params = resolveStudyParams(KC_SCHEMA.inputs, KC_SCHEMA.style, KC_SCHEMA.text, params)
 
-    this.#series.upper.applyOptions({ color: this.#params.upper })
-    this.#series.middle.applyOptions({ color: this.#params.middle })
-    this.#series.lower.applyOptions({ color: this.#params.lower })
-    this.#fill.fill = this.#params.fill
+    this.#series.upper.applyOptions({ color: this.#params['kc-upper'] })
+    this.#series.middle.applyOptions({ color: this.#params['kc-middle'] })
+    this.#series.lower.applyOptions({ color: this.#params['kc-lower'] })
+    this.#fill.fill = this.#params['kc-fill']
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -88,11 +91,17 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
     const uData = seriesData.get(this.#series.upper)
     const mData = seriesData.get(this.#series.middle)
     const lData = seriesData.get(this.#series.lower)
+
+    legend.data.push(
+      { value: this.#params['kc-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['kc-mul'].toString(), color: 'rgb(140, 140, 140)' }
+    )
+
     if (uData && mData && lData) {
       legend.data.push(
-        { value: formatPrice((mData as LineData<Time>).value), color: this.#params.middle },
-        { value: formatPrice((uData as LineData<Time>).value), color: this.#params.upper },
-        { value: formatPrice((lData as LineData<Time>).value), color: this.#params.lower }
+        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['kc-middle'] },
+        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['kc-upper'] },
+        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['kc-lower'] }
       )
     }
     return legend
@@ -115,11 +124,12 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const basis = ta.ema(source, this.#params.length)
-    const trSeries = this.#params.useTrueRange
+    const basis = ta.ema(source, this.#params['kc-length'])
+    console.log(this.#params['kc-useTrueRange'])
+    const trSeries = this.#params['kc-useTrueRange']
       ? ta.tr(bars)
       : getSourceSeries(bars, 'high').sub(getSourceSeries(bars, 'low'))
-    const range = ta.ema(trSeries, this.#params.length).mul(this.#params.mul)
+    const range = ta.ema(trSeries, this.#params['kc-length']).mul(this.#params['kc-mul'])
     const upper = basis.add(range)
     const lower = basis.sub(range)
 

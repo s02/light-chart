@@ -38,6 +38,11 @@ type StudyFontSizeParam = {
   default: number
 } & StudyParam
 
+type StudyBoolParam = {
+  type: 'bool'
+  default: boolean
+} & StudyParam
+
 export type StudyParamDescriptor =
   | StudyNumberParam
   | StudyColorParam
@@ -45,8 +50,9 @@ export type StudyParamDescriptor =
   | StudySelectParam
   | StudyLineWidthParam
   | StudyFontSizeParam
+  | StudyBoolParam
 
-export type StudyParams = Record<string, number | string>
+export type StudyParams = Record<string, number | string | boolean>
 
 export type StudySchema = {
   text: StudyParamDescriptor[]
@@ -59,7 +65,9 @@ export type InferStudyValues<T extends readonly StudyParamDescriptor[]> = {
     ? V
     : D extends { type: 'number' }
       ? number
-      : D['default']
+      : D extends { type: 'bool' }
+        ? boolean
+        : D['default']
 }
 
 const studyDefaultValues = <T extends readonly StudyParamDescriptor[]>(descriptors: T): InferStudyValues<T> => {
@@ -74,7 +82,7 @@ export const resolveStudyParams = <
   inputs: TInputs,
   style: TStyle,
   text: TText,
-  incoming?: Record<string, number | string>
+  incoming?: StudyParams
 ): InferStudyValues<TInputs> & InferStudyValues<TStyle> & InferStudyValues<TText> => {
   const defaults = { ...studyDefaultValues(inputs), ...studyDefaultValues(style), ...studyDefaultValues(text) }
   return { ...defaults, ...incoming } as InferStudyValues<TInputs> & InferStudyValues<TStyle> & InferStudyValues<TText>

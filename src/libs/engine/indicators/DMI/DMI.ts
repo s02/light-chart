@@ -11,20 +11,23 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const DMI_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'diLength', default: 14, min: 1 },
-    { type: 'number', key: 'adxSmoothing', default: 14, min: 1 }
+    { type: 'number', key: 'dmi-diLength', default: 14, min: 1 },
+    { type: 'number', key: 'dmi-adxSmoothing', default: 14, min: 1 }
   ],
   style: [
-    { type: 'color', key: 'plusDIColor', default: '#2196F3' },
-    { type: 'color', key: 'minusDIColor', default: '#FF6D00' },
-    { type: 'color', key: 'dxColor', default: '#FFA726' },
-    { type: 'color', key: 'adxColor', default: '#F50057' },
-    { type: 'color', key: 'adxrColor', default: '#ab47bc' }
+    { type: 'color', key: 'dmi-plusDIColor', default: '#2196F3' },
+    { type: 'color', key: 'dmi-minusDIColor', default: '#FF6D00' },
+    { type: 'color', key: 'dmi-dxColor', default: '#FFA726' },
+    { type: 'color', key: 'dmi-adxColor', default: '#F50057' },
+    { type: 'color', key: 'dmi-adxrColor', default: '#ab47bc' }
   ]
 } as const satisfies StudySchema
 
-type DMIParams = InferStudyValues<typeof DMI_SCHEMA.inputs> & InferStudyValues<typeof DMI_SCHEMA.style>
+type DMIParams = InferStudyValues<typeof DMI_SCHEMA.inputs> &
+  InferStudyValues<typeof DMI_SCHEMA.style> &
+  InferStudyValues<typeof DMI_SCHEMA.text>
 
 export class DMI extends AbstractIndicator implements Indicator {
   static readonly ikey = 'dmi' as const
@@ -43,32 +46,32 @@ export class DMI extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(DMI_SCHEMA.inputs, DMI_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(DMI_SCHEMA.inputs, DMI_SCHEMA.style, DMI_SCHEMA.text, options?.params)
 
     this.#series = {
       plusDI: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.plusDIColor, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['dmi-plusDIColor'], priceLineVisible: false },
         this.paneIndex
       ),
       minusDI: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.minusDIColor, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['dmi-minusDIColor'], priceLineVisible: false },
         this.paneIndex
       ),
       dx: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.dxColor, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['dmi-dxColor'], priceLineVisible: false },
         this.paneIndex
       ),
       adx: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.adxColor, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['dmi-adxColor'], priceLineVisible: false },
         this.paneIndex
       ),
       adxr: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.adxrColor, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['dmi-adxrColor'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -83,22 +86,26 @@ export class DMI extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(DMI_SCHEMA.inputs, DMI_SCHEMA.style, params)
-    this.#series.plusDI.applyOptions({ color: this.#params.plusDIColor })
-    this.#series.minusDI.applyOptions({ color: this.#params.minusDIColor })
-    this.#series.dx.applyOptions({ color: this.#params.dxColor })
-    this.#series.adx.applyOptions({ color: this.#params.adxColor })
-    this.#series.adxr.applyOptions({ color: this.#params.adxrColor })
+    this.#params = resolveStudyParams(DMI_SCHEMA.inputs, DMI_SCHEMA.style, DMI_SCHEMA.text, params)
+    this.#series.plusDI.applyOptions({ color: this.#params['dmi-plusDIColor'] })
+    this.#series.minusDI.applyOptions({ color: this.#params['dmi-minusDIColor'] })
+    this.#series.dx.applyOptions({ color: this.#params['dmi-dxColor'] })
+    this.#series.adx.applyOptions({ color: this.#params['dmi-adxColor'] })
+    this.#series.adxr.applyOptions({ color: this.#params['dmi-adxrColor'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'DMI', paneIndex: this.paneIndex, data: [] }
+    legend.data.push(
+      { value: this.#params['dmi-diLength'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['dmi-adxSmoothing'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     const entries = [
-      [this.#series.plusDI, this.#params.plusDIColor],
-      [this.#series.minusDI, this.#params.minusDIColor],
-      [this.#series.dx, this.#params.dxColor],
-      [this.#series.adx, this.#params.adxColor],
-      [this.#series.adxr, this.#params.adxrColor]
+      [this.#series.plusDI, this.#params['dmi-plusDIColor']],
+      [this.#series.minusDI, this.#params['dmi-minusDIColor']],
+      [this.#series.dx, this.#params['dmi-dxColor']],
+      [this.#series.adx, this.#params['dmi-adxColor']],
+      [this.#series.adxr, this.#params['dmi-adxrColor']]
     ] as const
     for (const [series, color] of entries) {
       const data = seriesData.get(series)
@@ -126,7 +133,8 @@ export class DMI extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const { diLength, adxSmoothing } = this.#params
+    const diLength = this.#params['dmi-diLength']
+    const adxSmoothing = this.#params['dmi-adxSmoothing']
 
     const [plusDISeries, minusDISeries, adxSeries] = ta.dmi(bars, diLength, adxSmoothing)
     const plusDIArr = plusDISeries.toArray()

@@ -21,7 +21,7 @@ const BB_SCHEMA = {
     { type: 'color', key: 'bb-upper', default: 'rgb(41 98 255)' },
     { type: 'color', key: 'bb-middle', default: 'rgb(255 171 64)' },
     { type: 'color', key: 'bb-lower', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'bb-fill-color', default: 'rgb(41 98 255 / 10%)' }
+    { type: 'color', key: 'bb-fill-color', default: 'rgb(41 98 255 / 5%)' }
   ]
 } as const satisfies StudySchema
 

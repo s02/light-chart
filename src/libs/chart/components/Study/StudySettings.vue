@@ -8,6 +8,7 @@ import StudyColor from './StudyColor.vue'
 import StudyLineWidth from './StudyLineWidth.vue'
 import StudyFontSize from './StudyFontSize.vue'
 import StudyInput from '@chart/components/Study/StudyInput.vue'
+import StudyCheckbox from '@chart/components/Study/StudyCheckbox.vue'
 
 const emit = defineEmits<{
   (e: 'close', result?: StudyParams): void
@@ -64,7 +65,7 @@ const tab = ref(tabs[0])
             </div>
           </div>
           <div v-if="schema.text?.find((ps) => ps.key === 'text')" class="studysett-ctrl-text">
-            <textarea v-model="params['text']"></textarea>
+            <textarea v-model="params['text'] as string"></textarea>
           </div>
         </template>
         <template v-else-if="tab === 'tab-style'">
@@ -83,6 +84,14 @@ const tab = ref(tabs[0])
                 v-else-if="el.type === 'font-size'"
                 :size="Number(params[el.key])"
                 @update="params[el.key] = $event" />
+              <StudyInput
+                v-if="el.type === 'number'"
+                v-model="params[el.key]"
+                type="number"
+                :min="el.min"
+                :max="el.max"
+                :step="el.step || 1"
+                class="studysett-input" />
             </template>
           </div>
         </template>
@@ -98,6 +107,7 @@ const tab = ref(tabs[0])
                 :max="el.max"
                 :step="el.step || 1"
                 class="studysett-input" />
+              <StudyCheckbox v-else-if="el.type === 'bool'" v-model="params[el.key]" />
             </template>
           </div>
         </template>

@@ -13,15 +13,23 @@ import type { SeriesLegend } from '@engine/series'
 // TODO: Перепроверить рассчеты
 
 const CRSI_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'lenrsi', default: 3, min: 1 },
-    { type: 'number', key: 'lenupdown', default: 2, min: 1 },
-    { type: 'number', key: 'lenroc', default: 100, min: 1 }
+    { type: 'number', key: 'crsi-lenrsi', default: 3, min: 1, max: 9999 },
+    { type: 'number', key: 'crsi-lenupdown', default: 2, min: 1, max: 9999 },
+    { type: 'number', key: 'crsi-lenroc', default: 100, min: 1, max: 9999 },
+    { type: 'number', key: 'crsi-upperLimit', default: 70, min: 1, max: 99 },
+    { type: 'number', key: 'crsi-lowerLimit', default: 30, min: 1, max: 99 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(41 98 255)' }]
+  style: [
+    { type: 'color', key: 'crsi-color', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'crsi-fill-color', default: 'rgb(41 98 255 / 10%)' }
+  ]
 } as const satisfies StudySchema
 
-type CRSIParams = InferStudyValues<typeof CRSI_SCHEMA.inputs> & InferStudyValues<typeof CRSI_SCHEMA.style>
+type CRSIParams = InferStudyValues<typeof CRSI_SCHEMA.inputs> &
+  InferStudyValues<typeof CRSI_SCHEMA.style> &
+  InferStudyValues<typeof CRSI_SCHEMA.text>
 
 export class ConnorsRSI extends AbstractIndicator implements Indicator {
   static readonly ikey = 'crsi' as const
@@ -32,7 +40,6 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
   #series: {
     crsi: ISeriesApi<SeriesType>
     upperLine: ISeriesApi<SeriesType>
-    middleLine: ISeriesApi<SeriesType>
     lowerLine: ISeriesApi<SeriesType>
     fill: ISeriesApi<SeriesType>
   }
@@ -40,30 +47,18 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(CRSI_SCHEMA.inputs, CRSI_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(CRSI_SCHEMA.inputs, CRSI_SCHEMA.style, CRSI_SCHEMA.text, options?.params)
 
     this.#series = {
       crsi: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['crsi-color'], priceLineVisible: false },
         this.paneIndex
       ),
       upperLine: this.#chart.addSeries(
         LineSeries,
         {
           color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
-          crosshairMarkerVisible: false,
-          lastValueVisible: false,
-          priceLineVisible: false
-        },
-        this.paneIndex
-      ),
-      middleLine: this.#chart.addSeries(
-        LineSeries,
-        {
-          color: '#787B8680',
           lineWidth: 1,
           lineStyle: LineStyle.LargeDashed,
           crosshairMarkerVisible: false,
@@ -87,9 +82,9 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
       fill: this.#chart.addSeries(
         BaselineSeries,
         {
-          baseValue: { type: 'price', price: 30 },
-          topFillColor1: 'rgba(41,98,255,0.1)',
-          topFillColor2: 'rgba(41,98,255,0.1)',
+          baseValue: { type: 'price', price: this.#params['crsi-lowerLimit'] },
+          topFillColor1: this.#params['crsi-fill-color'],
+          topFillColor2: this.#params['crsi-fill-color'],
           bottomFillColor1: 'transparent',
           bottomFillColor2: 'transparent',
           topLineColor: 'transparent',
@@ -113,15 +108,25 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(CRSI_SCHEMA.inputs, CRSI_SCHEMA.style, params)
-    this.#series.crsi.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(CRSI_SCHEMA.inputs, CRSI_SCHEMA.style, CRSI_SCHEMA.text, params)
+    this.#series.crsi.applyOptions({ color: this.#params['crsi-color'] })
+    this.#series.fill.applyOptions({
+      topFillColor1: this.#params['crsi-fill-color'],
+      topFillColor2: this.#params['crsi-fill-color'],
+      baseValue: { type: 'price', price: this.#params['crsi-lowerLimit'] }
+    })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: ConnorsRSI.ikey.toUpperCase(), paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.crsi)
+    legend.data.push(
+      { value: this.#params['crsi-lenrsi'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['crsi-lenupdown'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['crsi-lenroc'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['crsi-color'] })
     }
     return legend
   }
@@ -132,20 +137,16 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
     const lastTime = data[data.length - 1].time
 
     this.#series.upperLine.setData([
-      { time: firstTime, value: 70 },
-      { time: lastTime, value: 70 }
-    ])
-    this.#series.middleLine.setData([
-      { time: firstTime, value: 50 },
-      { time: lastTime, value: 50 }
+      { time: firstTime, value: this.#params['crsi-upperLimit'] },
+      { time: lastTime, value: this.#params['crsi-upperLimit'] }
     ])
     this.#series.lowerLine.setData([
-      { time: firstTime, value: 30 },
-      { time: lastTime, value: 30 }
+      { time: firstTime, value: this.#params['crsi-lowerLimit'] },
+      { time: lastTime, value: this.#params['crsi-lowerLimit'] }
     ])
     this.#series.fill.setData([
-      { time: firstTime, value: 70 },
-      { time: lastTime, value: 70 }
+      { time: firstTime, value: this.#params['crsi-upperLimit'] },
+      { time: lastTime, value: this.#params['crsi-upperLimit'] }
     ])
 
     this.#series.crsi.setData(crsiData)
@@ -154,7 +155,6 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
   protected removeSeries() {
     this.#chart.removeSeries(this.#series.crsi)
     this.#chart.removeSeries(this.#series.upperLine)
-    this.#chart.removeSeries(this.#series.middleLine)
     this.#chart.removeSeries(this.#series.lowerLine)
     this.#chart.removeSeries(this.#series.fill)
   }
@@ -177,9 +177,9 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
 
     const udSeries = new Series(bars, (_, i) => ud[i])
 
-    const rsiArr = ta.rsi(close, this.#params.lenrsi).toArray()
-    const udRsiArr = ta.rsi(udSeries, this.#params.lenupdown).toArray()
-    const prArr = ta.percentrank(ta.roc(close, 1), this.#params.lenroc).toArray()
+    const rsiArr = ta.rsi(close, this.#params['crsi-lenrsi']).toArray()
+    const udRsiArr = ta.rsi(udSeries, this.#params['crsi-lenupdown']).toArray()
+    const prArr = ta.percentrank(ta.roc(close, 1), this.#params['crsi-lenroc']).toArray()
 
     const mapped = bars.map((bar, i) => {
       const a = rsiArr[i]

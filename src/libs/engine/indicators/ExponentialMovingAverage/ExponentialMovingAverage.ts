@@ -13,14 +13,17 @@ import { getSourceSeries, ta } from 'oakscriptjs'
 // TODO: Добавить настройки линии сглаживания https://github.com/deepentropy/lightweight-charts-indicators/blob/main/src/standard/ema.ts#L67
 
 const EMA_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'length', default: 9, min: 1 },
-    { type: 'number', key: 'offset', default: 0, min: 0 }
+    { type: 'number', key: 'ema-length', default: 9, min: 1 },
+    { type: 'number', key: 'ema-offset', default: 0, min: 0 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 109 0)' }]
+  style: [{ type: 'color', key: 'ema-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
 
-type EMAParams = InferStudyValues<typeof EMA_SCHEMA.inputs> & InferStudyValues<typeof EMA_SCHEMA.style>
+type EMAParams = InferStudyValues<typeof EMA_SCHEMA.inputs> &
+  InferStudyValues<typeof EMA_SCHEMA.style> &
+  InferStudyValues<typeof EMA_SCHEMA.text>
 
 export class ExponentialMovingAverage extends AbstractIndicator implements Indicator {
   static readonly ikey = 'ema' as const
@@ -32,18 +35,18 @@ export class ExponentialMovingAverage extends AbstractIndicator implements Indic
   constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
     super(datafeed, options?.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(EMA_SCHEMA.inputs, EMA_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(EMA_SCHEMA.inputs, EMA_SCHEMA.style, EMA_SCHEMA.text, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['ema-color'], priceLineVisible: false },
       this.paneIndex
     )
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(EMA_SCHEMA.inputs, EMA_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(EMA_SCHEMA.inputs, EMA_SCHEMA.style, EMA_SCHEMA.text, params)
+    this.#series.applyOptions({ color: this.#params['ema-color'] })
   }
 
   getSchema() {
@@ -61,8 +64,12 @@ export class ExponentialMovingAverage extends AbstractIndicator implements Indic
       data: []
     }
     const data = seriesData.get(this.#series)
+    legend.data.push(
+      { value: this.#params['ema-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['ema-offset'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['ema-color'] })
     }
     return legend
   }
@@ -77,7 +84,7 @@ export class ExponentialMovingAverage extends AbstractIndicator implements Indic
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const shifted = this.applyOffset(ta.ema(source, this.#params.length).toArray(), this.#params.offset)
+    const shifted = this.applyOffset(ta.ema(source, this.#params['ema-length']).toArray(), this.#params['ema-offset'])
 
     const toBar = (value: number, i: number) => ({
       time: bars[i].time,

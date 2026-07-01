@@ -11,11 +11,14 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const ATR_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', default: 14, min: 1 }],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 109 0)' }]
+  text: [],
+  inputs: [{ type: 'number', key: 'atr-length', default: 14, min: 1 }],
+  style: [{ type: 'color', key: 'atr-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
 
-type ATRParams = InferStudyValues<typeof ATR_SCHEMA.inputs> & InferStudyValues<typeof ATR_SCHEMA.style>
+type ATRParams = InferStudyValues<typeof ATR_SCHEMA.inputs> &
+  InferStudyValues<typeof ATR_SCHEMA.style> &
+  InferStudyValues<typeof ATR_SCHEMA.text>
 
 export class ATR extends AbstractIndicator implements Indicator {
   static readonly ikey = 'atr' as const
@@ -27,11 +30,11 @@ export class ATR extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(ATR_SCHEMA.inputs, ATR_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(ATR_SCHEMA.inputs, ATR_SCHEMA.style, ATR_SCHEMA.text, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['atr-color'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -45,15 +48,16 @@ export class ATR extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ATR_SCHEMA.inputs, ATR_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(ATR_SCHEMA.inputs, ATR_SCHEMA.style, ATR_SCHEMA.text, params)
+    this.#series.applyOptions({ color: this.#params['atr-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'ATR', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
+    legend.data.push({ value: this.#params['atr-length'].toString(), color: 'rgb(140, 140, 140)' })
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['atr-color'] })
     }
     return legend
   }
@@ -67,7 +71,7 @@ export class ATR extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const values = ta.atr(bars, this.#params.length).toArray()
+    const values = ta.atr(bars, this.#params['atr-length']).toArray()
     return this.filter(values.map((value, i) => ({ time: bars[i].time, value: value ?? NaN })))
   }
 }

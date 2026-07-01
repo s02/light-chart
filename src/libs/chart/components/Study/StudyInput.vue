@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const model = defineModel<number | string>({ required: true })
+const model = defineModel<number | string | boolean>({ required: true })
 
 const props = withDefaults(
   defineProps<{

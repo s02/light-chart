@@ -30,7 +30,7 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
     super(datafeed, options?.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, SMA_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, SMA_SCHEMA.text, options?.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
@@ -40,7 +40,7 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, SMA_SCHEMA.style, params)
+    this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, SMA_SCHEMA.text, params)
     this.#series.applyOptions({ color: this.#params['sma-color'] })
   }
 

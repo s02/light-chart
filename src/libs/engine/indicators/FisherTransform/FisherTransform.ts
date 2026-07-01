@@ -11,14 +11,17 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const FISHER_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', default: 9, min: 1 }],
+  text: [],
+  inputs: [{ type: 'number', key: 'fisher-transform-length', default: 9, min: 1 }],
   style: [
-    { type: 'color', key: 'fisherColor', default: 'rgb(33 150 243)' },
-    { type: 'color', key: 'triggerColor', default: 'rgb(255 109 0)' }
+    { type: 'color', key: 'fisher-transform-fisherColor', default: 'rgb(33 150 243)' },
+    { type: 'color', key: 'fisher-transform-triggerColor', default: 'rgb(255 109 0)' }
   ]
 } as const satisfies StudySchema
 
-type FisherParams = InferStudyValues<typeof FISHER_SCHEMA.inputs> & InferStudyValues<typeof FISHER_SCHEMA.style>
+type FisherParams = InferStudyValues<typeof FISHER_SCHEMA.inputs> &
+  InferStudyValues<typeof FISHER_SCHEMA.style> &
+  InferStudyValues<typeof FISHER_SCHEMA.text>
 
 export class FisherTransform extends AbstractIndicator implements Indicator {
   static readonly ikey = 'fisher-transform' as const
@@ -35,7 +38,7 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(FISHER_SCHEMA.inputs, FISHER_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(FISHER_SCHEMA.inputs, FISHER_SCHEMA.style, FISHER_SCHEMA.text, options?.params)
 
     const levelOpts = (color: string) => ({
       color,
@@ -49,12 +52,12 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
     this.#series = {
       fisher: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.fisherColor, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['fisher-transform-fisherColor'], priceLineVisible: false },
         this.paneIndex
       ),
       trigger: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.triggerColor, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['fisher-transform-triggerColor'], priceLineVisible: false },
         this.paneIndex
       ),
       levels: [
@@ -76,16 +79,17 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(FISHER_SCHEMA.inputs, FISHER_SCHEMA.style, params)
-    this.#series.fisher.applyOptions({ color: this.#params.fisherColor })
-    this.#series.trigger.applyOptions({ color: this.#params.triggerColor })
+    this.#params = resolveStudyParams(FISHER_SCHEMA.inputs, FISHER_SCHEMA.style, FISHER_SCHEMA.text, params)
+    this.#series.fisher.applyOptions({ color: this.#params['fisher-transform-fisherColor'] })
+    this.#series.trigger.applyOptions({ color: this.#params['fisher-transform-triggerColor'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'Fisher Transform', paneIndex: this.paneIndex, data: [] }
+    legend.data.push({ value: this.#params['fisher-transform-length'].toString(), color: 'rgb(140, 140, 140)' })
     const entries = [
-      [this.#series.fisher, this.#params.fisherColor],
-      [this.#series.trigger, this.#params.triggerColor]
+      [this.#series.fisher, this.#params['fisher-transform-fisherColor']],
+      [this.#series.trigger, this.#params['fisher-transform-triggerColor']]
     ] as const
     for (const [series, color] of entries) {
       const data = seriesData.get(series)
@@ -118,7 +122,7 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const { length } = this.#params
+    const length = this.#params['fisher-transform-length']
 
     const hl2Arr = bars.map((b) => (b.high + b.low) / 2)
     const hl2Series = Series.fromArray(bars, hl2Arr)

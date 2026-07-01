@@ -11,15 +11,17 @@ import type { SeriesLegend } from '@engine/series'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const SMMA_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'length', default: 7, min: 1 },
-    { type: 'number', key: 'offset', default: 0, min: 0 },
-    { type: 'select', key: 'source', default: 'close', values: ['open', 'close', 'high', 'low'] }
+    { type: 'number', key: 'smma-length', default: 7, min: 1, max: 9999 },
+    { type: 'number', key: 'smma-offset', default: 0, min: 0, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(255 109 0)' }]
+  style: [{ type: 'color', key: 'smma-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
 
-type SMMAParams = InferStudyValues<typeof SMMA_SCHEMA.inputs> & InferStudyValues<typeof SMMA_SCHEMA.style>
+type SMMAParams = InferStudyValues<typeof SMMA_SCHEMA.inputs> &
+  InferStudyValues<typeof SMMA_SCHEMA.style> &
+  InferStudyValues<typeof SMMA_SCHEMA.text>
 
 export class SmoothedMovingAverage extends AbstractIndicator implements Indicator {
   static readonly ikey = 'smma' as const
@@ -31,11 +33,11 @@ export class SmoothedMovingAverage extends AbstractIndicator implements Indicato
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(SMMA_SCHEMA.inputs, SMMA_SCHEMA.style, options.params)
+    this.#params = resolveStudyParams(SMMA_SCHEMA.inputs, SMMA_SCHEMA.style, SMMA_SCHEMA.text, options.params)
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['smma-color'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -49,15 +51,20 @@ export class SmoothedMovingAverage extends AbstractIndicator implements Indicato
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(SMMA_SCHEMA.inputs, SMMA_SCHEMA.style, params)
-    this.#series.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(SMMA_SCHEMA.inputs, SMMA_SCHEMA.style, SMMA_SCHEMA.text, params)
+    this.#series.applyOptions({ color: this.#params['smma-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'SMMA', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series)
+    legend.data.push(
+      { value: this.#params['smma-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['smma-offset'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: 'close', color: 'rgb(140, 140, 140)' }
+    )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['smma-color'] })
     }
     return legend
   }
@@ -71,8 +78,8 @@ export class SmoothedMovingAverage extends AbstractIndicator implements Indicato
   }
 
   #calculate(bars: ChartBar[]) {
-    const source = getSourceSeries(bars, this.#params.source)
-    const shifted = this.applyOffset(ta.rma(source, this.#params.length).toArray(), this.#params.offset)
+    const source = getSourceSeries(bars, 'close')
+    const shifted = this.applyOffset(ta.rma(source, this.#params['smma-length']).toArray(), this.#params['smma-offset'])
 
     const toBar = (value: number, i: number) => ({
       time: bars[i].time,

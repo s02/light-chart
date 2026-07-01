@@ -12,25 +12,28 @@ import type { SeriesLegend } from '@engine/series'
 import { ta } from 'oakscriptjs'
 
 const ICHIMOKU_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'conversionPeriods', default: 9, min: 1 },
-    { type: 'number', key: 'basePeriods', default: 26, min: 1 },
-    { type: 'number', key: 'leadingSpanPeriods', default: 52, min: 1 },
-    { type: 'number', key: 'laggingSpanPeriods', default: 26, min: 1 },
-    { type: 'number', key: 'leadingShiftPeriods', default: 26, min: 1 }
+    { type: 'number', key: 'ichimoku-conversionPeriods', default: 9, min: 1, max: 9999 },
+    { type: 'number', key: 'ichimoku-basePeriods', default: 26, min: 1, max: 9999 },
+    { type: 'number', key: 'ichimoku-leadingSpanPeriods', default: 52, min: 1, max: 9999 },
+    { type: 'number', key: 'ichimoku-laggingSpanPeriods', default: 26, min: 1, max: 9999 },
+    { type: 'number', key: 'ichimoku-leadingShiftPeriods', default: 26, min: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'tenkan', default: 'rgb(33 150 243)' },
-    { type: 'color', key: 'kijun', default: 'rgb(128 25 34)' },
-    { type: 'color', key: 'chikou', default: 'rgb(67, 160, 71)' },
-    { type: 'color', key: 'senkouA', default: 'rgb(165 214 167)' },
-    { type: 'color', key: 'senkouB', default: 'rgb(250 161 164)' },
-    { type: 'color', key: 'cloudBull', default: 'rgb(76 175 80 / 50%)' },
-    { type: 'color', key: 'cloudBear', default: 'rgb(242 54 69 / 50%)' }
+    { type: 'color', key: 'ichimoku-tenkan', default: 'rgb(33 150 243)' },
+    { type: 'color', key: 'ichimoku-kijun', default: 'rgb(128 25 34)' },
+    { type: 'color', key: 'ichimoku-chikou', default: 'rgb(67, 160, 71)' },
+    { type: 'color', key: 'ichimoku-senkouA', default: 'rgb(165 214 167)' },
+    { type: 'color', key: 'ichimoku-senkouB', default: 'rgb(250 161 164)' },
+    { type: 'color', key: 'ichimoku-cloudBull', default: 'rgb(76 175 80 / 50%)' },
+    { type: 'color', key: 'ichimoku-cloudBear', default: 'rgb(242 54 69 / 50%)' }
   ]
 } as const satisfies StudySchema
 
-type IchimokuParams = InferStudyValues<typeof ICHIMOKU_SCHEMA.inputs> & InferStudyValues<typeof ICHIMOKU_SCHEMA.style>
+type IchimokuParams = InferStudyValues<typeof ICHIMOKU_SCHEMA.inputs> &
+  InferStudyValues<typeof ICHIMOKU_SCHEMA.style> &
+  InferStudyValues<typeof ICHIMOKU_SCHEMA.text>
 
 export class IchimokuCloud extends AbstractIndicator implements Indicator {
   static readonly ikey = 'ichimoku' as const
@@ -51,33 +54,38 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(ICHIMOKU_SCHEMA.inputs, ICHIMOKU_SCHEMA.style, options.params)
-    this.#fill = new IchimokuCloudFill(this.#params.cloudBull, this.#params.cloudBear)
+    this.#params = resolveStudyParams(
+      ICHIMOKU_SCHEMA.inputs,
+      ICHIMOKU_SCHEMA.style,
+      ICHIMOKU_SCHEMA.text,
+      options.params
+    )
+    this.#fill = new IchimokuCloudFill(this.#params['ichimoku-cloudBull'], this.#params['ichimoku-cloudBear'])
 
     this.#series = {
       tenkan: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.tenkan, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['ichimoku-tenkan'], priceLineVisible: false },
         this.paneIndex
       ),
       kijun: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.kijun, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['ichimoku-kijun'], priceLineVisible: false },
         this.paneIndex
       ),
       senkouA: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.senkouA, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['ichimoku-senkouA'], priceLineVisible: false },
         this.paneIndex
       ),
       senkouB: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.senkouB, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['ichimoku-senkouB'], priceLineVisible: false },
         this.paneIndex
       ),
       chikou: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.chikou, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['ichimoku-chikou'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -94,21 +102,28 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ICHIMOKU_SCHEMA.inputs, ICHIMOKU_SCHEMA.style, params)
-    this.#series.tenkan.applyOptions({ color: this.#params.tenkan })
-    this.#series.kijun.applyOptions({ color: this.#params.kijun })
-    this.#series.senkouA.applyOptions({ color: this.#params.senkouA })
-    this.#series.senkouB.applyOptions({ color: this.#params.senkouB })
-    this.#series.chikou.applyOptions({ color: this.#params.chikou })
-    this.#fill.bull = this.#params.cloudBull
-    this.#fill.bear = this.#params.cloudBear
+    this.#params = resolveStudyParams(ICHIMOKU_SCHEMA.inputs, ICHIMOKU_SCHEMA.style, ICHIMOKU_SCHEMA.text, params)
+    this.#series.tenkan.applyOptions({ color: this.#params['ichimoku-tenkan'] })
+    this.#series.kijun.applyOptions({ color: this.#params['ichimoku-kijun'] })
+    this.#series.senkouA.applyOptions({ color: this.#params['ichimoku-senkouA'] })
+    this.#series.senkouB.applyOptions({ color: this.#params['ichimoku-senkouB'] })
+    this.#series.chikou.applyOptions({ color: this.#params['ichimoku-chikou'] })
+    this.#fill.bull = this.#params['ichimoku-cloudBull']
+    this.#fill.bear = this.#params['ichimoku-cloudBear']
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'ICHIMOKU', paneIndex: this.paneIndex, data: [] }
+    legend.data.push(
+      { value: this.#params['ichimoku-conversionPeriods'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['ichimoku-basePeriods'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['ichimoku-leadingSpanPeriods'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['ichimoku-laggingSpanPeriods'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['ichimoku-leadingShiftPeriods'].toString(), color: 'rgb(140, 140, 140)' }
+    )
     const entries = [
-      [this.#series.tenkan, this.#params.tenkan],
-      [this.#series.kijun, this.#params.kijun]
+      [this.#series.tenkan, this.#params['ichimoku-tenkan']],
+      [this.#series.kijun, this.#params['ichimoku-kijun']]
     ] as const
 
     for (const [series, color] of entries) {
@@ -119,12 +134,12 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
     const chikouData = seriesData.get(this.#series.chikou)
     const chikouValue = (chikouData as LineData<Time>)?.value ?? this.#lastChikou
     if (!isNaN(chikouValue)) {
-      legend.data.push({ value: formatPrice(chikouValue), color: this.#params.chikou })
+      legend.data.push({ value: formatPrice(chikouValue), color: this.#params['ichimoku-chikou'] })
     }
 
     const spanEntries = [
-      [this.#series.senkouA, this.#params.senkouA],
-      [this.#series.senkouB, this.#params.senkouB]
+      [this.#series.senkouA, this.#params['ichimoku-senkouA']],
+      [this.#series.senkouB, this.#params['ichimoku-senkouB']]
     ] as const
 
     for (const [series, color] of spanEntries) {
@@ -157,12 +172,12 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const displacement = this.#params.leadingShiftPeriods - 1
+    const displacement = this.#params['ichimoku-leadingShiftPeriods'] - 1
     const [tenkan, kijun, senkouA, senkouB] = ta.ichimoku(
       bars,
-      this.#params.conversionPeriods,
-      this.#params.basePeriods,
-      this.#params.leadingSpanPeriods,
+      this.#params['ichimoku-conversionPeriods'],
+      this.#params['ichimoku-basePeriods'],
+      this.#params['ichimoku-leadingSpanPeriods'],
       displacement
     )
 
@@ -171,7 +186,7 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
     const senkouAArr = senkouA.toArray()
     const senkouBArr = senkouB.toArray()
 
-    const d = this.#params.laggingSpanPeriods
+    const d = this.#params['ichimoku-laggingSpanPeriods']
     const chikouArr = bars.map((_, i) => {
       const src = i + d
       return src < bars.length ? bars[src].close : NaN
@@ -184,7 +199,7 @@ export class IchimokuCloud extends AbstractIndicator implements Indicator {
 
     const futureSenkouA: LineData<Time>[] = []
     const futureSenkouB: LineData<Time>[] = []
-    const spanLen = this.#params.leadingSpanPeriods
+    const spanLen = this.#params['ichimoku-leadingSpanPeriods']
 
     for (let j = 1; j <= displacement; j++) {
       const futureTime = ((bars[bars.length - 1].time as number) + barInterval * j) as Time

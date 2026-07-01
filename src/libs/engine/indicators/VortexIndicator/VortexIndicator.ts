@@ -10,14 +10,17 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const VI_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', default: 14, min: 2 }],
+  text: [],
+  inputs: [{ type: 'number', key: 'vi-length', default: 14, min: 2 }],
   style: [
-    { type: 'color', key: 'viPlus', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'viMinus', default: 'rgb(239 83 80)' }
+    { type: 'color', key: 'vi-viPlus', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'vi-viMinus', default: 'rgb(239 83 80)' }
   ]
 } as const satisfies StudySchema
 
-type VIParams = InferStudyValues<typeof VI_SCHEMA.inputs> & InferStudyValues<typeof VI_SCHEMA.style>
+type VIParams = InferStudyValues<typeof VI_SCHEMA.inputs> &
+  InferStudyValues<typeof VI_SCHEMA.style> &
+  InferStudyValues<typeof VI_SCHEMA.text>
 
 export class VortexIndicator extends AbstractIndicator implements Indicator {
   static readonly ikey = 'vi' as const
@@ -34,17 +37,17 @@ export class VortexIndicator extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(VI_SCHEMA.inputs, VI_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(VI_SCHEMA.inputs, VI_SCHEMA.style, VI_SCHEMA.text, options?.params)
 
     this.#series = {
       viPlus: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.viPlus, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['vi-viPlus'], priceLineVisible: false },
         this.paneIndex
       ),
       viMinus: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.viMinus, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['vi-viMinus'], priceLineVisible: false },
         this.paneIndex
       ),
       midLine: this.#chart.addSeries(
@@ -71,16 +74,17 @@ export class VortexIndicator extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(VI_SCHEMA.inputs, VI_SCHEMA.style, params)
-    this.#series.viPlus.applyOptions({ color: this.#params.viPlus })
-    this.#series.viMinus.applyOptions({ color: this.#params.viMinus })
+    this.#params = resolveStudyParams(VI_SCHEMA.inputs, VI_SCHEMA.style, VI_SCHEMA.text, params)
+    this.#series.viPlus.applyOptions({ color: this.#params['vi-viPlus'] })
+    this.#series.viMinus.applyOptions({ color: this.#params['vi-viMinus'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'VI', paneIndex: this.paneIndex, data: [] }
+    legend.data.push({ value: this.#params['vi-length'].toString(), color: 'rgb(140, 140, 140)' })
     const entries = [
-      [this.#series.viPlus, this.#params.viPlus],
-      [this.#series.viMinus, this.#params.viMinus]
+      [this.#series.viPlus, this.#params['vi-viPlus']],
+      [this.#series.viMinus, this.#params['vi-viMinus']]
     ] as const
     for (const [series, color] of entries) {
       const data = seriesData.get(series)
@@ -109,7 +113,7 @@ export class VortexIndicator extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const len = this.#params.length
+    const len = this.#params['vi-length']
     const n = bars.length
     const tr = new Array<number>(n).fill(NaN)
     const vmPlus = new Array<number>(n).fill(NaN)

@@ -11,11 +11,19 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const CCI_SCHEMA = {
-  inputs: [{ type: 'number', key: 'length', default: 20, min: 1 }],
-  style: [{ type: 'color', key: 'color', default: 'rgb(126 87 194)' }]
+  text: [],
+  inputs: [{ type: 'number', key: 'cci-length', default: 20, min: 1, max: 9999 }],
+  style: [
+    { type: 'color', key: 'cci-color', default: 'rgb(126 87 194)' },
+    { type: 'number', key: 'cci-upperLimit', default: 100, min: -9999, max: 9999 },
+    { type: 'number', key: 'cci-lowerLimit', default: -100, min: -9999, max: 9999 },
+    { type: 'color', key: 'cci-fill-color', default: 'rgb(41 98 255 / 10%)' }
+  ]
 } as const satisfies StudySchema
 
-type CCIParams = InferStudyValues<typeof CCI_SCHEMA.inputs> & InferStudyValues<typeof CCI_SCHEMA.style>
+type CCIParams = InferStudyValues<typeof CCI_SCHEMA.inputs> &
+  InferStudyValues<typeof CCI_SCHEMA.style> &
+  InferStudyValues<typeof CCI_SCHEMA.text>
 
 export class CCI extends AbstractIndicator implements Indicator {
   static readonly ikey = 'cci' as const
@@ -33,12 +41,12 @@ export class CCI extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(CCI_SCHEMA.inputs, CCI_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(CCI_SCHEMA.inputs, CCI_SCHEMA.style, CCI_SCHEMA.text, options?.params)
 
     this.#series = {
       cci: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['cci-color'], priceLineVisible: false },
         this.paneIndex
       ),
       upperLine: this.#chart.addSeries(
@@ -68,9 +76,9 @@ export class CCI extends AbstractIndicator implements Indicator {
       fill: this.#chart.addSeries(
         BaselineSeries,
         {
-          baseValue: { type: 'price', price: -100 },
-          topFillColor1: 'rgba(126,87,194,0.1)',
-          topFillColor2: 'rgba(126,87,194,0.1)',
+          baseValue: { type: 'price', price: this.#params['cci-lowerLimit'] },
+          topFillColor1: this.#params['cci-fill-color'],
+          topFillColor2: this.#params['cci-fill-color'],
           bottomFillColor1: 'transparent',
           bottomFillColor2: 'transparent',
           topLineColor: 'transparent',
@@ -94,15 +102,21 @@ export class CCI extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(CCI_SCHEMA.inputs, CCI_SCHEMA.style, params)
-    this.#series.cci.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(CCI_SCHEMA.inputs, CCI_SCHEMA.style, CCI_SCHEMA.text, params)
+    this.#series.cci.applyOptions({ color: this.#params['cci-color'] })
+    this.#series.fill.applyOptions({
+      topFillColor1: this.#params['cci-fill-color'],
+      topFillColor2: this.#params['cci-fill-color'],
+      baseValue: { type: 'price', price: this.#params['cci-lowerLimit'] }
+    })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'CCI', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.cci)
+    legend.data.push({ value: this.#params['cci-length'].toString(), color: 'rgb(140, 140, 140)' })
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params.color })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['cci-color'] })
     }
     return legend
   }
@@ -113,16 +127,16 @@ export class CCI extends AbstractIndicator implements Indicator {
     const lastTime = data[data.length - 1].time
 
     this.#series.upperLine.setData([
-      { time: firstTime, value: 100 },
-      { time: lastTime, value: 100 }
+      { time: firstTime, value: this.#params['cci-upperLimit'] },
+      { time: lastTime, value: this.#params['cci-upperLimit'] }
     ])
     this.#series.lowerLine.setData([
-      { time: firstTime, value: -100 },
-      { time: lastTime, value: -100 }
+      { time: firstTime, value: this.#params['cci-lowerLimit'] },
+      { time: lastTime, value: this.#params['cci-lowerLimit'] }
     ])
     this.#series.fill.setData([
-      { time: firstTime, value: 100 },
-      { time: lastTime, value: 100 }
+      { time: firstTime, value: this.#params['cci-upperLimit'] },
+      { time: lastTime, value: this.#params['cci-upperLimit'] }
     ])
     this.#series.cci.setData(cciData)
   }
@@ -136,7 +150,7 @@ export class CCI extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const typical = new Series(bars, (b) => (b.high + b.low + b.close) / 3)
-    const values = ta.cci(typical, this.#params.length).toArray()
+    const values = ta.cci(typical, this.#params['cci-length']).toArray()
 
     return this.filter(values.map((value, i) => ({ time: bars[i].time, value: value ?? NaN })))
   }

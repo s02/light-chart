@@ -11,14 +11,17 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const BBB_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'length', default: 20, min: 1 },
-    { type: 'number', key: 'mul', default: 2, min: 1, step: 1 }
+    { type: 'number', key: 'bbb-length', default: 20, min: 1 },
+    { type: 'number', key: 'bbb-mul', default: 2, min: 1, step: 1 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(126 87 194)' }]
+  style: [{ type: 'color', key: 'bbb-color', default: 'rgb(126 87 194)' }]
 } as const satisfies StudySchema
 
-type BBBParams = InferStudyValues<typeof BBB_SCHEMA.inputs> & InferStudyValues<typeof BBB_SCHEMA.style>
+type BBBParams = InferStudyValues<typeof BBB_SCHEMA.inputs> &
+  InferStudyValues<typeof BBB_SCHEMA.style> &
+  InferStudyValues<typeof BBB_SCHEMA.text>
 
 const REF_LINE_OPTIONS = {
   color: '#787B86',
@@ -45,12 +48,12 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(BBB_SCHEMA.inputs, BBB_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(BBB_SCHEMA.inputs, BBB_SCHEMA.style, BBB_SCHEMA.text, options?.params)
 
     this.#series = {
       b: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['bbb-color'], priceLineVisible: false },
         this.paneIndex
       ),
       upperLine: this.#chart.addSeries(LineSeries, REF_LINE_OPTIONS, this.paneIndex),
@@ -84,15 +87,19 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(BBB_SCHEMA.inputs, BBB_SCHEMA.style, params)
-    this.#series.b.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(BBB_SCHEMA.inputs, BBB_SCHEMA.style, BBB_SCHEMA.text, params)
+    this.#series.b.applyOptions({ color: this.#params['bbb-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'BB %B', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.b)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
-    legend.data.push({ value, color: this.#params.color })
+    legend.data.push(
+      { value: this.#params['bbb-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['bbb-mul'].toString(), color: 'rgb(140, 140, 140)' }
+    )
+    legend.data.push({ value, color: this.#params['bbb-color'] })
     return legend
   }
 
@@ -125,8 +132,8 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const basis = ta.sma(source, this.#params.length)
-    const dev = ta.stdev(source, this.#params.length).mul(this.#params.mul)
+    const basis = ta.sma(source, this.#params['bbb-length'])
+    const dev = ta.stdev(source, this.#params['bbb-length']).mul(this.#params['bbb-mul'])
     const upper = basis.add(dev)
     const lower = basis.sub(dev)
 

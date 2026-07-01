@@ -13,14 +13,17 @@ import { calculateZigZag } from 'oakscriptjs'
 import type { SeriesLegend } from '@engine/series'
 
 const ZZ_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'deviation', default: 0.001, min: 0 },
-    { type: 'number', key: 'depth', default: 10, min: 1 }
+    { type: 'number', key: 'zigzag-deviation', default: 0.001, min: 0, max: 9999 },
+    { type: 'number', key: 'zigzag-depth', default: 10, min: 1, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(33 150 243)' }]
+  style: [{ type: 'color', key: 'zigzag-color', default: 'rgb(33 150 243)' }]
 } as const satisfies StudySchema
 
-type ZZParams = InferStudyValues<typeof ZZ_SCHEMA.inputs> & InferStudyValues<typeof ZZ_SCHEMA.style>
+type ZZParams = InferStudyValues<typeof ZZ_SCHEMA.inputs> &
+  InferStudyValues<typeof ZZ_SCHEMA.style> &
+  InferStudyValues<typeof ZZ_SCHEMA.text>
 
 export class ZigZag extends AbstractIndicator implements Indicator {
   static readonly ikey = 'zigzag' as const
@@ -33,8 +36,8 @@ export class ZigZag extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(ZZ_SCHEMA.inputs, ZZ_SCHEMA.style, options?.params)
-    this.#primitive = new ZigZagPrimitive(this.#params.color)
+    this.#params = resolveStudyParams(ZZ_SCHEMA.inputs, ZZ_SCHEMA.style, ZZ_SCHEMA.text, options?.params)
+    this.#primitive = new ZigZagPrimitive(this.#params['zigzag-color'])
 
     this.#series = this.#chart.addSeries(
       LineSeries,
@@ -60,8 +63,8 @@ export class ZigZag extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ZZ_SCHEMA.inputs, ZZ_SCHEMA.style, params)
-    this.#primitive.setColor(this.#params.color)
+    this.#params = resolveStudyParams(ZZ_SCHEMA.inputs, ZZ_SCHEMA.style, ZZ_SCHEMA.text, params)
+    this.#primitive.setColor(this.#params['zigzag-color'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -72,11 +75,15 @@ export class ZigZag extends AbstractIndicator implements Indicator {
     }
 
     const data = seriesData.get(this.#series) as LineData<Time> | undefined
+    legend.data.push(
+      { value: this.#params['zigzag-deviation'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['zigzag-depth'].toString(), color: 'rgb(140, 140, 140)' }
+    )
 
     if (data) {
-      legend.data.push({ value: formatPrice(data.value), color: this.#params.color })
+      legend.data.push({ value: formatPrice(data.value), color: this.#params['zigzag-color'] })
     } else {
-      legend.data.push({ value: '∅', color: this.#params.color })
+      legend.data.push({ value: '∅', color: this.#params['zigzag-color'] })
     }
 
     return legend
@@ -94,8 +101,8 @@ export class ZigZag extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const result = calculateZigZag(bars, {
-      devThreshold: this.#params.deviation,
-      depth: this.#params.depth,
+      devThreshold: this.#params['zigzag-deviation'],
+      depth: this.#params['zigzag-depth'],
       extendLast: false
     })
 

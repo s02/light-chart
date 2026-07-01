@@ -4,7 +4,7 @@ import TerminalChart from '@chart/TerminalChart.vue'
 import { useChart } from './useChart'
 import { useQuoteHandler, useTrading } from './useTrading'
 import { datafeedFactory } from './datafeedFactory'
-import { dateToEpoch } from '@chart/helpers'
+import { helpers } from '@chart/helpers'
 import BuyButton from './components/BuyButton.vue'
 import ExpirationMenu from './components/ExpirationMenu.vue'
 import type { TerminalChartConfig } from '@chart/types'
@@ -17,8 +17,8 @@ useQuoteHandler(toRef(() => chartState.value.assetSymbol.id))
 const chartOptions = computed(() =>
   options.value.map((option) => ({
     ...option,
-    createdAt: dateToEpoch(option.createdAt),
-    expirationDate: dateToEpoch(option.expirationDate)
+    createdAt: helpers.dateToEpoch(option.createdAt),
+    expirationDate: helpers.dateToEpoch(option.expirationDate)
   }))
 )
 

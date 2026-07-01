@@ -11,14 +11,17 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const DPO_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'length', default: 21, min: 1 },
-    { type: 'select', key: 'mode', default: 'Non-centered', values: ['Non-centered', 'Centered'] }
+    { type: 'number', key: 'dpo-length', default: 21, min: 1 },
+    { type: 'select', key: 'dpo-mode', default: 'Non-centered', values: ['Non-centered', 'Centered'] }
   ],
-  style: [{ type: 'color', key: 'color', default: 'rgb(126 87 194)' }]
+  style: [{ type: 'color', key: 'dpo-color', default: 'rgb(126 87 194)' }]
 } as const satisfies StudySchema
 
-type DPOParams = InferStudyValues<typeof DPO_SCHEMA.inputs> & InferStudyValues<typeof DPO_SCHEMA.style>
+type DPOParams = InferStudyValues<typeof DPO_SCHEMA.inputs> &
+  InferStudyValues<typeof DPO_SCHEMA.style> &
+  InferStudyValues<typeof DPO_SCHEMA.text>
 
 export class DPO extends AbstractIndicator implements Indicator {
   static readonly ikey = 'dpo' as const
@@ -34,12 +37,12 @@ export class DPO extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(DPO_SCHEMA.inputs, DPO_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(DPO_SCHEMA.inputs, DPO_SCHEMA.style, DPO_SCHEMA.text, options?.params)
 
     this.#series = {
       dpo: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params.color, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['dpo-color'], priceLineVisible: false },
         this.paneIndex
       ),
       zeroLine: this.#chart.addSeries(
@@ -66,15 +69,19 @@ export class DPO extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(DPO_SCHEMA.inputs, DPO_SCHEMA.style, params)
-    this.#series.dpo.applyOptions({ color: this.#params.color })
+    this.#params = resolveStudyParams(DPO_SCHEMA.inputs, DPO_SCHEMA.style, DPO_SCHEMA.text, params)
+    this.#series.dpo.applyOptions({ color: this.#params['dpo-color'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'DPO', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.dpo)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
-    legend.data.push({ value, color: this.#params.color })
+    legend.data.push(
+      { value: this.#params['dpo-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['dpo-mode'].toString(), color: 'rgb(140, 140, 140)' }
+    )
+    legend.data.push({ value, color: this.#params['dpo-color'] })
     return legend
   }
 
@@ -96,7 +103,8 @@ export class DPO extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const { length, mode } = this.#params
+    const length = this.#params['dpo-length']
+    const mode = this.#params['dpo-mode']
     const offset = Math.floor(length / 2) + 1
     const source = getSourceSeries(bars, 'close')
     const smaArr = ta.sma(source, length).toArray()

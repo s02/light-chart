@@ -11,14 +11,17 @@ import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
 const ADX_SCHEMA = {
+  text: [],
   inputs: [
-    { type: 'number', key: 'adxSmoothing', default: 14, min: 1 },
-    { type: 'number', key: 'diLength', default: 14, min: 1 }
+    { type: 'number', key: 'adx-adxSmoothing', default: 14, min: 1 },
+    { type: 'number', key: 'adx-diLength', default: 14, min: 1 }
   ],
-  style: [{ type: 'color', key: 'adxColor', default: 'rgb(126 87 194)' }]
+  style: [{ type: 'color', key: 'adx-adxColor', default: 'rgb(126 87 194)' }]
 } as const satisfies StudySchema
 
-type ADXParams = InferStudyValues<typeof ADX_SCHEMA.inputs> & InferStudyValues<typeof ADX_SCHEMA.style>
+type ADXParams = InferStudyValues<typeof ADX_SCHEMA.inputs> &
+  InferStudyValues<typeof ADX_SCHEMA.style> &
+  InferStudyValues<typeof ADX_SCHEMA.text>
 
 export class ADX extends AbstractIndicator implements Indicator {
   static readonly ikey = 'adx' as const
@@ -33,12 +36,12 @@ export class ADX extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(ADX_SCHEMA.inputs, ADX_SCHEMA.style, options?.params)
+    this.#params = resolveStudyParams(ADX_SCHEMA.inputs, ADX_SCHEMA.style, ADX_SCHEMA.text, options?.params)
 
     this.#series = {
       adx: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 2, color: this.#params.adxColor, priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, lineWidth: 2, color: this.#params['adx-adxColor'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -53,13 +56,17 @@ export class ADX extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ADX_SCHEMA.inputs, ADX_SCHEMA.style, params)
-    this.#series.adx.applyOptions({ color: this.#params.adxColor })
+    this.#params = resolveStudyParams(ADX_SCHEMA.inputs, ADX_SCHEMA.style, ADX_SCHEMA.text, params)
+    this.#series.adx.applyOptions({ color: this.#params['adx-adxColor'] })
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'ADX', paneIndex: this.paneIndex, data: [] }
-    const entries = [[this.#series.adx, 'ADX', this.#params.adxColor]] as const
+    legend.data.push(
+      { value: this.#params['adx-adxSmoothing'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['adx-diLength'].toString(), color: 'rgb(140, 140, 140)' }
+    )
+    const entries = [[this.#series.adx, 'ADX', this.#params['adx-adxColor']]] as const
     for (const [series, , color] of entries) {
       const data = seriesData.get(series)
       const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
@@ -79,7 +86,8 @@ export class ADX extends AbstractIndicator implements Indicator {
   }
 
   #calculate(bars: ChartBar[]) {
-    const { diLength, adxSmoothing } = this.#params
+    const diLength = this.#params['adx-diLength']
+    const adxSmoothing = this.#params['adx-adxSmoothing']
 
     const smoothedTRArr = ta.rma(ta.tr(bars), diLength).toArray()
 
