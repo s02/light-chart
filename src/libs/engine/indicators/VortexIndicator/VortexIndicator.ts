@@ -11,7 +11,7 @@ import type { SeriesLegend } from '@engine/series'
 
 const VI_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'vi-length', default: 14, min: 2 }],
+  inputs: [{ type: 'number', key: 'vi-length', default: 14, min: 2, max: 9999 }],
   style: [
     { type: 'color', key: 'vi-viPlus', default: 'rgb(41 98 255)' },
     { type: 'color', key: 'vi-viMinus', default: 'rgb(239 83 80)' }

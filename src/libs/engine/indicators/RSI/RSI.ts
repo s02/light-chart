@@ -12,14 +12,12 @@ import type { SeriesLegend } from '@engine/series'
 
 const RSI_SCHEMA = {
   text: [],
-  inputs: [
-    { type: 'number', key: 'rsi-length', default: 14, min: 1, max: 9999 },
-    { type: 'number', key: 'rsi-upperLimit', default: 70, min: 1, max: 99 },
-    { type: 'number', key: 'rsi-middleLimit', default: 50, min: 1, max: 99 },
-    { type: 'number', key: 'rsi-lowerLimit', default: 30, min: 1, max: 99 }
-  ],
+  inputs: [{ type: 'number', key: 'rsi-length', default: 14, min: 1, max: 9999 }],
   style: [
     { type: 'color', key: 'rsi-color', default: 'rgb(126 87 194)' },
+    { type: 'number', key: 'rsi-upperLimit', default: 70, min: 1, max: 99 },
+    { type: 'number', key: 'rsi-middleLimit', default: 50, min: 1, max: 99 },
+    { type: 'number', key: 'rsi-lowerLimit', default: 30, min: 1, max: 99 },
     { type: 'color', key: 'rsi-fill-color', default: 'rgb(41 98 255 / 10%)' }
   ]
 } as const satisfies StudySchema

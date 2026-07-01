@@ -11,7 +11,7 @@ import type { SeriesLegend } from '@engine/series'
 
 const MOM_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'mom-length', default: 10, min: 1 }],
+  inputs: [{ type: 'number', key: 'mom-length', default: 10, min: 1, max: 9999 }],
   style: [{ type: 'color', key: 'mom-color', default: 'rgb(126 87 194)' }]
 } as const satisfies StudySchema
 
@@ -74,6 +74,7 @@ export class Momentum extends AbstractIndicator implements Indicator {
     const data = seriesData.get(this.#series.mom)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
     legend.data.push({ value: this.#params['mom-length'].toString(), color: 'rgb(140, 140, 140)' })
+    legend.data.push({ value: 'close', color: 'rgb(140, 140, 140)' })
     legend.data.push({ value, color: this.#params['mom-color'] })
     return legend
   }

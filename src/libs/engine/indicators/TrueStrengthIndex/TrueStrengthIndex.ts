@@ -13,13 +13,14 @@ import type { SeriesLegend } from '@engine/series'
 const TSI_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'true-si-long', default: 25, min: 1 },
-    { type: 'number', key: 'true-si-short', default: 13, min: 1 },
-    { type: 'number', key: 'true-si-signal', default: 13, min: 1 }
+    { type: 'number', key: 'true-si-long', default: 25, min: 1, max: 9999 },
+    { type: 'number', key: 'true-si-short', default: 13, min: 1, max: 9999 },
+    { type: 'number', key: 'true-si-signal', default: 13, min: 1, max: 9999 }
   ],
   style: [
     { type: 'color', key: 'true-si-tsiLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'true-si-signalLine', default: 'rgb(255 109 0)' }
+    { type: 'color', key: 'true-si-signalLine', default: 'rgb(255 109 0)' },
+    { type: 'number', key: 'true-si-zero', default: 0, min: -9999, max: 9999 }
   ]
 } as const satisfies StudySchema
 
@@ -108,8 +109,8 @@ export class TrueStrengthIndex extends AbstractIndicator implements Indicator {
     const lastTime = data[data.length - 1].time
 
     this.#series.zeroLine.setData([
-      { time: firstTime, value: 0 },
-      { time: lastTime, value: 0 }
+      { time: firstTime, value: this.#params['true-si-zero'] },
+      { time: lastTime, value: this.#params['true-si-zero'] }
     ])
     this.#series.tsi.setData(tsiData)
     this.#series.signal.setData(signalData)

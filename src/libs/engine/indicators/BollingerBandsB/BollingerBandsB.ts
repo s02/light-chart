@@ -13,10 +13,15 @@ import type { SeriesLegend } from '@engine/series'
 const BBB_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'bbb-length', default: 20, min: 1 },
-    { type: 'number', key: 'bbb-mul', default: 2, min: 1, step: 1 }
+    { type: 'number', key: 'bbb-length', default: 20, min: 1, max: 9999 },
+    { type: 'number', key: 'bbb-mul', default: 2, min: 1, step: 1, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'bbb-color', default: 'rgb(126 87 194)' }]
+  style: [
+    { type: 'color', key: 'bbb-color', default: 'rgb(126 87 194)' },
+    { type: 'number', key: 'bbb-upperLimit', default: 1, min: -9999, max: 9999 },
+    { type: 'number', key: 'bbb-lowerLimit', default: 0, min: -9999, max: 9999 },
+    { type: 'color', key: 'bbb-fill-color', default: 'rgb(41 98 255 / 10%)' }
+  ]
 } as const satisfies StudySchema
 
 type BBBParams = InferStudyValues<typeof BBB_SCHEMA.inputs> &
@@ -61,9 +66,9 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
       fill: this.#chart.addSeries(
         BaselineSeries,
         {
-          baseValue: { type: 'price', price: 0 },
-          topFillColor1: 'rgba(41,98,255,0.1)',
-          topFillColor2: 'rgba(41,98,255,0.1)',
+          baseValue: { type: 'price', price: this.#params['bbb-lowerLimit'] },
+          topFillColor1: this.#params['bbb-fill-color'],
+          topFillColor2: this.#params['bbb-fill-color'],
           bottomFillColor1: 'transparent',
           bottomFillColor2: 'transparent',
           topLineColor: 'transparent',
@@ -89,6 +94,12 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(BBB_SCHEMA.inputs, BBB_SCHEMA.style, BBB_SCHEMA.text, params)
     this.#series.b.applyOptions({ color: this.#params['bbb-color'] })
+
+    this.#series.fill.applyOptions({
+      topFillColor1: this.#params['bbb-fill-color'],
+      topFillColor2: this.#params['bbb-fill-color'],
+      baseValue: { type: 'price', price: this.#params['bbb-lowerLimit'] }
+    })
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -109,17 +120,17 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
     const lastTime = data[data.length - 1].time
 
     this.#series.upperLine.setData([
-      { time: firstTime, value: 1 },
-      { time: lastTime, value: 1 }
+      { time: firstTime, value: this.#params['bbb-upperLimit'] },
+      { time: lastTime, value: this.#params['bbb-upperLimit'] }
     ])
     this.#series.lowerLine.setData([
-      { time: firstTime, value: 0 },
-      { time: lastTime, value: 0 }
+      { time: firstTime, value: this.#params['bbb-lowerLimit'] },
+      { time: lastTime, value: this.#params['bbb-lowerLimit'] }
     ])
     this.#series.b.setData(bData)
     this.#series.fill.setData([
-      { time: firstTime, value: 1 },
-      { time: lastTime, value: 1 }
+      { time: firstTime, value: this.#params['bbb-upperLimit'] },
+      { time: lastTime, value: this.#params['bbb-upperLimit'] }
     ])
   }
 

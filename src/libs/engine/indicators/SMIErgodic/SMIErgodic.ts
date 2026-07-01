@@ -13,9 +13,9 @@ import type { SeriesLegend } from '@engine/series'
 const SMI_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'smiio-fast', default: 5, min: 1 },
-    { type: 'number', key: 'smiio-slow', default: 20, min: 1 },
-    { type: 'number', key: 'smiio-signal', default: 5, min: 1 }
+    { type: 'number', key: 'smiio-fast', default: 5, min: 1, max: 9999 },
+    { type: 'number', key: 'smiio-slow', default: 20, min: 1, max: 9999 },
+    { type: 'number', key: 'smiio-signal', default: 5, min: 1, max: 9999 }
   ],
   style: [
     { type: 'color', key: 'smiio-ergodicLine', default: 'rgb(41 98 255)' },

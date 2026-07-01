@@ -416,5 +416,45 @@
   "study-prop-cci-color": "Plot",
   "study-prop-cci-upperLimit": "Upper Limit",
   "study-prop-cci-lowerLimit": "Lower Limit",
-  "study-prop-cci-fill-color": "Hlines Background"
+  "study-prop-cci-fill-color": "Hlines Background",
+
+  "study-true-si": "True Strength Index",
+  "study-prop-true-si-long": "Long",
+  "study-prop-true-si-short": "Short",
+  "study-prop-true-si-signal": "SigLen",
+  "study-prop-true-si-tsiLine": "True Strength Index",
+  "study-prop-true-si-signalLine": "Signal",
+  "study-prop-true-si-zero": "Zero",
+
+  "study-atr": "Average True Range",
+  "study-prop-atr-length": "Length",
+  "study-prop-atr-color": "Plot",
+
+  "study-vi": "Vortex Indicator",
+  "study-prop-vi-length": "Length",
+  "study-prop-vi-viPlus": "VI +",
+  "study-prop-vi-viMinus": "VI -",
+
+  "study-smiio": "SMI Ergodic Indicator/Oscillator",
+  "study-prop-smiio-fast": "ShortLen",
+  "study-prop-smiio-slow": "LongLen",
+  "study-prop-smiio-signal": "SigLen",
+  "study-prop-smiio-ergodicLine": "Indicator",
+  "study-prop-smiio-signalLine": "Signal",
+  "study-prop-smiio-hist": "Oscillator",
+
+  "study-bop": "Balance of Power",
+  "study-prop-bop-color": "Plot",
+
+  "study-mom": "Momentum",
+  "study-prop-mom-length": "Length",
+  "study-prop-mom-color": "Plot",
+
+  "study-bbb": "Bollinger Bands %B",
+  "study-prop-bbb-length": "Length",
+  "study-prop-bbb-mul": "Mult",
+  "study-prop-bbb-color": "Plot",
+  "study-prop-bbb-upperLimit": "Upper Limit",
+  "study-prop-bbb-lowerLimit": "Lower Limit",
+  "study-prop-bbb-fill-color": "Hlines Background"
 }

@@ -21,12 +21,12 @@ const KST_SCHEMA = {
     { type: 'number', key: 'kst-sma2', default: 10, min: 1, max: 9999 },
     { type: 'number', key: 'kst-sma3', default: 10, min: 1, max: 9999 },
     { type: 'number', key: 'kst-sma4', default: 15, min: 1, max: 9999 },
-    { type: 'number', key: 'kst-signal', default: 9, min: 1, max: 9999 },
-    { type: 'number', key: 'kst-zero', default: 0, min: 0, max: 9999 }
+    { type: 'number', key: 'kst-signal', default: 9, min: 1, max: 9999 }
   ],
   style: [
     { type: 'color', key: 'kst-kstLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'kst-signalLine', default: 'rgb(255 109 0)' }
+    { type: 'color', key: 'kst-signalLine', default: 'rgb(255 109 0)' },
+    { type: 'number', key: 'kst-zero', default: 0, min: -9999, max: 9999 }
   ]
 } as const satisfies StudySchema
 

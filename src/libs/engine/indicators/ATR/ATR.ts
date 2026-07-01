@@ -12,7 +12,7 @@ import type { SeriesLegend } from '@engine/series'
 
 const ATR_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'atr-length', default: 14, min: 1 }],
+  inputs: [{ type: 'number', key: 'atr-length', default: 14, min: 1, max: 9999 }],
   style: [{ type: 'color', key: 'atr-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
 
