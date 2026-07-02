@@ -54,7 +54,10 @@ const availableSettings = computed(() => {
 
 const hasSettings = computed(
   () =>
-    availableSettings.value.inputs.length || availableSettings.value.text.length || availableSettings.value.style.length
+    (availableSettings.value.inputs.length ||
+      availableSettings.value.text.length ||
+      availableSettings.value.style.length) &&
+    drawingSchema.value?.ikey !== 'emoji'
 )
 
 onClickOutside(useTemplateRef('dws'), () => {
@@ -108,7 +111,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="drawingSchema && drawingSchema.ikey !== 'emoji'">
+  <div v-if="drawingSchema">
     <div ref="dws" class="drawing-settings" :class="{ hidden: isSettingsOpened }">
       <div class="drawing-settings-handle">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 12" width="8" height="12" fill="currentColor">
