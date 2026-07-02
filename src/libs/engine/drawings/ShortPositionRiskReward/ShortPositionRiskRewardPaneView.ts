@@ -31,11 +31,11 @@ export class ShortPositionRiskRewardPaneView extends RiskRewardPaneView implemen
     this.#anchors = anchors
     this.#withDots = withDots
 
-    this.targetPriceOffset = this.params['entry-price'] - this.params['target-price']
-    this.stopPriceOffset = this.params['stop-price'] - this.params['entry-price']
+    this.targetPriceOffset = this.params['rr-entry-price'] - this.params['rr-target-price']
+    this.stopPriceOffset = this.params['rr-stop-price'] - this.params['rr-entry-price']
 
     const closePrice = this.closePrice()
-    this.openPnl = closePrice ? this.params['entry-price'] - closePrice : 0
+    this.openPnl = closePrice ? this.params['rr-entry-price'] - closePrice : 0
   }
 
   renderer() {
@@ -52,26 +52,26 @@ export class ShortPositionRiskRewardPaneView extends RiskRewardPaneView implemen
 
     return new RiskRewardRenderers(
       new RwRectangleRenderer(p0, p1, p2, p3, this.#withDots, {
-        downColor: this.params['profit-fill'],
-        upColor: this.params['loss-fill']
+        downColor: this.params['rr-profit-fill'],
+        upColor: this.params['rr-loss-fill']
       }),
       new RwTextRenderer([this.stopText()], { x: centerX, y: p1.y - LABEL_GAP } as Point, {
         origin: 'bottom',
         color: `rgb(255 255 255)`,
-        fill: helpers.parseColor(this.params['loss-fill']).baseColor
+        fill: helpers.parseColor(this.params['rr-loss-fill']).baseColor
       }),
       new RwTextRenderer(this.pnlText(), { x: centerX, y: p0.y + LABEL_GAP } as Point, {
         color: `rgb(255 255 255)`,
         fill:
           this.pnl() > 0
-            ? helpers.parseColor(this.params['profit-fill']).baseColor
-            : helpers.parseColor(this.params['loss-fill']).baseColor,
+            ? helpers.parseColor(this.params['rr-profit-fill']).baseColor
+            : helpers.parseColor(this.params['rr-loss-fill']).baseColor,
         stroke: `rgb(255 255 255)`
       }),
 
       new RwTextRenderer([this.targetText()], { x: centerX, y: p2.y + LABEL_GAP } as Point, {
         color: `rgb(255 255 255)`,
-        fill: helpers.parseColor(this.params['profit-fill']).baseColor
+        fill: helpers.parseColor(this.params['rr-profit-fill']).baseColor
       })
     )
   }
@@ -79,14 +79,14 @@ export class ShortPositionRiskRewardPaneView extends RiskRewardPaneView implemen
   protected isStopPriceReached() {
     return this.barsInRange.some((bar) => {
       const val = this.barHighValue(bar)
-      return val && val >= this.params['stop-price']
+      return val && val >= this.params['rr-stop-price']
     })
   }
 
   protected isTargetPriceReached() {
     return this.barsInRange.some((bar) => {
       const val = this.barLowValue(bar)
-      return val && val <= this.params['target-price']
+      return val && val <= this.params['rr-target-price']
     })
   }
 }

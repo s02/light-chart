@@ -8,9 +8,9 @@ export class ShortPositionRiskReward extends RiskReward {
   override paneViews() {
     const viewport = this.getViewport()
     if (viewport && this.anchors.length === 4) {
-      this.params['entry-price'] = this.anchors[0].price
-      this.params['target-price'] = this.anchors[2].price
-      this.params['stop-price'] = this.anchors[1].price
+      this.params['rr-entry-price'] = this.anchors[0].price
+      this.params['rr-target-price'] = this.anchors[2].price
+      this.params['rr-stop-price'] = this.anchors[1].price
 
       return [
         new ShortPositionRiskRewardPaneView(
@@ -33,9 +33,9 @@ export class ShortPositionRiskReward extends RiskReward {
       params
     )
 
-    const anchor0 = this.updateAnchorPrice(this.anchors[0], this.params['entry-price'])
-    const anchor1 = this.updateAnchorPrice(this.anchors[1], this.params['target-price'])
-    const anchor2 = this.updateAnchorPrice(this.anchors[2], this.params['stop-price'])
+    const anchor0 = this.updateAnchorPrice(this.anchors[0], this.params['rr-entry-price'])
+    const anchor1 = this.updateAnchorPrice(this.anchors[1], this.params['rr-target-price'])
+    const anchor2 = this.updateAnchorPrice(this.anchors[2], this.params['rr-stop-price'])
 
     if (anchor0 && anchor1 && anchor2) {
       this.setAnchors([anchor0, anchor2, anchor1, this.anchors[3]])

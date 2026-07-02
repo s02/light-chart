@@ -16,23 +16,23 @@ export abstract class RiskRewardPaneView {
   }
 
   protected targetPriceOffsetPercents() {
-    return (this.targetPriceOffset / this.params['entry-price']) * 100
+    return (this.targetPriceOffset / this.params['rr-entry-price']) * 100
   }
 
   protected stopPriceOffsetPercents() {
-    return (this.stopPriceOffset / this.params['entry-price']) * 100
+    return (this.stopPriceOffset / this.params['rr-entry-price']) * 100
   }
 
   protected qtyRisk() {
-    return this.params['risk-size'] / Math.abs(this.stopPriceOffset) / this.params['lot-size']
+    return this.params['rr-risk-size'] / Math.abs(this.stopPriceOffset) / this.params['rr-lot-size']
   }
 
   protected targetAmount() {
-    return this.params['account-size'] + this.targetPriceOffset * this.qtyRisk() * this.params['lot-size']
+    return this.params['rr-account-size'] + this.targetPriceOffset * this.qtyRisk() * this.params['rr-lot-size']
   }
 
   protected stopAmount() {
-    return this.params['account-size'] - this.stopPriceOffset * this.qtyRisk() * this.params['lot-size']
+    return this.params['rr-account-size'] - this.stopPriceOffset * this.qtyRisk() * this.params['rr-lot-size']
   }
 
   protected riskRatio() {
@@ -59,11 +59,11 @@ export abstract class RiskRewardPaneView {
   }
 
   protected profitPnl() {
-    return this.targetPriceOffset * this.qtyRisk() * this.params['lot-size']
+    return this.targetPriceOffset * this.qtyRisk() * this.params['rr-lot-size']
   }
 
   protected lossPnl() {
-    return this.stopPriceOffset * this.qtyRisk() * this.params['lot-size']
+    return this.stopPriceOffset * this.qtyRisk() * this.params['rr-lot-size']
   }
 
   zOrder(): PrimitivePaneViewZOrder {

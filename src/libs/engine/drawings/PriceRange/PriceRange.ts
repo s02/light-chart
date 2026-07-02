@@ -13,11 +13,11 @@ const PRICE_RANGE_SCHEMA = {
     { type: 'color', key: 'line-color', default: 'rgb(76 175 80)', fastPanel: true },
     { type: 'color', key: 'fill-color', default: 'rgb(76 175 80 / 15%)', fastPanel: true },
 
-    { type: 'line-width', key: 'border-width', default: 1 },
-    { type: 'color', key: 'border-color', default: 'rgb(76 175 80 / 0%)' },
-    { type: 'font-size', key: 'label-font-size', default: 12 },
-    { type: 'color', key: 'label-color', default: 'rgb(255 255 255)' },
-    { type: 'color', key: 'label-fill', default: 'rgb(76 175 80)' }
+    { type: 'line-width', key: 'pr-border-width', default: 1 },
+    { type: 'color', key: 'pr-border-color', default: 'rgb(76 175 80 / 0%)' },
+    { type: 'font-size', key: 'pr-label-font-size', default: 12 },
+    { type: 'color', key: 'pr-label-color', default: 'rgb(255 255 255)' },
+    { type: 'color', key: 'pr-label-fill', default: 'rgb(76 175 80)' }
   ]
 } as const satisfies StudySchema
 

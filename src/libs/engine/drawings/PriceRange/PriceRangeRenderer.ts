@@ -70,11 +70,11 @@ export class PriceRangeRenderer implements IPrimitivePaneRenderer {
 
       // Border
       rect(scope, { x: minX, y: minY } as Point, { x: maxX, y: maxY } as Point, {
-        'line-color': this.#params['border-color'],
-        'line-width': this.#params['border-width']
+        'line-color': this.#params['pr-border-color'],
+        'line-width': this.#params['pr-border-width']
       })
 
-      const bw = this.#params['border-width'] / 2
+      const bw = this.#params['pr-border-width'] / 2
       const lw = this.#params['line-width']
 
       // Horizontal distance line at vertical midpoint
@@ -106,7 +106,7 @@ export class PriceRangeRenderer implements IPrimitivePaneRenderer {
 
       const labelLines = line2 ? [line1, line2] : [line1]
 
-      const fontSize = this.#params['label-font-size'] * pr
+      const fontSize = this.#params['pr-label-font-size'] * pr
       const lineSpacing = 2 * pr
       const padH = 4 * vpr
       const padW = 6 * hpr
@@ -131,10 +131,10 @@ export class PriceRangeRenderer implements IPrimitivePaneRenderer {
       ctx.lineTo(bx, by + radius)
       ctx.arcTo(bx, by, bx + radius, by, radius)
       ctx.closePath()
-      ctx.fillStyle = this.#params['label-fill']
+      ctx.fillStyle = this.#params['pr-label-fill']
       ctx.fill()
 
-      ctx.fillStyle = this.#params['label-color']
+      ctx.fillStyle = this.#params['pr-label-color']
       ctx.textAlign = 'center'
       ctx.textBaseline = 'top'
       const centerX = bx + boxW / 2

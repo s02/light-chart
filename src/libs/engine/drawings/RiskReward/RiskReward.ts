@@ -12,17 +12,17 @@ const INITIAL_HEIGHT = 200
 export const RISK_REWARD_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'account-size', default: 1000 },
-    { type: 'number', key: 'risk-size', default: 250 },
-    { type: 'number', key: 'lot-size', default: 1 },
+    { type: 'number', key: 'rr-account-size', default: 1000 },
+    { type: 'number', key: 'rr-risk-size', default: 250 },
+    { type: 'number', key: 'rr-lot-size', default: 1 },
 
-    { type: 'number', key: 'entry-price', default: 0, step: 0.01 },
-    { type: 'number', key: 'stop-price', default: 0, step: 0.01 },
-    { type: 'number', key: 'target-price', default: 0, step: 0.01 }
+    { type: 'number', key: 'rr-entry-price', default: 0, step: 0.01 },
+    { type: 'number', key: 'rr-stop-price', default: 0, step: 0.01 },
+    { type: 'number', key: 'rr-target-price', default: 0, step: 0.01 }
   ],
   style: [
-    { type: 'color', key: 'profit-fill', default: 'rgb(8 153 129 / 20%)' },
-    { type: 'color', key: 'loss-fill', default: 'rgb(242 54 69 / 20%)' }
+    { type: 'color', key: 'rr-profit-fill', default: 'rgb(8 153 129 / 20%)' },
+    { type: 'color', key: 'rr-loss-fill', default: 'rgb(242 54 69 / 20%)' }
   ]
 } as const satisfies StudySchema
 
