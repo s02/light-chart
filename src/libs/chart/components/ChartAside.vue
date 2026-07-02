@@ -5,7 +5,6 @@ import { ref } from 'vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import { DRAWINGS } from '@engine/drawings'
 import { i18n } from '@chart/i18n'
-import ChartAsideButton from '@chart/components/ChartAsideButton.vue'
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import EmojiList from '@chart/components/EmojiList.vue'
 import type { DrawingGroup, DrawingName, DrawingOptions, DrawingScript } from '@engine/drawings/types'
@@ -103,13 +102,21 @@ const selectDrawing = (script: DrawingScript) => {
       placement="right-start"
       @update:open="currentDrawingGroup = null">
       <template #trigger="{ triggerRef }">
-        <ChartAsideButton
-          :ref="triggerRef"
-          :initialized="initialized === menu[g].drawing.ikey"
-          :opened="currentDrawingGroup === g"
-          :icon="menu[g].icon"
-          @toggle="currentDrawingGroup ? (currentDrawingGroup = null) : (currentDrawingGroup = g)"
-          @click="handleStart(menu[g].drawing.ikey)" />
+        <div :ref="triggerRef" class="ca-btn">
+          <div
+            class="ca-btn-icon"
+            :class="{ initialized: initialized === menu[g].drawing.ikey }"
+            @click="handleStart(menu[g].drawing.ikey)"
+            v-html="menu[g].icon"></div>
+          <div
+            class="ca-btn-collapse"
+            :class="{ opened: currentDrawingGroup === g }"
+            @click="currentDrawingGroup ? (currentDrawingGroup = null) : (currentDrawingGroup = g)">
+            <svg class="ca-btn-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" width="4" height="7">
+              <path d="M.6 1.4l1.4-1.4 8 8-8 8-1.4-1.4 6.389-6.532-6.389-6.668z" stroke="currentColor"></path>
+            </svg>
+          </div>
+        </div>
       </template>
 
       <div v-if="currentDrawingGroup == 'emoji'" class="ca-emoji-menu">
