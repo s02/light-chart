@@ -386,6 +386,10 @@
   "study-prop-macross-longLength": "Long",
   "study-prop-macross-short": "Short",
   "study-prop-macross-long" : "Long",
-  "study-prop-macross-cross": "Crosses"
+  "study-prop-macross-cross": "Crosses",
 
+  "study-ema": "Exponential Moving Average",
+  "study-prop-ema-length": "Length",
+  "study-prop-ema-offset": "Offset",
+  "study-prop-ema-color": "Plot"
 }

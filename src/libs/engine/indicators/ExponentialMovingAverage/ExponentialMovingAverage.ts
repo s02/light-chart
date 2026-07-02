@@ -15,8 +15,8 @@ import { getSourceSeries, ta } from 'oakscriptjs'
 const EMA_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'ema-length', default: 9, min: 1 },
-    { type: 'number', key: 'ema-offset', default: 0, min: 0 }
+    { type: 'number', key: 'ema-length', default: 9, min: 1, max: 9999 },
+    { type: 'number', key: 'ema-offset', default: 0, min: 0, max: 9999 }
   ],
   style: [{ type: 'color', key: 'ema-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
