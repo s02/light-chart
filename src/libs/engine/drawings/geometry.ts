@@ -66,8 +66,10 @@ const distanceToLine = (point: Point, lineP1: Point, lineP2: Point) => {
 const pointInPolygon = (point: Point, polygon: Point[]) => {
   let inside = false
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].x, yi = polygon[i].y
-    const xj = polygon[j].x, yj = polygon[j].y
+    const xi = polygon[i].x,
+      yi = polygon[i].y
+    const xj = polygon[j].x,
+      yj = polygon[j].y
     if (yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi) {
       inside = !inside
     }

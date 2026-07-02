@@ -1,5 +1,6 @@
 input {
-  display: block;
+  display: flex;
+  align-items: center;
   background-color: transparent;
   box-shadow: none;
   border: 1px solid #575757;
@@ -7,5 +8,11 @@ input {
   font-family: inherit;
   color: inherit;
   outline: none;
-  padding: 7px 6px 8px;
+  padding: 0 6px;
+  height: 34px;
+  font-size: 14px;
+
+  &:hover {
+    border-color: #707070;
+  }
 }

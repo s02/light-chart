@@ -14,5 +14,5 @@ const model = defineModel<number | string | boolean>({ required: true })
 </template>
 
 <style lang="scss" scoped>
-@use 'StudyCheckbox.scss';
+@use 'CCheckbox.scss';
 </style>

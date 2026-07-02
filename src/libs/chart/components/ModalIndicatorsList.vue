@@ -22,7 +22,7 @@ const emit = defineEmits<{
         :key="script.indicator.ikey"
         class="ind-list-item"
         @click="emit('close', script)">
-        {{ i18n.translate(`indicator-${script.indicator.ikey}`) }}
+        {{ i18n.translate(`study-${script.indicator.ikey}`) }}
       </div>
     </div>
   </div>

@@ -13,10 +13,13 @@ import type { SeriesLegend } from '@engine/series'
 const DPO_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'dpo-length', default: 21, min: 1 },
-    { type: 'select', key: 'dpo-mode', default: 'Non-centered', values: ['Non-centered', 'Centered'] }
+    { type: 'number', key: 'dpo-length', default: 21, min: 1, max: 9999 },
+    { type: 'bool', key: 'dpo-mode', default: false }
   ],
-  style: [{ type: 'color', key: 'dpo-color', default: 'rgb(126 87 194)' }]
+  style: [
+    { type: 'color', key: 'dpo-color', default: 'rgb(126 87 194)' },
+    { type: 'number', key: 'dpo-zero', default: 0, min: -9999, max: 9999 }
+  ]
 } as const satisfies StudySchema
 
 type DPOParams = InferStudyValues<typeof DPO_SCHEMA.inputs> &
@@ -31,7 +34,7 @@ export class DPO extends AbstractIndicator implements Indicator {
 
   #series: {
     dpo: ISeriesApi<SeriesType>
-    zeroLine: ISeriesApi<SeriesType>
+    zero: ISeriesApi<SeriesType>
   }
 
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
@@ -45,7 +48,7 @@ export class DPO extends AbstractIndicator implements Indicator {
         { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['dpo-color'], priceLineVisible: false },
         this.paneIndex
       ),
-      zeroLine: this.#chart.addSeries(
+      zero: this.#chart.addSeries(
         LineSeries,
         {
           color: '#787B86',
@@ -77,10 +80,12 @@ export class DPO extends AbstractIndicator implements Indicator {
     const legend: SeriesLegend = { key: 'DPO', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.dpo)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
+
     legend.data.push(
       { value: this.#params['dpo-length'].toString(), color: 'rgb(140, 140, 140)' },
-      { value: this.#params['dpo-mode'].toString(), color: 'rgb(140, 140, 140)' }
+      { value: this.#params['dpo-mode'] ? 'centered' : 'not centered', color: 'rgb(140, 140, 140)' }
     )
+
     legend.data.push({ value, color: this.#params['dpo-color'] })
     return legend
   }
@@ -90,33 +95,30 @@ export class DPO extends AbstractIndicator implements Indicator {
     const firstTime = data[0].time
     const lastTime = data[data.length - 1].time
 
-    this.#series.zeroLine.setData([
-      { time: firstTime, value: 0 },
-      { time: lastTime, value: 0 }
+    this.#series.zero.setData([
+      { time: firstTime, value: this.#params['dpo-zero'] },
+      { time: lastTime, value: this.#params['dpo-zero'] }
     ])
     this.#series.dpo.setData(dpoData)
   }
 
   protected removeSeries() {
     this.#chart.removeSeries(this.#series.dpo)
-    this.#chart.removeSeries(this.#series.zeroLine)
+    this.#chart.removeSeries(this.#series.zero)
   }
 
   #calculate(bars: ChartBar[]) {
     const length = this.#params['dpo-length']
-    const mode = this.#params['dpo-mode']
     const offset = Math.floor(length / 2) + 1
     const source = getSourceSeries(bars, 'close')
     const smaArr = ta.sma(source, length).toArray()
-    const centered = mode === 'Centered'
+    const centered = this.#params['dpo-mode']
 
     const mapped = bars.map((b, i) => {
       if (centered) {
-        // close[i] - sma shifted forward: displayed at the bar offset periods before the SMA
         const sma = smaArr[i + offset]
         return { time: b.time, value: sma == null ? NaN : b.close - sma }
       } else {
-        // close - sma[offset bars ago]
         const sma = i >= offset ? smaArr[i - offset] : null
         return { time: b.time, value: sma == null ? NaN : b.close - sma }
       }

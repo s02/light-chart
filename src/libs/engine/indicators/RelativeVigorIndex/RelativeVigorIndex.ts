@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle } from 'lightweight-charts'
+import { LineSeries } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -12,7 +12,7 @@ import type { SeriesLegend } from '@engine/series'
 
 const RVI_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'rvi-length', default: 10, min: 1 }],
+  inputs: [{ type: 'number', key: 'rvi-length', default: 10, min: 1, max: 9999 }],
   style: [
     { type: 'color', key: 'rvi-rviColor', default: 'rgb(41 98 255)' },
     { type: 'color', key: 'rvi-signalColor', default: 'rgb(255 109 0)' }
@@ -32,7 +32,6 @@ export class RelativeVigorIndex extends AbstractIndicator implements Indicator {
   #series: {
     rvi: ISeriesApi<SeriesType>
     signal: ISeriesApi<SeriesType>
-    zeroLine: ISeriesApi<SeriesType>
   }
 
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
@@ -49,18 +48,6 @@ export class RelativeVigorIndex extends AbstractIndicator implements Indicator {
       signal: this.#chart.addSeries(
         LineSeries,
         { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['rvi-signalColor'], priceLineVisible: false },
-        this.paneIndex
-      ),
-      zeroLine: this.#chart.addSeries(
-        LineSeries,
-        {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
-          crosshairMarkerVisible: false,
-          lastValueVisible: false,
-          priceLineVisible: false
-        },
         this.paneIndex
       )
     }
@@ -97,13 +84,6 @@ export class RelativeVigorIndex extends AbstractIndicator implements Indicator {
 
   protected onData(data: ChartBar[]) {
     const { rvi, signal } = this.#calculate(data)
-    const firstTime = data[0].time
-    const lastTime = data[data.length - 1].time
-
-    this.#series.zeroLine.setData([
-      { time: firstTime, value: 0 },
-      { time: lastTime, value: 0 }
-    ])
     this.#series.rvi.setData(rvi)
     this.#series.signal.setData(signal)
   }
@@ -111,7 +91,6 @@ export class RelativeVigorIndex extends AbstractIndicator implements Indicator {
   protected removeSeries() {
     this.#chart.removeSeries(this.#series.rvi)
     this.#chart.removeSeries(this.#series.signal)
-    this.#chart.removeSeries(this.#series.zeroLine)
   }
 
   #calculate(bars: ChartBar[]) {

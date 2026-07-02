@@ -1,7 +1,7 @@
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import type { DrawingOptions } from '@engine/drawings/types'
 import type { Anchor } from '@engine/points'
-import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
+import { resolveStudyParams, type InferStudyValues, type StudySchema } from '@engine/schema'
 import type { IChartApi, Point, Time } from 'lightweight-charts'
 
 //https://www.tradingview.com/support/solutions/43000475660-how-to-use-long-and-short-position-drawing-tools/

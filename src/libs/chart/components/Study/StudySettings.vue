@@ -3,12 +3,13 @@ import { i18n } from '@chart/i18n'
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import ChartTabs from '@chart/components/ChartTabs.vue'
 import { ref } from 'vue'
-import type { StudyParams, StudySchema } from '@engine/schema'
+import type { SchemaKey, StudyParams, StudySchema } from '@engine/schema'
 import StudyColor from './StudyColor.vue'
 import StudyLineWidth from './StudyLineWidth.vue'
 import StudyFontSize from './StudyFontSize.vue'
-import StudyInput from '@chart/components/Study/StudyInput.vue'
-import StudyCheckbox from '@chart/components/Study/StudyCheckbox.vue'
+import CInput from '@chart/components/Controls/CInput.vue'
+import CCheckbox from '@chart/components/Controls/CCheckbox.vue'
+import CSelect from '@chart/components/Controls/CSelect.vue'
 
 const emit = defineEmits<{
   (e: 'close', result?: StudyParams): void
@@ -22,25 +23,22 @@ const apply = () => {
 }
 
 const initTabs = () => {
-  const result: string[] = []
-
-  if (props.schema.inputs.length) {
-    result.push('tab-inputs')
-  }
-
-  if (props.schema.style.length) {
-    result.push('tab-style')
-  }
-
-  if (props.schema.text.length) {
-    result.push('tab-text')
-  }
+  const result: (keyof StudySchema)[] = []
+  const keys = Object.keys(props.schema) as SchemaKey[]
+  keys.forEach((key) => {
+    if (props.schema[key].length) {
+      result.push(key)
+    }
+  })
 
   return result
 }
 
 const tabs = initTabs()
 const tab = ref(tabs[0])
+const setTab = (v: string) => {
+  tab.value = v.replace('tab-', '') as SchemaKey
+}
 </script>
 
 <template>
@@ -50,12 +48,16 @@ const tab = ref(tabs[0])
         <p class="studysett-title">{{ i18n.translate(`study-${ikey}`) }}</p>
         <button class="studysett-close" @click="emit('close')"><CloseIcon /></button>
       </div>
-      <ChartTabs v-if="tabs && tab" :active="tab" :tabs="tabs.map((key) => ({ key }))" @selected="tab = $event" />
+      <ChartTabs
+        v-if="tabs && tab"
+        :active="`tab-${tab}`"
+        :tabs="tabs.map((key) => ({ key: `tab-${key}` }))"
+        @selected="setTab" />
     </div>
 
     <div class="studysett-body ch-scroll">
       <div class="studysett-container">
-        <template v-if="tab === 'tab-text'">
+        <template v-if="tab === 'text'">
           <div class="studysett-row">
             <div v-if="schema.text?.find((ps) => ps.key === 'text-color')" class="studysett-ctrl-color">
               <StudyColor :color="String(params['text-color'])" @update="params['text-color'] = $event" />
@@ -65,12 +67,14 @@ const tab = ref(tabs[0])
             </div>
           </div>
           <div v-if="schema.text?.find((ps) => ps.key === 'text')" class="studysett-ctrl-text">
-            <textarea v-model="params['text'] as string"></textarea>
+            <textarea
+              :value="String(params['text'])"
+              @input="params['text'] = ($event.target as HTMLTextAreaElement).value"></textarea>
           </div>
         </template>
-        <template v-else-if="tab === 'tab-style'">
+        <template v-else>
           <div class="studysett-group">
-            <template v-for="el in schema.style" :key="el.key">
+            <template v-for="el in schema[tab]" :key="el.key">
               <label>{{ i18n.translate(`study-prop-${el.key}`) }}</label>
               <StudyColor
                 v-if="el.type === 'color'"
@@ -84,7 +88,7 @@ const tab = ref(tabs[0])
                 v-else-if="el.type === 'font-size'"
                 :size="Number(params[el.key])"
                 @update="params[el.key] = $event" />
-              <StudyInput
+              <CInput
                 v-if="el.type === 'number'"
                 v-model="params[el.key]"
                 type="number"
@@ -92,22 +96,11 @@ const tab = ref(tabs[0])
                 :max="el.max"
                 :step="el.step || 1"
                 class="studysett-input" />
-            </template>
-          </div>
-        </template>
-        <template v-else-if="tab === 'tab-inputs'">
-          <div class="studysett-group">
-            <template v-for="el in schema.inputs" :key="el.key">
-              <label>{{ i18n.translate(`study-prop-${el.key}`) }}</label>
-              <StudyInput
-                v-if="el.type === 'number'"
-                v-model="params[el.key]"
-                type="number"
-                :min="el.min"
-                :max="el.max"
-                :step="el.step || 1"
-                class="studysett-input" />
-              <StudyCheckbox v-else-if="el.type === 'bool'" v-model="params[el.key]" />
+              <CCheckbox v-else-if="el.type === 'bool'" v-model="params[el.key]" />
+              <CSelect
+                v-else-if="el.type === 'select' && el.values"
+                v-model:current="params[el.key]"
+                :values="el.values" />
             </template>
           </div>
         </template>

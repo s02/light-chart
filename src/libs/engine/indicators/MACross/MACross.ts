@@ -21,8 +21,8 @@ import { getSourceSeries, ta } from 'oakscriptjs'
 const MA_CROSS_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'macross-shortLength', default: 9, min: 1 },
-    { type: 'number', key: 'macross-longLength', default: 26, min: 1 }
+    { type: 'number', key: 'macross-shortLength', default: 9, min: 1, max: 9999 },
+    { type: 'number', key: 'macross-longLength', default: 26, min: 1, max: 9999 }
   ],
   style: [
     { type: 'color', key: 'macross-short', default: 'rgb(255 109 0)' },
@@ -51,7 +51,12 @@ export class MACross extends AbstractIndicator implements Indicator {
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
     this.#chart = chart
-    this.#params = resolveStudyParams(MA_CROSS_SCHEMA.inputs, MA_CROSS_SCHEMA.style, MA_CROSS_SCHEMA.text, options?.params)
+    this.#params = resolveStudyParams(
+      MA_CROSS_SCHEMA.inputs,
+      MA_CROSS_SCHEMA.style,
+      MA_CROSS_SCHEMA.text,
+      options?.params
+    )
 
     this.#series = {
       fast: this.#chart.addSeries(

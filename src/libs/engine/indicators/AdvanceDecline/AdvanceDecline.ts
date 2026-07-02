@@ -11,7 +11,7 @@ import type { SeriesLegend } from '@engine/series'
 
 const AD_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'advance-decline-length', default: 10, min: 1 }],
+  inputs: [{ type: 'number', key: 'advance-decline-length', default: 10, min: 1, max: 9999 }],
   style: [{ type: 'color', key: 'advance-decline-color', default: 'rgb(33 150 243)' }]
 } as const satisfies StudySchema
 
@@ -37,7 +37,12 @@ export class AdvanceDecline extends AbstractIndicator implements Indicator {
     this.#series = {
       line: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['advance-decline-color'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          lineWidth: 1,
+          color: this.#params['advance-decline-color'],
+          priceLineVisible: false
+        },
         this.paneIndex
       )
     }

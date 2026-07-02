@@ -1,6 +1,6 @@
 .studysett {
   background-color: #262626;
-  width: 380px;
+  width: 400px;
   color: #dbdbdb;
   border-radius: 6px;
   display: flex;
@@ -110,7 +110,7 @@
 }
 
 .studysett-group {
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 130px;
   align-items: center;
   gap: 16px;
   padding-bottom: 16px;
@@ -119,8 +119,4 @@
 
 label {
   font-size: 14px;
-}
-
-.studysett-input {
-  width: 100px;
 }

@@ -13,8 +13,8 @@ import type { SeriesLegend } from '@engine/series'
 const DMI_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'dmi-diLength', default: 14, min: 1 },
-    { type: 'number', key: 'dmi-adxSmoothing', default: 14, min: 1 }
+    { type: 'number', key: 'dmi-diLength', default: 14, min: 1, max: 9999 },
+    { type: 'number', key: 'dmi-adxSmoothing', default: 14, min: 1, max: 9999 }
   ],
   style: [
     { type: 'color', key: 'dmi-plusDIColor', default: '#2196F3' },

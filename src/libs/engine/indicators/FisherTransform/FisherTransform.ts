@@ -12,7 +12,7 @@ import type { SeriesLegend } from '@engine/series'
 
 const FISHER_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'fisher-transform-length', default: 9, min: 1 }],
+  inputs: [{ type: 'number', key: 'fisher-transform-length', default: 9, min: 1, max: 9999 }],
   style: [
     { type: 'color', key: 'fisher-transform-fisherColor', default: 'rgb(33 150 243)' },
     { type: 'color', key: 'fisher-transform-triggerColor', default: 'rgb(255 109 0)' }
@@ -52,12 +52,22 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
     this.#series = {
       fisher: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['fisher-transform-fisherColor'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          lineWidth: 1,
+          color: this.#params['fisher-transform-fisherColor'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       trigger: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['fisher-transform-triggerColor'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          lineWidth: 1,
+          color: this.#params['fisher-transform-triggerColor'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       levels: [

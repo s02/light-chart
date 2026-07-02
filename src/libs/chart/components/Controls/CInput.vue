@@ -30,5 +30,5 @@ const inputValue = computed({
 </template>
 
 <style lang="scss" scoped>
-@use 'StudyInput.scss';
+@use 'CInput.scss';
 </style>

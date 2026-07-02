@@ -11,8 +11,8 @@ import type { SeriesLegend } from '@engine/series'
 const VZT_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'vzt-period', default: 10, min: 1 },
-    { type: 'number', key: 'vzt-daysPerYear', default: 252, min: 1 }
+    { type: 'number', key: 'vzt-period', default: 10, min: 1, max: 9999 },
+    { type: 'number', key: 'vzt-daysPerYear', default: 252, min: 1, max: 9999 }
   ],
   style: [{ type: 'color', key: 'vzt-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema

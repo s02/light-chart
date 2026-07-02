@@ -53,6 +53,8 @@ export type StudyParamDescriptor =
   | StudyBoolParam
 
 export type StudyParams = Record<string, number | string | boolean>
+export type StudyParamValue = StudyParams[string]
+export type SchemaKey = keyof StudySchema
 
 export type StudySchema = {
   text: StudyParamDescriptor[]

@@ -13,9 +13,9 @@ import { getSourceSeries, ta } from 'oakscriptjs'
 const ALMA_SCHEMA = {
   text: [],
   inputs: [
-    { type: 'number', key: 'alma-length', default: 9, min: 1 },
+    { type: 'number', key: 'alma-length', default: 9, min: 1, max: 9999 },
     { type: 'number', key: 'alma-offset', default: 0.85, min: 0, max: 1 },
-    { type: 'number', key: 'alma-sigma', default: 6, min: 1 }
+    { type: 'number', key: 'alma-sigma', default: 6, min: 1, max: 9999 }
   ],
   style: [{ type: 'color', key: 'alma-color', default: 'rgb(255 109 0)' }]
 } as const satisfies StudySchema
@@ -80,7 +80,9 @@ export class ArnaudLegouxMA extends AbstractIndicator implements Indicator {
 
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
-    const almaArr = ta.alma(source, this.#params['alma-length'], this.#params['alma-offset'], this.#params['alma-sigma'], true).toArray()
+    const almaArr = ta
+      .alma(source, this.#params['alma-length'], this.#params['alma-offset'], this.#params['alma-sigma'], true)
+      .toArray()
 
     const toBar = (value: number, i: number) => ({
       time: bars[i].time,
