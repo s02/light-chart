@@ -12,6 +12,7 @@ import { DrawingsManager } from '@engine/drawings'
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { StudyParams } from '@engine/schema'
 import type { LayoutConfig } from '@engine/indicators/types'
+import type { Anchor } from '@engine/points'
 
 type Params = {
   datafeed: Datafeed
@@ -127,8 +128,12 @@ export class PlotEngine {
     this.#indicatorsManager.updateParams(id, params)
   }
 
-  addDrawing(key: DrawingName, options?: DrawingOptions) {
-    return this.#drawingsManager.add(key, options)
+  addDrawing(key: DrawingName, options: DrawingOptions, anchors: Anchor[]) {
+    return this.#drawingsManager.add(key, options, anchors)
+  }
+
+  initDrawing(key: DrawingName, options?: DrawingOptions) {
+    return this.#drawingsManager.init(key, options)
   }
 
   updateDrawing(id: number, params: StudyParams) {
@@ -145,7 +150,8 @@ export class PlotEngine {
 
   getStudiesLayout() {
     return {
-      indicators: this.#indicatorsManager.getConfigs()
+      indicators: this.#indicatorsManager.getAllSchemas(),
+      drawings: this.#drawingsManager.getAllSchemas()
     }
   }
 

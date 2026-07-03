@@ -190,6 +190,10 @@ export abstract class BaseDrawing implements ISeriesPrimitive<Time> {
     return null
   }
 
+  getAnchors() {
+    return this.anchors
+  }
+
   abstract paneViews(): IPrimitivePaneView[]
   abstract checkTap(point: Point): boolean
   abstract setParams(params: StudyParams): void

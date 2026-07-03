@@ -17,7 +17,7 @@ export class IndicatorsManager {
     this.#datafeed = datafeed
   }
 
-  getConfigs() {
+  getAllSchemas() {
     return this.#indicators.map((el) => {
       const schema = el.indicator.getSchema()
       return {

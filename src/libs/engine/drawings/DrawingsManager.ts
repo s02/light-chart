@@ -1,7 +1,7 @@
 import { findDrawingScript } from '@engine/drawings'
 import { DrawingDragHandler } from '@engine/drawings/DrawingDragHandler'
 import { DrawingSelectHandler } from '@engine/drawings/DrawingSelectHandler'
-import { POINTS_MODE, type PointsManager } from '@engine/points'
+import { POINTS_MODE, type Anchor, type PointsManager } from '@engine/points'
 import { ContinuousPointsCollector } from '@engine/points/ContinuousPointsCollector'
 import { PointsCollector } from '@engine/points/PointsCollector'
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
@@ -39,6 +39,17 @@ export class DrawingsManager {
     )
   }
 
+  getAllSchemas() {
+    return this.#drawings.map((el) => {
+      const schema = el.drawing.getSchema()
+      return {
+        anchors: el.drawing.getAnchors(),
+        params: schema.params,
+        ikey: schema.ikey
+      }
+    })
+  }
+
   cancelCurrent() {
     if (this.#pendingAdd) {
       this.#pendingAdd.pc.destroy()
@@ -48,7 +59,20 @@ export class DrawingsManager {
     }
   }
 
-  add(name: DrawingName, options?: DrawingOptions) {
+  add(name: DrawingName, options: DrawingOptions, anchors: Anchor[]) {
+    this.cancelCurrent()
+
+    const script = findDrawingScript(name)
+    if (!script) {
+      throw new Error(`unknown drawing key: ${name}`)
+    }
+
+    const drawing = new script.drawing(this.#chart, options)
+    drawing.setAnchors(anchors)
+    drawing.attach(this.#series)
+  }
+
+  init(name: DrawingName, options?: DrawingOptions) {
     this.cancelCurrent()
 
     const script = findDrawingScript(name)

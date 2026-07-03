@@ -1,3 +1,4 @@
+import type { Anchor } from '@engine/points'
 import type { StudyParams, StudySchema } from '@engine/schema'
 import type { SeriesLegend, SeriesOverlayData } from '@engine/series'
 import type { Datafeed } from '@engine/types'
@@ -24,6 +25,11 @@ export type Indicator = {
 }
 
 export type LayoutConfig = {
+  drawings: {
+    params: StudyParams
+    anchors: Anchor[]
+    ikey: string
+  }[]
   indicators: {
     params: StudyParams
     ikey: string

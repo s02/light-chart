@@ -10,7 +10,13 @@ const layouts = ref<Layout[]>(repository.load())
 const emit = defineEmits<(e: 'close', result?: Layout) => void>()
 
 const getDetails = (layout: Layout) => {
-  return layout.config.indicators.map((ind) => ind.ikey).join(', ')
+  const studies = [...layout.config.indicators.map((ind) => ind.ikey), ...layout.config.drawings.map((ind) => ind.ikey)]
+  const set = new Set<string>()
+  studies.forEach((key) => {
+    set.add(key)
+  })
+
+  return Array.from(set).join(', ')
 }
 
 const remove = (layout: Layout) => {

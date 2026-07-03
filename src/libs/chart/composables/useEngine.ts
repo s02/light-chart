@@ -134,6 +134,10 @@ export const useEngineApi = () => {
     config.indicators.forEach((ind) => {
       addIndicator(ind.ikey as IndicatorName, ind.params)
     })
+
+    config.drawings.forEach((dw) => {
+      pe!.addDrawing(dw.ikey as DrawingName, dw.params, dw.anchors)
+    })
   }
 
   const addIndicator = async (key: IndicatorName, params: StudyParams) => {
@@ -164,7 +168,7 @@ export const useEngineApi = () => {
 
   const startDrawing = (id: DrawingName, options?: DrawingOptions) => {
     assertEngine(pe)
-    return pe.addDrawing(id, options)
+    return pe.initDrawing(id, options)
   }
 
   const cancelDrawing = () => {
