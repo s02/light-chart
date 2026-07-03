@@ -2,16 +2,13 @@
 import CButton from '@chart/components/Controls/CButton.vue'
 import CToggleButton from '@chart/components/Controls/CToggleButton.vue'
 import ModalStudyName from '@chart/components/StudyRepository/ModalStudyName.vue'
-import ModalStudyTemplates, {
-  type ModalStudyTemplatesListResult
-} from '@chart/components/StudyRepository/ModalStudyTemplatesList.vue'
+import ModalStudyTemplates from '@chart/components/StudyRepository/ModalStudyTemplatesList.vue'
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import { useModal } from '@chart/composables/useModal'
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 import ChartMenuGroup from '@chart/components/ChartMenuGroup.vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import type { Layout } from '@engine/indicators/types'
-import { ref } from 'vue'
 import { getStudyRepository } from '@chart/components/StudyRepository/getStudyRepository'
 
 const { open } = useModal()

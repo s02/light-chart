@@ -1,6 +1,6 @@
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
 import type { IndicatorName } from '@engine/indicators'
-import type { Indicator, LayoutConfig, SeriesMap } from './types'
+import type { Indicator, SeriesMap } from './types'
 import type { Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 import type { StudyParams } from '@engine/schema'

@@ -142,7 +142,7 @@ export const useEngineApi = () => {
     })
   }
 
-  const addIndicator = async (key: IndicatorName, params: StudyParams) => {
+  const addIndicator = async (key: IndicatorName, params?: StudyParams) => {
     assertEngine(pe)
     const t = await pe.addIndicator(key, params)
 
