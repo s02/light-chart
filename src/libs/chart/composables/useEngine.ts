@@ -15,6 +15,7 @@ import type {
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { DatafeedFactory } from '@chart/types'
 import StudySettings from '@chart/components/Study/StudySettings.vue'
+import type { LayoutConfig } from '@engine/indicators/types'
 
 type DrawingElement = Parameters<DrawingSelectFn>[0]
 
@@ -121,9 +122,23 @@ export const useEngineApi = () => {
     unwatch.forEach((fn) => fn())
   }
 
-  const addIndicator = async (key: IndicatorName) => {
+  const getLayoutConfig = () => {
     assertEngine(pe)
-    const t = await pe.addIndicator(key)
+    return pe.getStudiesLayout()
+  }
+
+  const setLayoutConfig = (config: LayoutConfig) => {
+    assertEngine(pe)
+    pe.clearStudies()
+
+    config.indicators.forEach((ind) => {
+      addIndicator(ind.ikey as IndicatorName, ind.params)
+    })
+  }
+
+  const addIndicator = async (key: IndicatorName, params: StudyParams) => {
+    assertEngine(pe)
+    const t = await pe.addIndicator(key, params)
 
     if (t.paneIndex && t.paneIndex > 0 && t.el) {
       render(h(PaneLegend, { paneIndex: t.paneIndex, subscribeToLegends: pe.subscribeToLegends.bind(pe) }), t.el)
@@ -193,6 +208,8 @@ export const useEngineApi = () => {
       }
 
       return null
-    })
+    }),
+    getLayoutConfig,
+    setLayoutConfig
   }
 }

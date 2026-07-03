@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { onClickOutside } from '@vueuse/core'
 import { computed, onUnmounted, ref, useTemplateRef } from 'vue'
-import PropLineColor from '@chart/components/DrawingPanel/PropLineColor.vue'
-import PropFontSize from '@chart/components/DrawingPanel/PropFontSize.vue'
-import PropLineWidth from '@chart/components/DrawingPanel/PropLineWidth.vue'
-import PropBrushWidth from '@chart/components/DrawingPanel/PropBrushWidth.vue'
-import PropFillColor from '@chart/components/DrawingPanel/PropFillColor.vue'
-import PropTextColor from '@chart/components/DrawingPanel/PropTextColor.vue'
+import PropLineColor from '@chart/components/StudyPanel/PropLineColor.vue'
+import PropFontSize from '@chart/components/StudyPanel/PropFontSize.vue'
+import PropLineWidth from '@chart/components/StudyPanel/PropLineWidth.vue'
+import PropBrushWidth from '@chart/components/StudyPanel/PropBrushWidth.vue'
+import PropFillColor from '@chart/components/StudyPanel/PropFillColor.vue'
+import PropTextColor from '@chart/components/StudyPanel/PropTextColor.vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import { useModal } from '@chart/composables/useModal'
 import StudySettings from '@chart/components/Study/StudySettings.vue'
@@ -175,6 +175,6 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
-@use 'DrawingPanel.scss';
+@use 'StudyPanel.scss';
 @use 'btn.scss';
 </style>

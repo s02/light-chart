@@ -1,0 +1,15 @@
+<script setup lang="ts">
+defineProps<{ isOpened: boolean }>()
+</script>
+
+<template>
+  <div class="c-toggle-btn" :class="{ isOpened }">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18">
+      <path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path>
+    </svg>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+@use 'CToggleButton.scss';
+</style>

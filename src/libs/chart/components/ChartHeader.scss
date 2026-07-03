@@ -1,6 +1,12 @@
+.chart-header-side,
 .chart-header {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+.chart-header {
+  justify-content: space-between;
 }
 
 .chart-header-separator {

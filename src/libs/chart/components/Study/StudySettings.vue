@@ -10,6 +10,7 @@ import StudyFontSize from './StudyFontSize.vue'
 import CInput from '@chart/components/Controls/CInput.vue'
 import CCheckbox from '@chart/components/Controls/CCheckbox.vue'
 import CSelect from '@chart/components/Controls/CSelect.vue'
+import CButton from '@chart/components/Controls/CButton.vue'
 
 const emit = defineEmits<{
   (e: 'close', result?: StudyParams): void
@@ -108,7 +109,7 @@ const setTab = (v: string) => {
     </div>
 
     <div class="studysett-footer studysett-container">
-      <button class="studysett-btn" @click="apply()">Apply</button>
+      <CButton type="primary" @click="apply()">Apply</CButton>
     </div>
   </div>
 </template>

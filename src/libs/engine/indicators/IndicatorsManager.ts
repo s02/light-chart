@@ -1,6 +1,6 @@
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
 import type { IndicatorName } from '@engine/indicators'
-import type { Indicator, SeriesMap } from './types'
+import type { Indicator, LayoutConfig, SeriesMap } from './types'
 import type { Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 import type { StudyParams } from '@engine/schema'
@@ -15,6 +15,16 @@ export class IndicatorsManager {
   constructor(chart: IChartApi, datafeed: Datafeed) {
     this.#chart = chart
     this.#datafeed = datafeed
+  }
+
+  getConfigs() {
+    return this.#indicators.map((el) => {
+      const schema = el.indicator.getSchema()
+      return {
+        params: schema.params,
+        ikey: schema.ikey
+      }
+    })
   }
 
   setDatafeed(datafeed: Datafeed) {
@@ -38,13 +48,13 @@ export class IndicatorsManager {
     return legends
   }
 
-  add(key: IndicatorName): Promise<IndicatorOnPane> {
+  add(key: IndicatorName, params?: StudyParams): Promise<IndicatorOnPane> {
     const script = this.#findScript(key)
 
     const pane = script.separatePane ? this.#chart.addPane() : this.#chart.panes()[0]
     const id = this.#id++
 
-    const indicator = new script.indicator(this.#chart, this.#datafeed, { paneIndex: pane.paneIndex() })
+    const indicator = new script.indicator(this.#chart, this.#datafeed, { paneIndex: pane.paneIndex(), params })
 
     this.#indicators.push({
       id,
@@ -96,7 +106,7 @@ export class IndicatorsManager {
     this.#indicators = this.#indicators.filter((ind) => ind.id !== id)
   }
 
-  destroy() {
+  clear() {
     this.#indicators.forEach((el) => {
       el.indicator.remove()
     })

@@ -86,23 +86,6 @@
   }
 }
 
-.studysett-btn {
-  border-radius: 6px;
-  background-color: #fff;
-  border: 1px solid #fff;
-  color: #001020;
-  font-size: 14px;
-  line-height: 1;
-  padding: 9px 12px;
-  box-shadow: none;
-  cursor: pointer;
-  transition: opacity 200ms ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
 .studysett-row {
   display: flex;
   gap: 8px;

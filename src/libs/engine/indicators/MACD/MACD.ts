@@ -102,6 +102,7 @@ export class MACD extends AbstractIndicator implements Indicator {
         { value: formatPrice((signalData as LineData<Time>).value), color: this.#params['macd-signalLine'] }
       )
     }
+
     return legend
   }
 

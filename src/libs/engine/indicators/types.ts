@@ -22,3 +22,12 @@ export type Indicator = {
     params: StudyParams
   }
 }
+
+export type LayoutConfig = {
+  indicators: {
+    params: StudyParams
+    ikey: string
+  }[]
+}
+
+export type Layout = { name: string; config: LayoutConfig }

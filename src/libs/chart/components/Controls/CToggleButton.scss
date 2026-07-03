@@ -1,0 +1,25 @@
+.c-toggle-btn {
+  width: 20px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+
+  svg {
+    display: block;
+    transition: transform 200ms ease;
+  }
+
+  &.isOpened {
+    svg {
+      transform: rotate(180deg);
+    }
+  }
+
+  &:hover {
+    background-color: #303030;
+  }
+}

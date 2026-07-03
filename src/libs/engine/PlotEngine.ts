@@ -11,6 +11,7 @@ import type { IndicatorName } from '@engine/indicators'
 import { DrawingsManager } from '@engine/drawings'
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { StudyParams } from '@engine/schema'
+import type { LayoutConfig } from '@engine/indicators/types'
 
 type Params = {
   datafeed: Datafeed
@@ -104,8 +105,12 @@ export class PlotEngine {
     this.#pluginManager.exp.setExpiration(expiration)
   }
 
-  async addIndicator(key: IndicatorName): Promise<IndicatorOnPane> {
-    const iop = await this.#indicatorsManager.add(key)
+  clearStudies() {
+    this.#indicatorsManager.clear()
+  }
+
+  async addIndicator(key: IndicatorName, params: StudyParams): Promise<IndicatorOnPane> {
+    const iop = await this.#indicatorsManager.add(key, params)
     this.#seriesOverlay.moveToTop()
     return iop
   }
@@ -138,10 +143,16 @@ export class PlotEngine {
     this.#drawingsManager.cancelCurrent()
   }
 
+  getStudiesLayout() {
+    return {
+      indicators: this.#indicatorsManager.getConfigs()
+    }
+  }
+
   destroy() {
     this.#whitespace.destroy()
     this.#pluginManager.detach()
-    this.#indicatorsManager.destroy()
+    this.#indicatorsManager.clear()
     this.#seriesOverlay.destroy()
     this.#chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
     this.#chart.remove()

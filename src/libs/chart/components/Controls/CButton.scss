@@ -1,0 +1,37 @@
+button {
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  padding: 9px 12px;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    opacity 200ms ease,
+    background-color 200ms ease;
+  border: 0;
+  background-color: transparent;
+  color: inherit;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.primary {
+    color: #001020;
+    border: 1px solid #fff;
+    background-color: #fff;
+  }
+
+  &.transparent {
+    color: #dbdbdb;
+
+    &:hover {
+      opacity: 1;
+      background-color: #303030;
+    }
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
+}
