@@ -4,6 +4,7 @@ import type { BarData, CustomData, HistogramData, ISeriesApi, LineData, SeriesTy
 export type SeriesOverlayData = BarData<Time> | LineData<Time> | HistogramData<Time> | CustomData<Time>
 
 export interface SeriesOverlay<TData = SeriesOverlayData> {
+  ready: Promise<void>
   destroy(): void
   getSeries(): ISeriesApi<SeriesType>
   getLegend(data: TData): SeriesLegend

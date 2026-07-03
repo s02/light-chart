@@ -111,6 +111,8 @@ export const useEngineApi = () => {
         }
       )
     )
+
+    return pe.ready
   }
 
   const unregister = () => {

@@ -11,7 +11,6 @@ import type { IndicatorName } from '@engine/indicators'
 import { DrawingsManager } from '@engine/drawings'
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { StudyParams } from '@engine/schema'
-import type { LayoutConfig } from '@engine/indicators/types'
 import type { Anchor } from '@engine/points'
 
 type Params = {
@@ -43,6 +42,10 @@ export class PlotEngine {
 
     this.#chart.timeScale().subscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
     console.log(`%c[Plot Engine: started]`, 'background: #90ac12; color:#fff')
+  }
+
+  get ready() {
+    return this.#seriesOverlay.ready
   }
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {

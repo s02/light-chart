@@ -13,11 +13,16 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
   #chart: IChartApi
   #datafeedSubscriptionId?: string
   #destroyed = false
+  ready: Promise<void>
+  #ready: (() => void) | null = null
 
   constructor(chart: IChartApi, datafeed: Datafeed, settings: SeriesSettings) {
     this.#chart = chart
     this.#datafeed = datafeed
     this.series = this.#chart.addSeries(settings.series, settings.options)
+    this.ready = new Promise((resolve) => {
+      this.#ready = resolve
+    })
     queueMicrotask(() => this.#init())
   }
 
@@ -54,6 +59,9 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
   protected transformData(result: DatafeedResult) {
     if (result.type === 'set') {
       this.series.setData(result.data)
+      if (this.#ready) {
+        this.#ready()
+      }
     } else {
       result.data.forEach((bar) => this.series.update(bar))
     }

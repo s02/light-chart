@@ -19,6 +19,7 @@ const props = defineProps<{
 }>()
 
 const { state } = useChart()
+const isReady = ref(false)
 
 state.assetSymbol = props.assetSymbol
 state.resolutionId = props.defaultConfig.resolutionId
@@ -28,12 +29,12 @@ const chartRef = ref<HTMLElement | null>(null)
 const mainPaneLegends = computed(() => legends.value.filter((legend) => legend.paneIndex === 0))
 const { register, unregister, legends } = useEngineApi()
 
-onMounted(() => {
+onMounted(async () => {
   if (!chartRef.value) {
     throw 'Terminal Chart: no ref provided'
   }
 
-  register(chartRef.value, {
+  await register(chartRef.value, {
     seriesId: toRef(state, 'seriesId'),
     options: toRef(props, 'options'),
     expiration: toRef(props, 'expiration'),
@@ -41,6 +42,8 @@ onMounted(() => {
     resolutionId: toRef(state, 'resolutionId'),
     datafeedFactory: props.datafeedFactory
   })
+
+  isReady.value = true
 })
 
 onUnmounted(() => {
@@ -50,6 +53,7 @@ onUnmounted(() => {
 
 <template>
   <div class="t-chart">
+    <div v-if="!isReady" class="t-chart-loader"></div>
     <div class="t-chart-header">
       <ChartHeader />
     </div>
@@ -63,6 +67,7 @@ onUnmounted(() => {
       <StudyPanel class="t-chart-drawings" />
       <div ref="chartRef" class="t-chart-plot"></div>
     </div>
+
     <ModalContainer />
   </div>
 </template>
