@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { Http } from '@app/transport'
+import { Transport } from '@app/transport'
 import { MAX_SYSTEM_TIMEOUT, dateHelpers } from '@app/services/dateHelpers'
 import type { Expiration } from '@transport/types'
 
@@ -26,7 +26,7 @@ export const useExpirations = () => {
   }
 
   const load = async () => {
-    const list = await Http.get().getExpirations()
+    const list = await Transport.get().http.getExpirations()
     expirationsListTimeouts.map(clearTimeout)
 
     const now = Date.now()

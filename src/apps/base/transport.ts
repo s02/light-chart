@@ -1,15 +1,21 @@
-import { HttpClient, type HttpClientOptions } from '@transport/HttpClient'
-import { WebSocketClient, type WebSocketClientOptions } from '@transport/WebSocketClient'
+import { HttpClient } from '@transport/HttpClient'
+import { WebSocketClient } from '@transport/WebSocketClient'
 
 let httpClientInstance: HttpClient | null = null
+let webSocketClientInstance: WebSocketClient | null = null
 
-export const Http = {
-  initialize: (options: HttpClientOptions) => {
+export const Transport = {
+  initialize: (apiHost: string, wsHost: string) => {
     if (httpClientInstance) {
       throw 'HttpClient already initialized'
     }
 
-    httpClientInstance = new HttpClient(options)
+    if (webSocketClientInstance) {
+      throw 'WebSocketClient already initialized'
+    }
+
+    httpClientInstance = new HttpClient({ api: apiHost })
+    webSocketClientInstance = new WebSocketClient(httpClientInstance, { host: wsHost })
   },
 
   get: () => {
@@ -17,26 +23,13 @@ export const Http = {
       throw `HttpClient isn't initialized`
     }
 
-    return httpClientInstance
-  }
-}
-
-let webSocketClientInstance: WebSocketClient | null = null
-
-export const Ws = {
-  initialize: (httpClient: HttpClient, options: WebSocketClientOptions) => {
-    if (webSocketClientInstance) {
-      throw 'WebSocketClient already initialized'
-    }
-
-    webSocketClientInstance = new WebSocketClient(httpClient, options)
-  },
-
-  get: () => {
     if (!webSocketClientInstance) {
       throw `WebSocketClient isn't initialized`
     }
 
-    return webSocketClientInstance
+    return {
+      http: httpClientInstance,
+      ws: webSocketClientInstance
+    }
   }
 }

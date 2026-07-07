@@ -1,6 +1,6 @@
 import { computed, onUnmounted, reactive, toValue, watch } from 'vue'
 import { dateHelpers } from '@app/services/dateHelpers'
-import { Ws } from '@app/transport'
+import { Transport } from '@app/transport'
 import type { Ref } from 'vue'
 import type { Option, Asset, OptionKind } from '@app/types'
 import type { Expiration, Quote } from '@transport/types'
@@ -38,11 +38,11 @@ const quoteSubIds = reactive<Record<Asset['id'], number>>({})
 
 export const useQuoteHandler = (assetIdRef: Ref<Asset['id']>) => {
   const subscribeToQuotes = (assetId: string) =>
-    Ws.get().subscribeToQuotes(assetId, (quote) => {
+    Transport.get().ws.subscribeToQuotes(assetId, (quote) => {
       lastQuotes[toValue(assetIdRef)] = quote
     })
 
-  const unsubscribeFromQuotes = (assetId: string, id: number) => Ws.get().unsubscribeFromQuotes(assetId, id)
+  const unsubscribeFromQuotes = (assetId: string, id: number) => Transport.get().ws.unsubscribeFromQuotes(assetId, id)
 
   onUnmounted(() => {
     const assetId = toValue(assetIdRef)
