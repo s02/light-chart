@@ -4,16 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --config src/app/vite.config.ts",
-    "build:app": "vue-tsc -b && vite build --config src/app/vite.config.ts",
-    "dev:std": "vite --config src/standalone/vite.config.ts",
+    "dev": "vite --config src/apps/base/vite.config.ts",
+    "build:app": "vue-tsc -b && vite build --config src/apps/base/vite.config.ts",
     
     "dev:widget": "vite --config src/widget/vite.config.ts",
     "build:widget": "vite build --config src/widget/vite.config.ts",
     "dev:demo-widget": "vite --config src/apps/demo-widget/vite.config.ts",
     "build:demo-widget": "vite build --config src/apps/demo-widget/vite.config.ts",
-    "lint": "eslint ./src",
     
+    "lint": "eslint ./src",
     "preview": "vite preview",
     "test": "vitest"
   },
