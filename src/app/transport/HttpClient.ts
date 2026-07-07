@@ -3,6 +3,7 @@ import type { Bar, Expiration, HttpTransport } from './types'
 export type HttpClientOptions = {
   api: string
 }
+
 class HttpClient {
   #options: HttpClientOptions
 

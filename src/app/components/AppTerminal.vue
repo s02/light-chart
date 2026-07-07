@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, toRef } from 'vue'
 import TerminalChart from '@chart/TerminalChart.vue'
-import { useChart } from './useChart'
-import { useQuoteHandler, useTrading } from './useTrading'
-import { datafeedFactory } from './datafeedFactory'
+import { useChart } from '@app/composables/useChart'
+import { useQuoteHandler, useTrading } from '@app/composables/useTrading'
 import { helpers } from '@chart/helpers'
-import BuyButton from './components/BuyButton.vue'
-import ExpirationMenu from './components/ExpirationMenu.vue'
+import BuyButton from '@app/components/BuyButton.vue'
+import ExpirationMenu from '@app/components/ExpirationMenu.vue'
 import type { TerminalChartConfig } from '@chart/types'
+import { datafeedFactory } from '@app/services/datafeedFactory.ts'
 
 const { chartState } = useChart()
 const { buyOption, options } = useTrading(toRef(() => chartState.value.assetSymbol.id))

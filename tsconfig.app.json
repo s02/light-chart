@@ -15,8 +15,9 @@
     "verbatimModuleSyntax": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@chart/*": ["./src/libs/chart/*"],
-      "@engine/*": ["./src/libs/engine/*"]
+      "@chart/*": ["./src/chart/*"],
+      "@engine/*": ["./src/engine/*"],
+      "@app/*": ["./src/app/*"]
     }
   },
   "include": [

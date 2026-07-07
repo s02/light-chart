@@ -13,7 +13,7 @@ export default [
   prettier,
   {
     files: ['src/**/*.{ts,vue}'],
-    ignores: ['src/libs/engine/**', 'src/libs/chart/**'],
+    ignores: ['src/engine/**', 'src/chart/**'],
     rules: {
       'no-restricted-imports': ['error', { patterns: ['@engine/*'] }]
     }

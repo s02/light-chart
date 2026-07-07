@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import AppTerminal from './AppTerminal.vue'
-import AssetButton from './components/AssetButton.vue'
-import { ASSETS, PROFITABILITY } from './constants'
-import { useChart } from './useChart'
-import { useExpirations } from './useExpirations'
+import AppTerminal from '@app/components/AppTerminal.vue'
+import AssetButton from '@app/components/AssetButton.vue'
+import { ASSETS, PROFITABILITY } from '@app/constants'
+import { useChart } from '@app/composables/useChart'
+import { useExpirations } from '@app/composables/useExpirations'
 
 const { schedule: scheduleExpirationsUpdate } = useExpirations()
 const { chartState, setChart } = useChart()

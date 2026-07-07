@@ -1,7 +1,7 @@
 import { ref } from 'vue'
-import { Http } from './transport/HttpClient'
-import { MAX_SYSTEM_TIMEOUT, dateHelpers } from './dateHelpers'
-import type { Expiration } from './transport/types'
+import { Http } from '@app/transport/HttpClient'
+import { MAX_SYSTEM_TIMEOUT, dateHelpers } from '@app/services/dateHelpers'
+import type { Expiration } from '@app/transport/types'
 
 let iv: number | null = null
 let isFirstRequest = true

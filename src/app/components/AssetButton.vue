@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { PROFITABILITY } from '../constants'
-import type { ProfitabilityType } from '../types'
+import { PROFITABILITY } from '@app/constants'
+import type { ProfitabilityType } from '@app/types'
 
 defineProps<{ name: string; active: boolean; profitability: ProfitabilityType }>()
 </script>

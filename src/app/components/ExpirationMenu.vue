@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Expiration } from '../transport/types'
-import { useChart } from '../useChart'
-import { useExpirations } from '../useExpirations'
+import { useChart } from '@app/composables/useChart'
+import { useExpirations } from '@app/composables/useExpirations'
 
 const { format: formatExp } = useExpirations()
 const { chartState, setExpiration } = useChart()

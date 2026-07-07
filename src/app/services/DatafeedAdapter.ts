@@ -1,6 +1,6 @@
 import { CandleHttpService } from './CandleHttpService'
 import { CandleStoreService } from './CandleStoreService'
-import type { HttpTransport, Quote, WsTransport } from './transport/types'
+import type { HttpTransport, Quote, WsTransport } from '@app/transport/types'
 import type {
   AssetSymbol,
   ChartBar,
