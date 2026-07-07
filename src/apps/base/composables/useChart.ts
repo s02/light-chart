@@ -2,8 +2,9 @@ import { computed, reactive } from 'vue'
 import { useExpirations } from '@app/composables/useExpirations'
 import { helpers } from '@chart/helpers'
 import { ASSETS, PROFITABILITY } from '@app/constants'
-import type { AppExpiration, ChartState, ChartUserState, ProfitabilityType, Expiration } from '@app/types'
+import type { AppExpiration, ChartState, ChartUserState, ProfitabilityType } from '@app/types'
 import type { AssetSymbol } from '@chart/types'
+import type { Expiration } from '@transport/types'
 
 const chartState = reactive<ChartUserState>({
   assetSymbol: ASSETS[0],

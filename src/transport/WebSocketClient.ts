@@ -1,5 +1,5 @@
+import type { Quote } from '@transport/types'
 import Centrifuge from 'centrifuge'
-import type { Quote } from '@app/types'
 
 type HttpClient = {
   getWebsocketToken(): Promise<string>

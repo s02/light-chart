@@ -1,5 +1,5 @@
-import { HttpClient, type HttpClientOptions } from '@datafeed/HttpClient'
-import { WebSocketClient, type WebSocketClientOptions } from '@datafeed/WebSocketClient'
+import { HttpClient, type HttpClientOptions } from '@transport/HttpClient'
+import { WebSocketClient, type WebSocketClientOptions } from '@transport/WebSocketClient'
 
 let httpClientInstance: HttpClient | null = null
 

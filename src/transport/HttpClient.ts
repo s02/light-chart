@@ -1,4 +1,4 @@
-import type { Bar, Expiration } from '@app/types'
+import type { Bar, Expiration } from '@transport/types'
 
 export type HttpClientOptions = {
   api: string

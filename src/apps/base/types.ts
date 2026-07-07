@@ -1,3 +1,4 @@
+import type { Expiration } from '@transport/types'
 import type { PROFITABILITY } from './constants'
 import type { AssetSymbol, ChartExpiration } from '@chart/types'
 
@@ -34,23 +35,4 @@ export type Option = {
   quoteOpen: number
   createdAt: string
   expirationDate: string
-}
-
-export type Bar = {
-  time: string
-  open: number
-  high: number
-  low: number
-  close: number
-}
-
-export type Expiration = {
-  type: number
-  lock: string
-  close: string
-}
-
-export type Quote = {
-  value: number
-  timestamp: number
 }

@@ -11,7 +11,7 @@
 import { candleHelpers } from './candleHelpers'
 import { RESOLUTION_SETTINGS } from '@chart/constants'
 import type { AssetSymbol, ChartBar, ResolutionId } from '@chart/types'
-import type { HttpClient } from '@app/types'
+import type { HttpClient } from '@transport/HttpClient'
 
 const MAX_DETALIZATION = 90 * 24 * 60 * 60
 

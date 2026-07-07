@@ -15,10 +15,11 @@
     "verbatimModuleSyntax": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
+      "@transport/*": ["./src/transport/*"],
       "@datafeed/*": ["./src/datafeed/*"],
       "@chart/*": ["./src/chart/*"],
       "@engine/*": ["./src/engine/*"],
-      "@app/*": ["./src/app/*"],
+      "@app/*": ["./src/apps/base/*"],
       "@widget": ["./src/widget/lib.ts"]
     }
   },

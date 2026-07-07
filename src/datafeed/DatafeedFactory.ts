@@ -1,6 +1,6 @@
 import { DatafeedAdapter } from '@datafeed/DatafeedAdapter'
-import { HttpClient } from '@datafeed/HttpClient'
-import { WebSocketClient } from '@datafeed/WebSocketClient'
+import { HttpClient } from '@transport/HttpClient'
+import { WebSocketClient } from '@transport/WebSocketClient'
 import type { AssetSymbol, ResolutionId } from '@chart/types'
 
 export class DatafeedFactory {
