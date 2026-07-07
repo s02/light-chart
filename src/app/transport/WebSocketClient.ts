@@ -1,5 +1,5 @@
 import Centrifuge from 'centrifuge'
-import type { Quote, WsTransport } from './types'
+import type { Quote } from '@app/types'
 
 type HttpClient = {
   getWebsocketToken(): Promise<string>
@@ -102,7 +102,7 @@ export const Ws = {
     instance = new WebSocketClient(httpClient, options)
   },
 
-  get: (): WsTransport => {
+  get: () => {
     if (!instance) {
       throw `WebSocketClient isn't initialized`
     }

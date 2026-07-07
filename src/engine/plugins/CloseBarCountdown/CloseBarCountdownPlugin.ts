@@ -101,7 +101,7 @@ class CountdownAxisView implements ISeriesPrimitiveAxisView {
 export class CloseBarCountdownPlugin implements ISeriesPrimitive<Time> {
   #series: ISeriesApi<SeriesType> | null = null
   #resolutionId: ResolutionId
-  #timerInterval: number | null = null
+  #timerInterval: NodeJS.Timeout | null = null
   #label = ''
   #axisView: CountdownAxisView
 

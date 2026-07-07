@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config src/app/vite.config.ts",
+    "build:app": "vue-tsc -b && vite build --config src/app/vite.config.ts",
     "lint": "eslint ./src",
-    "build": "vue-tsc -b && vite build",
+    
     "preview": "vite preview",
     "test": "vitest"
   },

@@ -28,7 +28,7 @@ jobs:
         run: npm test -- --run
 
       - name: Build
-        run: npm run build
+        run: npm run build:app
 
       - name: Publish dist to target repository
         env:
@@ -42,7 +42,7 @@ jobs:
           git clone "https://x-access-token:${DEPLOY_TOKEN}@github.com/${TARGET_REPO}.git" target-repo
 
           rm -rf target-repo/*
-          cp -r dist/. target-repo/
+          cp -r dist/app/. target-repo/
 
           cd target-repo
           echo "Files in target-repo:"

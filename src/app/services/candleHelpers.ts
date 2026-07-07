@@ -1,5 +1,5 @@
 import { helpers } from '@chart/helpers'
-import type { Bar, Quote } from '@app/transport/types'
+import type { Bar, Quote } from '@app/types'
 import type { ChartBar, UTCTimestamp } from '@chart/types'
 
 const transform = (candle: Bar): ChartBar => ({

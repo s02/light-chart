@@ -1,11 +1,11 @@
 import { ref } from 'vue'
 import { Http } from '@app/transport/HttpClient'
 import { MAX_SYSTEM_TIMEOUT, dateHelpers } from '@app/services/dateHelpers'
-import type { Expiration } from '@app/transport/types'
+import type { Expiration } from '@app/types'
 
-let iv: number | null = null
+let iv: NodeJS.Timeout | null = null
 let isFirstRequest = true
-const expirationsListTimeouts: number[] = []
+const expirationsListTimeouts: NodeJS.Timeout[] = []
 
 const data = ref<Expiration[]>([])
 

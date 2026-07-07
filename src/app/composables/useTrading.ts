@@ -2,8 +2,7 @@ import { computed, onUnmounted, reactive, toValue, watch } from 'vue'
 import { Ws } from '@app/transport/WebSocketClient'
 import { dateHelpers } from '@app/services/dateHelpers'
 import type { Ref } from 'vue'
-import type { Expiration, Quote } from '@app/transport/types'
-import type { Option, Asset, OptionKind } from '@app/types'
+import type { Option, Asset, OptionKind, Expiration, Quote } from '@app/types'
 
 const lskey = 'tr-history'
 

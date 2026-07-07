@@ -1,4 +1,4 @@
-import type { Bar, Expiration, HttpTransport } from './types'
+import type { Bar, Expiration } from '@app/types'
 
 export type HttpClientOptions = {
   api: string
@@ -46,7 +46,7 @@ export const Http = {
     instance = new HttpClient(options)
   },
 
-  get: (): HttpTransport => {
+  get: () => {
     if (!instance) {
       throw `HttpClient isn't initialized`
     }

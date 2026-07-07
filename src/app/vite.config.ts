@@ -5,6 +5,10 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig({
   root: fileURLToPath(new URL('.', import.meta.url)),
   plugins: [vue()],
+  build: {
+    outDir: fileURLToPath(new URL('../../dist/app', import.meta.url)),
+    emptyOutDir: true
+  },
   resolve: {
     alias: {
       '@chart': fileURLToPath(new URL('../chart', import.meta.url)),

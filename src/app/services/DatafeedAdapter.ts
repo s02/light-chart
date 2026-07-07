@@ -1,6 +1,6 @@
 import { CandleHttpService } from './CandleHttpService'
 import { CandleStoreService } from './CandleStoreService'
-import type { HttpTransport, Quote, WsTransport } from '@app/transport/types'
+import type { HttpClient, Quote, WsClient } from '@app/types'
 import type {
   AssetSymbol,
   ChartBar,
@@ -11,7 +11,7 @@ import type {
 } from '@chart/types'
 
 export class DatafeedAdapter implements Datafeed {
-  #ws: WsTransport
+  #ws: WsClient
   #assetSymbol: AssetSymbol
   #resolution: ResolutionId
   #quotesBuffer: Quote[] = []
@@ -25,7 +25,7 @@ export class DatafeedAdapter implements Datafeed {
   #candlesHttpService: CandleHttpService
   #candleStoreService: CandleStoreService
 
-  constructor(assetSymbol: AssetSymbol, resolution: ResolutionId, http: HttpTransport, ws: WsTransport) {
+  constructor(assetSymbol: AssetSymbol, resolution: ResolutionId, http: HttpClient, ws: WsClient) {
     this.#resolution = resolution
     this.#assetSymbol = assetSymbol
     this.#ws = ws

@@ -67,7 +67,7 @@ export class IndicatorsManager {
       if (!script.separatePane) {
         resolve({ id })
       }
-      let iv: number | null = null
+      let iv: NodeJS.Timeout | null = null
 
       const observer = new MutationObserver(() => {
         const el = pane.getHTMLElement()
