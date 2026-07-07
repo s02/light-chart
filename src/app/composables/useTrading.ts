@@ -1,6 +1,6 @@
 import { computed, onUnmounted, reactive, toValue, watch } from 'vue'
-import { Ws } from '@app/transport/WebSocketClient'
 import { dateHelpers } from '@app/services/dateHelpers'
+import { Ws } from '@app/transport'
 import type { Ref } from 'vue'
 import type { Option, Asset, OptionKind, Expiration, Quote } from '@app/types'
 

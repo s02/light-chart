@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { autoUpdate, size, useFloating, type Placement } from '@floating-ui/vue'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
-import { computed, ref, type ComponentPublicInstance } from 'vue'
+import { computed, inject, ref, type ComponentPublicInstance } from 'vue'
 
 type FloatingOptions = {
   placement?: Placement
@@ -53,12 +53,14 @@ onKeyStroke('Escape', () => {
     close()
   }
 })
+
+const rootEl = inject<string>('root-el')
 </script>
 
 <template>
   <slot name="trigger" :trigger-ref="setTriggerRef" :trigger-props="triggerProps" :is-open="isOpened" />
 
-  <Teleport to="#app">
+  <Teleport :to="rootEl">
     <div v-if="isOpened" ref="targetRef" class="f-dropdown" :style="floatingStyles" :data-placement="placement">
       <slot :close="close" :placement="placement" />
     </div>

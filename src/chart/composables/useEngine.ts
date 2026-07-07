@@ -52,7 +52,7 @@ export const useEngineApi = () => {
 
   const register = (el: HTMLElement, options: EngineOptions) => {
     pe = new PlotEngine(el, {
-      datafeed: options.datafeedFactory(options.assetSymbol.value, options.resolutionId.value),
+      datafeed: options.datafeedFactory.create(options.assetSymbol.value, options.resolutionId.value),
       seriesId: options.seriesId.value
     })
 
@@ -106,7 +106,7 @@ export const useEngineApi = () => {
         (next) => {
           assertEngine(pe)
           if (next) {
-            pe.setDatafeed(options.datafeedFactory(next.assetSymbol, next.resolutionId))
+            pe.setDatafeed(options.datafeedFactory.create(next.assetSymbol, next.resolutionId))
           }
         }
       )

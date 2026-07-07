@@ -7,10 +7,11 @@ import { helpers } from '@chart/helpers'
 import BuyButton from '@app/components/BuyButton.vue'
 import ExpirationMenu from '@app/components/ExpirationMenu.vue'
 import type { TerminalChartConfig } from '@chart/types'
-import { datafeedFactory } from '@app/services/datafeedFactory.ts'
+import { DatafeedFactory } from '@datafeed/DatafeedFactory'
 
 const { chartState } = useChart()
 const { buyOption, options } = useTrading(toRef(() => chartState.value.assetSymbol.id))
+const datafeedFactory = new DatafeedFactory('https://dev-api.bindev.info', 'wss://dev-ws.bindev.info')
 
 useQuoteHandler(toRef(() => chartState.value.assetSymbol.id))
 

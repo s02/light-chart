@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import App from '@app/App.vue'
-import { Http } from '@app/transport/HttpClient'
-import { Ws } from '@app/transport/WebSocketClient'
+import { Http, Ws } from '@app/transport'
 
 Http.initialize({
   api: 'https://dev-api.bindev.info'

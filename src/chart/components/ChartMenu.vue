@@ -2,7 +2,7 @@
 import { injectChartMenu, type ChartMenuKey } from '@chart/useChartMenu'
 import { useFloating, size, autoUpdate, type Placement } from '@floating-ui/vue'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
-import { useTemplateRef } from 'vue'
+import { inject, useTemplateRef } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -33,10 +33,12 @@ const { floatingStyles: menuResStyles } = useFloating(btn, target, {
 
 onClickOutside(target, close)
 onKeyStroke('Escape', close)
+
+const rootEl = inject<string>('root-el')
 </script>
 
 <template>
-  <Teleport to="#app">
+  <Teleport :to="rootEl">
     <div ref="target" class="chart-menu" :style="menuResStyles">
       <div v-if="isOpened" class="chart-menu-body">
         <slot></slot>

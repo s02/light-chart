@@ -5,10 +5,6 @@ type HttpClient = {
   getWebsocketToken(): Promise<string>
 }
 
-type WebSocketClientOptions = {
-  host: string
-}
-
 type ChannelName = string
 type CallbackFn = (data: unknown) => void
 
@@ -22,6 +18,10 @@ type Subscriptions = Record<
 
 const CHANNEL = {
   quotes: (assetId: string): ChannelName => `anonymous:assets/${assetId}/quotes`
+}
+
+export type WebSocketClientOptions = {
+  host: string
 }
 
 export class WebSocketClient {
@@ -88,25 +88,5 @@ export class WebSocketClient {
     }
 
     return this.#id++
-  }
-}
-
-let instance: WebSocketClient | null = null
-
-export const Ws = {
-  initialize: (httpClient: HttpClient, options: WebSocketClientOptions) => {
-    if (instance) {
-      throw 'WebSocketClient already initialized'
-    }
-
-    instance = new WebSocketClient(httpClient, options)
-  },
-
-  get: () => {
-    if (!instance) {
-      throw `WebSocketClient isn't initialized`
-    }
-
-    return instance
   }
 }

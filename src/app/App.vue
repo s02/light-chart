@@ -4,6 +4,7 @@ import AssetButton from '@app/components/AssetButton.vue'
 import { ASSETS, PROFITABILITY } from '@app/constants'
 import { useChart } from '@app/composables/useChart'
 import { useExpirations } from '@app/composables/useExpirations'
+import { provide } from 'vue'
 
 const { schedule: scheduleExpirationsUpdate } = useExpirations()
 const { chartState, setChart } = useChart()
@@ -23,6 +24,8 @@ const assetMenu = [
 const openChart = (el: (typeof assetMenu)[0]) => {
   setChart(el.asset, el.profitability)
 }
+
+provide('root-el', '#app')
 </script>
 
 <template>
@@ -43,35 +46,12 @@ const openChart = (el: (typeof assetMenu)[0]) => {
 </template>
 
 <style lang="scss">
-@import 'https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,500,600,700&display=swap&subset=cyrillic,cyrillic-ext,latin-ext';
-
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  color: #fff;
-  background-color: #001b36;
-  line-height: 1.5;
-  color-scheme: light dark;
-  font-synthesis: none;
-  font-family: 'IBM Plex Sans', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizelegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
   margin: 0;
   padding: 0;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  scrollbar-width: thin;
-  scrollbar-color: rgb(155 155 155 / 25%) transparent;
 }
 
 .app {

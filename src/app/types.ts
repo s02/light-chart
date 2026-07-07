@@ -1,7 +1,5 @@
-import type { Http } from '@app/transport/HttpClient'
 import type { PROFITABILITY } from './constants'
 import type { AssetSymbol, ChartExpiration } from '@chart/types'
-import type { Ws } from '@app/transport/WebSocketClient'
 
 export type ProfitabilityType = (typeof PROFITABILITY)[keyof typeof PROFITABILITY]
 
@@ -56,6 +54,3 @@ export type Quote = {
   value: number
   timestamp: number
 }
-
-export type HttpClient = ReturnType<typeof Http.get>
-export type WsClient = ReturnType<typeof Ws.get>

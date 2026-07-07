@@ -4,7 +4,7 @@ export type HttpClientOptions = {
   api: string
 }
 
-class HttpClient {
+export class HttpClient {
   #options: HttpClientOptions
 
   constructor(options: HttpClientOptions) {
@@ -32,25 +32,5 @@ class HttpClient {
     const response = await fetch(`${this.#options.api}/rpc/v1.Trading.GetAllExpirations`)
     const { data } = await response.json()
     return data
-  }
-}
-
-let instance: HttpClient | null = null
-
-export const Http = {
-  initialize: (options: HttpClientOptions) => {
-    if (instance) {
-      throw 'HttpClient already initialized'
-    }
-
-    instance = new HttpClient(options)
-  },
-
-  get: () => {
-    if (!instance) {
-      throw `HttpClient isn't initialized`
-    }
-
-    return instance
   }
 }

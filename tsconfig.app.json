@@ -15,9 +15,11 @@
     "verbatimModuleSyntax": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
+      "@datafeed/*": ["./src/datafeed/*"],
       "@chart/*": ["./src/chart/*"],
       "@engine/*": ["./src/engine/*"],
-      "@app/*": ["./src/app/*"]
+      "@app/*": ["./src/app/*"],
+      "@widget": ["./src/widget/lib.ts"]
     }
   },
   "include": [
