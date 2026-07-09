@@ -8,5 +8,6 @@ export const alias = {
 }
 
 export const outdirs = {
-  app: fileURLToPath(new URL('./dist/app', import.meta.url))
+  app: fileURLToPath(new URL('./dist/app', import.meta.url)),
+  component: fileURLToPath(new URL('./dist/component', import.meta.url))
 }
