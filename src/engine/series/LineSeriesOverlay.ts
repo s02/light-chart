@@ -11,7 +11,7 @@ export class LineSeriesOverlay extends AbstractSeriesOverlay<LineData<Time>> {
       series: LineSeries,
       options: {
         lineWidth: 1,
-        color: 'green',
+        color: '#26a69a',
         ...COMMON_SERIES_SETTINGS
       }
     })

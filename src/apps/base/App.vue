@@ -4,7 +4,6 @@ import AssetButton from '@app/components/AssetButton.vue'
 import { ASSETS, PROFITABILITY } from '@app/constants'
 import { useChart } from '@app/composables/useChart'
 import { useExpirations } from '@app/composables/useExpirations'
-import { provide } from 'vue'
 
 const { schedule: scheduleExpirationsUpdate } = useExpirations()
 const { chartState, setChart } = useChart()
@@ -24,8 +23,6 @@ const assetMenu = [
 const openChart = (el: (typeof assetMenu)[0]) => {
   setChart(el.asset, el.profitability)
 }
-
-provide('root-el', '#app')
 </script>
 
 <template>

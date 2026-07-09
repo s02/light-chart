@@ -3,8 +3,8 @@ defineProps<{ active?: boolean; narrow?: boolean }>()
 </script>
 
 <template>
-  <div class="chart-menu-item" :class="{ active }">
-    <div class="chart-menu-item-body"><slot></slot></div>
+  <div class="mwc-chart-menu-item" :class="{ active }">
+    <div class="mwc-chart-menu-item-body"><slot></slot></div>
   </div>
 </template>
 

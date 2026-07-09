@@ -16,6 +16,7 @@ const props = defineProps<{
   defaultConfig: TerminalChartConfig
   options?: ChartOption[]
   expiration?: ChartExpiration
+  rootEl: string
 }>()
 
 const { state } = useChart()
@@ -40,7 +41,8 @@ onMounted(async () => {
     expiration: toRef(props, 'expiration'),
     assetSymbol: toRef(props, 'assetSymbol'),
     resolutionId: toRef(state, 'resolutionId'),
-    datafeedFactory: props.datafeedFactory
+    datafeedFactory: props.datafeedFactory,
+    rootEl: props.rootEl
   })
 
   isReady.value = true

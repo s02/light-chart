@@ -26,6 +26,7 @@ type EngineOptions = {
   assetSymbol: Ref<AssetSymbol>
   resolutionId: Ref<ResolutionId>
   datafeedFactory: DatafeedFactory
+  rootEl: string
 }
 
 function assertDrawingElement(el: DrawingElement | null): asserts el {
@@ -41,6 +42,7 @@ function assertEngine(engine: PlotEngine | null): asserts engine {
 }
 
 let pe: PlotEngine | null = null
+const rootEl = ref<string | null>(null)
 const unwatch: Array<() => void> = []
 
 const selectedDrawingElement = ref<DrawingElement | null>(null)
@@ -51,6 +53,8 @@ export const useEngineApi = () => {
   const { open: openModal } = useModal()
 
   const register = (el: HTMLElement, options: EngineOptions) => {
+    rootEl.value = options.rootEl
+
     pe = new PlotEngine(el, {
       datafeed: options.datafeedFactory.create(options.assetSymbol.value, options.resolutionId.value),
       seriesId: options.seriesId.value
@@ -207,6 +211,7 @@ export const useEngineApi = () => {
     updateDrawing,
     removeDrawing,
     selectDrawing,
+    rootEl,
     legends,
     drawingSchema: computed(() => {
       if (selectedDrawingElement.value) {

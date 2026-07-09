@@ -20,7 +20,8 @@ export class WhitespaceSeries {
     this.#datafeed = datafeed
     this.#series = chart.addSeries(LineSeries, {
       lastValueVisible: false,
-      priceLineVisible: false
+      priceLineVisible: false,
+      priceScaleId: 'whitespace'
     })
     this.#init()
   }

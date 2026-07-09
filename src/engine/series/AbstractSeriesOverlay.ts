@@ -59,9 +59,6 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
   protected transformData(result: DatafeedResult) {
     if (result.type === 'set') {
       this.series.setData(result.data)
-      if (this.#ready) {
-        this.#ready()
-      }
     } else {
       result.data.forEach((bar) => this.series.update(bar))
     }
@@ -72,7 +69,12 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
       return
     }
 
-    this.#datafeedSubscriptionId = await this.#datafeed.subscribe((ev) => this.transformData(ev))
+    this.#datafeedSubscriptionId = await this.#datafeed.subscribe((ev) => {
+      this.transformData(ev)
+      if (this.#ready) {
+        this.#ready()
+      }
+    })
 
     if (this.#destroyed) {
       this.#datafeed.unsubscribe(this.#datafeedSubscriptionId)

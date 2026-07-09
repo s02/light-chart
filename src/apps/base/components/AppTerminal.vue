@@ -25,7 +25,7 @@ const chartOptions = computed(() =>
 
 const defaultConfig: TerminalChartConfig = {
   resolutionId: '5S',
-  seriesId: 'candlestick'
+  seriesId: 'line'
 }
 
 const buy = (direction: 'up' | 'down') => {
@@ -41,6 +41,7 @@ const buy = (direction: 'up' | 'down') => {
   <div class="terminal">
     <div class="terminal-chart">
       <TerminalChart
+        root-el="#app"
         :options="chartOptions"
         :expiration="chartState.currentExpiration?.chartExpiration"
         :asset-symbol="chartState.assetSymbol"

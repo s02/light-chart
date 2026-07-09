@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { useEngineApi } from '@chart/composables/useEngine'
 import { autoUpdate, size, useFloating, type Placement } from '@floating-ui/vue'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
-import { computed, inject, ref, type ComponentPublicInstance } from 'vue'
+import { computed, ref, type ComponentPublicInstance } from 'vue'
 
 type FloatingOptions = {
   placement?: Placement
@@ -12,6 +13,8 @@ const isOpened = defineModel<boolean>('open', { default: false })
 
 const triggerRef = ref<HTMLElement | null>(null)
 const targetRef = ref<HTMLElement | null>(null)
+
+const { rootEl } = useEngineApi()
 
 const setTriggerRef = (el: Element | ComponentPublicInstance | null): void => {
   triggerRef.value = (el as HTMLElement) ?? null
@@ -53,14 +56,12 @@ onKeyStroke('Escape', () => {
     close()
   }
 })
-
-const rootEl = inject<string>('root-el')
 </script>
 
 <template>
   <slot name="trigger" :trigger-ref="setTriggerRef" :trigger-props="triggerProps" :is-open="isOpened" />
 
-  <Teleport :to="rootEl">
+  <Teleport v-if="rootEl" :to="rootEl">
     <div v-if="isOpened" ref="targetRef" class="f-dropdown" :style="floatingStyles" :data-placement="placement">
       <slot :close="close" :placement="placement" />
     </div>
