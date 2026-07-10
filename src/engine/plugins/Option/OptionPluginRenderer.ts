@@ -38,7 +38,7 @@ export class OptionPluginRenderer implements IPrimitivePaneRenderer {
         const marker = this.#option.kind === 'up' ? '▴' : '▾'
         const defaultColor = this.#option.kind === 'up' ? '#00c21f' : '#f92c14'
         const background = this.#isProfitable ? defaultColor : '#999'
-        infoMarker(scope, this.#closePoint as Point, { text: `${marker} 100$`, background })
+        infoMarker(scope, this.#closePoint as Point, { text: `${marker} ${this.#option.getSum()}`, background })
       }
 
       if (this.#openPoint.x && this.#openPoint.y && this.#closePoint.x && this.#closePoint.y) {
