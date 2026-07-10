@@ -14,6 +14,7 @@ export type ChartOption = {
   createdAt: UTCTimestamp
   expirationDate: UTCTimestamp
   kind: 'up' | 'down'
+  getSum: () => string
 }
 
 export type AssetSymbol = {
