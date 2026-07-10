@@ -1,4 +1,4 @@
-import type { Quote } from '@transport/types'
+import type { Quote } from '@datafeed/types'
 import Centrifuge from 'centrifuge'
 
 type HttpClient = {

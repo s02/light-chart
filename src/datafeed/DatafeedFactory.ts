@@ -1,15 +1,13 @@
-import { DatafeedAdapter } from '@datafeed/DatafeedAdapter'
-import { HttpClient } from '@transport/HttpClient'
-import { WebSocketClient } from '@transport/WebSocketClient'
+import { DatafeedAdapter, type CandlesHttpClient, type QuotesWwebsocketClient } from '@datafeed/DatafeedAdapter'
 import type { AssetSymbol, ResolutionId } from '@chart/types'
 
 export class DatafeedFactory {
-  #httpClient: HttpClient
-  #wsClient: WebSocketClient
+  #httpClient: CandlesHttpClient
+  #wsClient: QuotesWwebsocketClient
 
-  constructor(apiHost: string, wsHost: string) {
-    this.#httpClient = new HttpClient({ api: apiHost })
-    this.#wsClient = new WebSocketClient(this.#httpClient, { host: wsHost })
+  constructor(httpClient: CandlesHttpClient, ws: QuotesWwebsocketClient) {
+    this.#httpClient = httpClient
+    this.#wsClient = ws
   }
 
   create(assetSymbol: AssetSymbol, resolutionId: ResolutionId) {

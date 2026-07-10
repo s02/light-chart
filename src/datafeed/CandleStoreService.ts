@@ -1,7 +1,7 @@
 import { RESOLUTION_SETTINGS } from '@chart/constants'
 import { candleHelpers } from './candleHelpers'
 import type { ChartBar, ResolutionId } from '@chart/types'
-import type { Quote } from '@transport/types'
+import type { Quote } from '@datafeed/types'
 
 type CANDLE_MERGE_STRATEGY = 'continuous' | 'gap'
 

@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { Transport } from '@app/transport'
 import { MAX_SYSTEM_TIMEOUT, dateHelpers } from '@app/services/dateHelpers'
-import type { Expiration } from '@transport/types'
+import type { Expiration } from '@app/types'
 
 let iv: NodeJS.Timeout | null = null
 let isFirstRequest = true

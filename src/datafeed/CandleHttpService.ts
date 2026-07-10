@@ -11,16 +11,16 @@
 import { candleHelpers } from './candleHelpers'
 import { RESOLUTION_SETTINGS } from '@chart/constants'
 import type { AssetSymbol, ChartBar, ResolutionId } from '@chart/types'
-import type { HttpClient } from '@transport/HttpClient'
+import type { CandlesHttpClient } from '@datafeed/DatafeedAdapter'
 
 const MAX_DETALIZATION = 90 * 24 * 60 * 60
 
 export class CandleHttpService {
-  #http: HttpClient
+  #http: CandlesHttpClient
   #resolutionId: ResolutionId
   #assetSymbol: AssetSymbol
 
-  constructor(resolutionId: ResolutionId, assetSymbol: AssetSymbol, http: HttpClient) {
+  constructor(resolutionId: ResolutionId, assetSymbol: AssetSymbol, http: CandlesHttpClient) {
     this.#http = http
     this.#resolutionId = resolutionId
     this.#assetSymbol = assetSymbol

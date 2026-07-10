@@ -1,5 +1,5 @@
-import { HttpClient } from '@transport/HttpClient'
-import { WebSocketClient } from '@transport/WebSocketClient'
+import { HttpClient } from '@app/HttpClient'
+import { WebSocketClient } from '@app/WebSocketClient'
 
 let httpClientInstance: HttpClient | null = null
 let webSocketClientInstance: WebSocketClient | null = null

@@ -8,12 +8,10 @@ import type {
   DatafeedDataCallbackFn,
   ResolutionId
 } from '@chart/types'
-import type { Quote } from '@transport/types'
-import type { HttpClient } from '@transport/HttpClient'
-import type { WebSocketClient } from '@transport/WebSocketClient'
+import type { Bar, Quote } from '@datafeed/types'
 
 export class DatafeedAdapter implements Datafeed {
-  #ws: WebSocketClient
+  #ws: QuotesWwebsocketClient
   #assetSymbol: AssetSymbol
   #resolution: ResolutionId
   #quotesBuffer: Quote[] = []
@@ -27,7 +25,7 @@ export class DatafeedAdapter implements Datafeed {
   #candlesHttpService: CandleHttpService
   #candleStoreService: CandleStoreService
 
-  constructor(assetSymbol: AssetSymbol, resolution: ResolutionId, http: HttpClient, ws: WebSocketClient) {
+  constructor(assetSymbol: AssetSymbol, resolution: ResolutionId, http: CandlesHttpClient, ws: QuotesWwebsocketClient) {
     this.#resolution = resolution
     this.#assetSymbol = assetSymbol
     this.#ws = ws
@@ -142,4 +140,13 @@ export class DatafeedAdapter implements Datafeed {
       this.#earliestDate = new Date(data[0].time * 1000)
     }
   }
+}
+
+export type CandlesHttpClient = {
+  getBars(assetId: string, from: string, to: string, detalization: string): Promise<Bar[]>
+}
+
+export type QuotesWwebsocketClient = {
+  subscribeToQuotes(assetId: string, callback: (quote: Quote) => void): Promise<number>
+  unsubscribeFromQuotes(assetId: string, id: number): void
 }

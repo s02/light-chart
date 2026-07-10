@@ -10,9 +10,3 @@ export type Quote = {
   value: number
   timestamp: number
 }
-
-export type Expiration = {
-  type: number
-  lock: string
-  close: string
-}

@@ -4,7 +4,7 @@ import { helpers } from '@chart/helpers'
 import { ASSETS, PROFITABILITY } from '@app/constants'
 import type { AppExpiration, ChartState, ChartUserState, ProfitabilityType } from '@app/types'
 import type { AssetSymbol } from '@chart/types'
-import type { Expiration } from '@transport/types'
+import type { Expiration } from '@app/types'
 
 const chartState = reactive<ChartUserState>({
   assetSymbol: ASSETS[0],

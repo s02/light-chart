@@ -1,4 +1,5 @@
-import type { Bar, Expiration } from '@transport/types'
+import type { Expiration } from '@app/types'
+import type { Bar } from '@datafeed/types'
 
 export type HttpClientOptions = {
   api: string
