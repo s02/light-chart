@@ -19,7 +19,10 @@ const chartOptions = computed(() =>
   options.value.map((option) => ({
     ...option,
     createdAt: helpers.dateToEpoch(option.createdAt),
-    expirationDate: helpers.dateToEpoch(option.expirationDate)
+    expirationDate: helpers.dateToEpoch(option.expirationDate),
+    getSum() {
+      return this.sum + '$'
+    }
   }))
 )
 
