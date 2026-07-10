@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --config src/apps/base/vite.config.ts",
     "build:app": "vue-tsc -b && vite build --config src/apps/base/vite.config.ts",
-    "build:component": "vite build --config src/lib/vite.config.ts && node scripts/build-component-package.mjs",
+    "build:component": "vue-tsc -b && vite build --config src/lib/vite.config.ts && node scripts/build-component-package.mjs",
     "lint": "eslint ./src",
     "preview": "vite preview",
     "test": "vitest"
