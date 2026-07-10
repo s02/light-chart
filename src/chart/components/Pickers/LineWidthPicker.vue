@@ -13,15 +13,15 @@ const select = (v: number) => {
 </script>
 
 <template>
-  <div class="lp">
+  <div class="mwc-line-width-picker">
     <button
       v-for="w of values"
       :key="w"
-      class="lp-button"
+      class="mwc-line-width-picker-button"
       :active="w === width"
       :class="{ active: w === width }"
       @click="select(w)">
-      <span class="lp-line" :style="{ height: `${w}px` }"></span>
+      <span class="mwc-line-width-picker-line" :style="{ height: `${w}px` }"></span>
       {{ w }}px
     </button>
   </div>

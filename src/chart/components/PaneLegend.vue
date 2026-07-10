@@ -17,7 +17,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="pane-legend">
+  <div class="mwc-pane-legend">
     <ChartLegend :legends="paneLegends" />
   </div>
 </template>

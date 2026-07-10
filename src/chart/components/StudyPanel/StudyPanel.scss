@@ -1,4 +1,4 @@
-.drawing-settings {
+.mwc-drawing-settings {
   background-color: #001020;
   box-shadow: 0 2px 4px 0 #0006;
   border-radius: 6px;
@@ -11,14 +11,14 @@
   }
 }
 
-.drawing-settings-handle {
+.mwc-drawing-settings-handle {
   width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.drw-text-input {
+.mwc-drw-text-input {
   height: 38px;
   min-width: 80px;
   max-width: 160px;

@@ -15,18 +15,13 @@ const closeModal = (result?: unknown) => {
 </script>
 
 <template>
-  <div v-if="current" class="modal" @click="closeModal()">
-    <component
-      :is="current.component"
-      class="modal-window"
-      v-bind="current.props"
-      @click.stop
-      @close="closeModal($event)" />
+  <div v-if="current" class="mwc-modal" @click="closeModal()">
+    <component :is="current.component" v-bind="current.props" @click.stop @close="closeModal($event)" />
   </div>
 </template>
 
 <style lang="scss" scoped>
-.modal {
+.mwc-modal {
   width: 100%;
   height: 100%;
   position: absolute;

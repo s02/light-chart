@@ -42,13 +42,13 @@ const openLayoutList = () => {
 </script>
 
 <template>
-  <div class="study-r">
+  <div class="mwc-study-r">
     <CButton type="transparent" @click="openLayoutName">Save</CButton>
     <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
       <template #trigger="{ triggerRef }">
-        <CToggleButton :ref="triggerRef" :is-opened="isOpened" class="study-r-toggle" @click="isOpened = true" />
+        <CToggleButton :ref="triggerRef" :is-opened="isOpened" class="mwc-study-r-toggle" @click="isOpened = true" />
       </template>
-      <div class="study-r-menu">
+      <div class="mwc-study-r-menu">
         <ChartMenuGroup>
           <ChartMenuItem @click="openLayoutName">Save Layout</ChartMenuItem>
         </ChartMenuGroup>

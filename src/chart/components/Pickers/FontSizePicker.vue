@@ -13,8 +13,10 @@ const select = (v: number) => {
 </script>
 
 <template>
-  <div class="fs">
-    <button v-for="s of values" :key="s" :active="s === size" class="fs-btn" @click="select(s)">{{ s }}px</button>
+  <div class="mwc-font-size-picker">
+    <button v-for="s of values" :key="s" :active="s === size" class="mwc-font-size-picker-btn" @click="select(s)">
+      {{ s }}px
+    </button>
   </div>
 </template>
 

@@ -14,8 +14,8 @@ const emit = defineEmits<{
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
-      <button :ref="triggerRef" class="study-color-btn" @click="isOpened = true">
-        <span class="study-color-bg" :style="{ backgroundColor: color }"></span>
+      <button :ref="triggerRef" class="mwc-study-color-btn" @click="isOpened = true">
+        <span class="mwc-study-color-bg" :style="{ backgroundColor: color }"></span>
       </button>
     </template>
     <ColorPicker :color="color" @select="emit('update', $event)" @close="isOpened = false" />

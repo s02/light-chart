@@ -54,20 +54,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="t-chart">
-    <div v-if="!isReady" class="t-chart-loader"></div>
-    <div class="t-chart-header">
+  <div class="mwc-chart">
+    <div v-if="!isReady" class="mwc-chart-loader"></div>
+    <div class="mwc-chart-header">
       <ChartHeader />
     </div>
-    <div class="t-chart-aside">
+    <div class="mwc-chart-aside">
       <ChartAside />
     </div>
-    <div class="t-chart-wrapper">
-      <div class="t-chart-legends">
+    <div class="mwc-chart-wrapper">
+      <div class="mwc-chart-legends">
         <ChartLegend :legends="mainPaneLegends" />
       </div>
-      <StudyPanel class="t-chart-drawings" />
-      <div ref="chartRef" class="t-chart-plot"></div>
+      <StudyPanel class="mwc-chart-drawings" />
+      <div ref="chartRef" class="mwc-chart-plot"></div>
     </div>
 
     <ModalContainer />

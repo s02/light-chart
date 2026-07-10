@@ -10,17 +10,17 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="ind-list">
-    <div class="ind-list-header">
-      <p class="ind-list-title">Indicators</p>
-      <button class="ind-list-close" @click="emit('close')"><CloseIcon /></button>
+  <div class="mwc-ind-list">
+    <div class="mwc-ind-list-header">
+      <p class="mwc-ind-list-title">Indicators</p>
+      <button class="mwc-ind-list-close" @click="emit('close')"><CloseIcon /></button>
     </div>
-    <div class="ind-list-body ch-scroll">
-      <div class="ind-list-group">Script Name</div>
+    <div class="mwc-ind-list-body ch-scroll">
+      <div class="mwc-ind-list-group">Script Name</div>
       <div
         v-for="script in INDICATOR_SCRIPTS"
         :key="script.indicator.ikey"
-        class="ind-list-item"
+        class="mwc-ind-list-item"
         @click="emit('close', script)">
         {{ i18n.translate(`study-${script.indicator.ikey}`) }}
       </div>

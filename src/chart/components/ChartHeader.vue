@@ -17,31 +17,31 @@ const isSeriesMenuOpened = ref(false)
 </script>
 
 <template>
-  <div class="chart-header">
-    <div class="chart-header-side">
+  <div class="mwc-chart-header">
+    <div class="mwc-chart-header-side">
       <FloatingDropdown :open="isResolutionMenuOpened" @update:open="isResolutionMenuOpened = false">
         <template #trigger="{ triggerRef }">
-          <button :ref="triggerRef" class="chart-header-btn" @click="isResolutionMenuOpened = true">
+          <button :ref="triggerRef" class="mwc-chart-header-btn" @click="isResolutionMenuOpened = true">
             {{ RESOLUTION_SETTINGS[state.resolutionId].name }}
           </button>
         </template>
         <ResolutionMenu @selected="isResolutionMenuOpened = false" />
       </FloatingDropdown>
 
-      <div class="chart-header-separator"></div>
+      <div class="mwc-chart-header-separator"></div>
 
       <FloatingDropdown :open="isSeriesMenuOpened" @update:open="isSeriesMenuOpened = false">
         <template #trigger="{ triggerRef }">
-          <button :ref="triggerRef" class="chart-header-btn" @click="isSeriesMenuOpened = true">
+          <button :ref="triggerRef" class="mwc-chart-header-btn" @click="isSeriesMenuOpened = true">
             <SeriesIcon :series-id="state.seriesId" />
           </button>
         </template>
         <SeriesMenu @selected="isSeriesMenuOpened = false" />
       </FloatingDropdown>
 
-      <div class="chart-header-separator"></div>
+      <div class="mwc-chart-header-separator"></div>
 
-      <button class="chart-header-btn chart-header-btn-indicator" @click="openScriptList()">
+      <button class="mwc-chart-header-btn chart-header-btn-indicator" @click="openScriptList()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="none">
           <path
             stroke="currentColor"
@@ -51,7 +51,7 @@ const isSeriesMenuOpened = ref(false)
       </button>
     </div>
 
-    <div class="chart-header-side">
+    <div class="mwc-chart-header-side">
       <StudyRepository />
     </div>
   </div>

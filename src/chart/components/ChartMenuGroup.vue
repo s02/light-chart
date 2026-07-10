@@ -3,9 +3,9 @@ defineProps<{ name?: string }>()
 </script>
 
 <template>
-  <div class="chart-group">
-    <div v-if="name" class="chart-group-name">{{ name }}</div>
-    <div class="chart-group-body">
+  <div class="mwc-chart-group">
+    <div v-if="name" class="mwc-chart-group-name">{{ name }}</div>
+    <div class="mwc-chart-group-body">
       <slot></slot>
     </div>
   </div>

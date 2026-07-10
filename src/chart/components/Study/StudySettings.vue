@@ -43,11 +43,11 @@ const setTab = (v: string) => {
 </script>
 
 <template>
-  <div class="studysett">
-    <div class="studysett-container">
-      <div class="studysett-header">
-        <p class="studysett-title">{{ i18n.translate(`study-${ikey}`) }}</p>
-        <button class="studysett-close" @click="emit('close')"><CloseIcon /></button>
+  <div class="mwc-studysett">
+    <div class="mwc-studysett-container">
+      <div class="mwc-studysett-header">
+        <p class="mwc-studysett-title">{{ i18n.translate(`study-${ikey}`) }}</p>
+        <button class="mwc-studysett-close" @click="emit('close')"><CloseIcon /></button>
       </div>
       <ChartTabs
         v-if="tabs && tab"
@@ -56,25 +56,25 @@ const setTab = (v: string) => {
         @selected="setTab" />
     </div>
 
-    <div class="studysett-body ch-scroll">
-      <div class="studysett-container">
+    <div class="mwc-studysett-body ch-scroll">
+      <div class="mwc-studysett-container">
         <template v-if="tab === 'text'">
-          <div class="studysett-row">
-            <div v-if="schema.text?.find((ps) => ps.key === 'text-color')" class="studysett-ctrl-color">
+          <div class="mwc-studysett-row">
+            <div v-if="schema.text?.find((ps) => ps.key === 'text-color')" class="mwc-studysett-ctrl-color">
               <StudyColor :color="String(params['text-color'])" @update="params['text-color'] = $event" />
             </div>
-            <div v-if="schema.text?.find((ps) => ps.key === 'font-size')" class="studysett-ctrl-font">
+            <div v-if="schema.text?.find((ps) => ps.key === 'font-size')" class="mwc-studysett-ctrl-font">
               <StudyFontSize :size="Number(params['font-size'])" @update="params['font-size'] = $event" />
             </div>
           </div>
-          <div v-if="schema.text?.find((ps) => ps.key === 'text')" class="studysett-ctrl-text">
+          <div v-if="schema.text?.find((ps) => ps.key === 'text')" class="mwc-studysett-ctrl-text">
             <textarea
               :value="String(params['text'])"
               @input="params['text'] = ($event.target as HTMLTextAreaElement).value"></textarea>
           </div>
         </template>
         <template v-else>
-          <div class="studysett-group">
+          <div class="mwc-studysett-group">
             <template v-for="el in schema[tab]" :key="el.key">
               <label>{{ i18n.translate(`study-prop-${el.key}`) }}</label>
               <StudyColor
@@ -96,7 +96,7 @@ const setTab = (v: string) => {
                 :min="el.min"
                 :max="el.max"
                 :step="el.step || 1"
-                class="studysett-input" />
+                class="mwc-studysett-input" />
               <CCheckbox v-else-if="el.type === 'bool'" v-model="params[el.key]" />
               <CSelect
                 v-else-if="el.type === 'select' && el.values"
@@ -108,7 +108,7 @@ const setTab = (v: string) => {
       </div>
     </div>
 
-    <div class="studysett-footer studysett-container">
+    <div class="mwc-studysett-footer studysett-container">
       <CButton type="primary" @click="apply()">Apply</CButton>
     </div>
   </div>

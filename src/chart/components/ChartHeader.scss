@@ -1,15 +1,15 @@
-.chart-header-side,
-.chart-header {
+.mwc-chart-header-side,
+.mwc-chart-header {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.chart-header {
+.mwc-chart-header {
   justify-content: space-between;
 }
 
-.chart-header-separator {
+.mwc-chart-header-separator {
   background-color: #4a4a4a;
   margin-left: 4px;
   margin-right: 4px;
@@ -17,7 +17,7 @@
   width: 1px;
 }
 
-.chart-header-btn {
+.mwc-chart-header-btn {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -39,6 +39,6 @@
   }
 }
 
-.chart-header-btn-indicator {
+.mwc-chart-header-btn-indicator {
   padding-inline: 5px 10px;
 }

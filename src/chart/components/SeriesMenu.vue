@@ -19,12 +19,12 @@ const setSeries = (seriesId: SeriesId) => {
 const values: SeriesId[] = ['bar', 'candlestick', 'line', 'area', 'heikin', 'hollow']
 </script>
 <template>
-  <div class="series-menu">
+  <div class="mwc-series-menu">
     <ChartMenuItem
       v-for="series in values"
       :key="series"
       :active="state.seriesId === series"
-      class="series-menu-item"
+      class="mwc-series-menu-item"
       @click="setSeries(series)">
       <SeriesIcon :series-id="series" />
       {{ i18n.translate(`series-${series}`) }}</ChartMenuItem

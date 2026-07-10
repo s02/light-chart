@@ -14,7 +14,7 @@ const emit = defineEmits<{
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
-      <button :ref="triggerRef" class="study-line-btn" @click="isOpened = true">
+      <button :ref="triggerRef" class="mwc-study-line-btn" @click="isOpened = true">
         <span class="study-line-w" :style="{ height: `${width}px` }"></span>
       </button>
     </template>

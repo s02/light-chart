@@ -34,7 +34,7 @@ const setResolution = (value: ResolutionId) => {
 </script>
 
 <template>
-  <div class="resolution-menu">
+  <div class="mwc-resolution-menu">
     <ChartMenuGroup v-for="group in groups" :key="group.name" :name="group.name">
       <ChartMenuItem
         v-for="resolutionId in group.values"

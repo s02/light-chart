@@ -18,12 +18,12 @@ const setValue = (val: StudyParamValue) => {
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
-      <div :ref="triggerRef" class="c-select" @click="isOpened = true">
+      <div :ref="triggerRef" class="mwc-select" @click="isOpened = true">
         {{ currentValue }}
         <CToggleButton :is-opened="isOpened" />
       </div>
     </template>
-    <div class="c-dropdown">
+    <div class="mwc-dropdown">
       <ChartMenuItem v-for="val of values" :key="val" @click="setValue(val)">
         {{ val }}
       </ChartMenuItem>

@@ -1,15 +1,15 @@
-.lp-line {
+.mwc-line-width-picker-line {
   width: 18px;
   background-color: currentcolor;
   display: block;
 }
 
-.lp {
+.mwc-line-width-picker {
   display: grid;
   grid-template-columns: repeat(2, 70px);
 }
 
-.lp-button {
+.mwc-line-width-picker-button {
   display: flex;
   color: inherit;
   font-family: inherit;

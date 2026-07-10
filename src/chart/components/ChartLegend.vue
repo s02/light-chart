@@ -29,7 +29,7 @@ const handleMenuAction = (name: string) => {
 </script>
 
 <template>
-  <div class="chart-legends">
+  <div class="mwc-chart-legends">
     <FloatingDropdown
       v-for="legend in legends"
       :key="legend.id"
@@ -37,12 +37,12 @@ const handleMenuAction = (name: string) => {
       :open="!!id"
       @update:open="id = null">
       <template #trigger="{ triggerRef }">
-        <div class="chart-legend" :class="legend.category">
-          <div v-if="legend.category !== 'main'" class="chart-legend-line">
-            <span class="chart-legend-label">{{ legend.key }}</span>
-            <div :ref="triggerRef" class="chart-legend-menu" @click="id = legend.id">
-              <div class="chart-legend-name">{{ legend.key }}</div>
-              <div class="chart-legend-menu-icon">
+        <div class="mwc-chart-legend" :class="legend.category">
+          <div v-if="legend.category !== 'main'" class="mwc-chart-legend-line">
+            <span class="mwc-chart-legend-label">{{ legend.key }}</span>
+            <div :ref="triggerRef" class="mwc-chart-legend-menu" @click="id = legend.id">
+              <div class="mwc-chart-legend-name">{{ legend.key }}</div>
+              <div class="mwc-chart-legend-menu-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18">
                   <path
                     fill="currentColor"

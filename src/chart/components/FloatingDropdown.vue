@@ -62,14 +62,19 @@ onKeyStroke('Escape', () => {
   <slot name="trigger" :trigger-ref="setTriggerRef" :trigger-props="triggerProps" :is-open="isOpened" />
 
   <Teleport v-if="rootEl" :to="rootEl">
-    <div v-if="isOpened" ref="targetRef" class="f-dropdown" :style="floatingStyles" :data-placement="placement">
+    <div
+      v-if="isOpened"
+      ref="targetRef"
+      class="mwc-floating-dropdown"
+      :style="floatingStyles"
+      :data-placement="placement">
       <slot :close="close" :placement="placement" />
     </div>
   </Teleport>
 </template>
 
 <style lang="scss" scoped>
-.f-dropdown {
+.mwc-floating-dropdown {
   background-color: #001020;
   border-radius: 6px;
   box-shadow: 0 2px 4px #0006;

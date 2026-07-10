@@ -29,11 +29,11 @@ onMounted(async () => {
 
 <template>
   <ChartMenuGroup v-for="[categoryIndex, emojis] in groups" :key="categoryIndex" :name="categoryNames[categoryIndex]">
-    <div class="emoji-group">
+    <div class="mwc-emoji-group">
       <span
         v-for="emoji in emojis"
         :key="emoji.name"
-        class="emoji"
+        class="mwc-emoji"
         :title="emoji.name"
         @click="emit('click', emoji.emoji)"
         >{{ emoji.emoji }}</span

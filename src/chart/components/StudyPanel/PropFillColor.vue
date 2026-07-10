@@ -14,7 +14,7 @@ const emit = defineEmits<{
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
-      <div :ref="triggerRef" class="drw-btn drw-btn-c" @click="isOpened = true">
+      <div :ref="triggerRef" class="mwc-drw-btn mwc-drw-btn-c" @click="isOpened = true">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20" fill="none">
           <path
             stroke="currentColor"
@@ -22,7 +22,7 @@ const emit = defineEmits<{
           <path fill="currentColor" d="M0 16.5C0 15 2.5 12 2.5 12S5 15 5 16.5 4 19 2.5 19 0 18 0 16.5z"></path>
           <circle fill="currentColor" cx="9.5" cy="9.5" r="1.5"></circle>
         </svg>
-        <div class="drw-btn-c-line" :style="{ backgroundColor: `${color}` }"></div>
+        <div class="mwc-drw-btn-c-line" :style="{ backgroundColor: `${color}` }"></div>
       </div>
     </template>
     <ColorPicker :color="color" @select="emit('update', $event)" @close="isOpened = false" />

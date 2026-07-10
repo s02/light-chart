@@ -19,8 +19,8 @@ const update = (size: number) => {
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
-      <div :ref="triggerRef" class="drw-btn drw-btn-w" @click="isOpened = true">
-        <div class="drw-btn-w-label">{{ size }}px</div>
+      <div :ref="triggerRef" class="mwc-drw-btn mwc-drw-btn-w" @click="isOpened = true">
+        <div class="mwc-drw-btn-w-label">{{ size }}px</div>
       </div>
     </template>
 

@@ -94,49 +94,47 @@ const selectDrawing = (script: DrawingScript) => {
 </script>
 
 <template>
-  <div class="chart-aside">
-    <FloatingDropdown
-      v-for="g in groups"
-      :key="g"
-      :open="currentDrawingGroup === g"
-      placement="right-start"
-      @update:open="currentDrawingGroup = null">
-      <template #trigger="{ triggerRef }">
-        <div :ref="triggerRef" class="ca-btn">
-          <div
-            class="ca-btn-icon"
-            :class="{ initialized: initialized === menu[g].drawing.ikey }"
-            @click="handleStart(menu[g].drawing.ikey)"
-            v-html="menu[g].icon"></div>
-          <div
-            class="ca-btn-collapse"
-            :class="{ opened: currentDrawingGroup === g }"
-            @click="currentDrawingGroup ? (currentDrawingGroup = null) : (currentDrawingGroup = g)">
-            <svg class="ca-btn-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" width="4" height="7">
-              <path d="M.6 1.4l1.4-1.4 8 8-8 8-1.4-1.4 6.389-6.532-6.389-6.668z" stroke="currentColor"></path>
-            </svg>
-          </div>
+  <FloatingDropdown
+    v-for="g in groups"
+    :key="g"
+    :open="currentDrawingGroup === g"
+    placement="right-start"
+    @update:open="currentDrawingGroup = null">
+    <template #trigger="{ triggerRef }">
+      <div :ref="triggerRef" class="mwc-ca-btn">
+        <div
+          class="mwc-ca-btn-icon"
+          :class="{ initialized: initialized === menu[g].drawing.ikey }"
+          @click="handleStart(menu[g].drawing.ikey)"
+          v-html="menu[g].icon"></div>
+        <div
+          class="mwc-ca-btn-collapse"
+          :class="{ opened: currentDrawingGroup === g }"
+          @click="currentDrawingGroup ? (currentDrawingGroup = null) : (currentDrawingGroup = g)">
+          <svg class="mwc-ca-btn-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" width="4" height="7">
+            <path d="M.6 1.4l1.4-1.4 8 8-8 8-1.4-1.4 6.389-6.532-6.389-6.668z" stroke="currentColor"></path>
+          </svg>
         </div>
-      </template>
-
-      <div v-if="currentDrawingGroup == 'emoji'" class="ca-emoji-menu">
-        <EmojiList @click="handleStart('emoji', { params: { emoji: $event } })" />
       </div>
+    </template>
 
-      <div v-else class="ca-drawing-menu">
-        <ChartMenuGroup v-for="subg in getDrawingSubgroups(g)" :key="subg" :name="subg">
-          <ChartMenuItem
-            v-for="item in getDrawingItems(subg)"
-            :key="item.drawing.ikey"
-            class="ca-menu-item"
-            @click="selectDrawing(item)">
-            <div v-html="item.icon"></div>
-            {{ i18n.translate(`draw-line-${item.drawing.ikey}`) }}
-          </ChartMenuItem>
-        </ChartMenuGroup>
-      </div>
-    </FloatingDropdown>
-  </div>
+    <div v-if="currentDrawingGroup == 'emoji'" class="mwc-ca-emoji-menu">
+      <EmojiList @click="handleStart('emoji', { params: { emoji: $event } })" />
+    </div>
+
+    <div v-else class="mwc-ca-drawing-menu">
+      <ChartMenuGroup v-for="subg in getDrawingSubgroups(g)" :key="subg" :name="subg">
+        <ChartMenuItem
+          v-for="item in getDrawingItems(subg)"
+          :key="item.drawing.ikey"
+          class="mwc-ca-menu-item"
+          @click="selectDrawing(item)">
+          <div v-html="item.icon"></div>
+          {{ i18n.translate(`draw-line-${item.drawing.ikey}`) }}
+        </ChartMenuItem>
+      </ChartMenuGroup>
+    </div>
+  </FloatingDropdown>
 </template>
 
 <style lang="scss" scoped>

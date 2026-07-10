@@ -1,27 +1,27 @@
-.ca-drawing-menu {
+.mwc-ca-drawing-menu {
   min-width: 200px;
 }
 
-.ca-emoji-menu {
+.mwc-ca-emoji-menu {
   width: 360px;
 }
 
-.ca-menu-item {
+.mwc-ca-menu-item {
   padding-top: 6px;
   padding-bottom: 6px;
 }
 
-.ca-btn {
+.mwc-ca-btn {
   cursor: pointer;
   display: flex;
 }
 
-.ca-btn-arrow {
+.mwc-ca-btn-arrow {
   opacity: 0;
   transition: transform 200ms ease;
 }
 
-.ca-btn-icon {
+.mwc-ca-btn-icon {
   display: flex;
   align-items: center;
   color: #dbdbdb;
@@ -44,13 +44,13 @@
   &:hover {
     background-color: #303030;
 
-    & + .ca-btn-collapse > .ca-btn-arrow {
+    & + .mwc-ca-btn-collapse > .mwc-ca-btn-arrow {
       opacity: 1;
     }
   }
 }
 
-.ca-btn-collapse {
+.mwc-ca-btn-collapse {
   border-radius: 4px;
   height: 32px;
   outline: 2px none #2962ff;
@@ -64,13 +64,13 @@
   &:hover {
     background-color: #303030;
 
-    .ca-btn-arrow {
+    .mwc-ca-btn-arrow {
       opacity: 1;
     }
   }
 
   &.opened {
-    .ca-btn-arrow {
+    .mwc-ca-btn-arrow {
       transform: rotate(-180deg);
     }
   }

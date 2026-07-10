@@ -25,20 +25,20 @@ const remove = (layout: Layout) => {
 </script>
 
 <template>
-  <div class="study-list">
-    <div class="study-list-header">
-      <div class="study-list-title">Layouts</div>
-      <button class="study-list-close" @click="emit('close')"><CloseIcon /></button>
+  <div class="mwc-study-list">
+    <div class="mwc-study-list-header">
+      <div class="mwc-study-list-title">Layouts</div>
+      <button class="mwc-study-list-close" @click="emit('close')"><CloseIcon /></button>
     </div>
-    <div class="study-list-body">
+    <div class="mwc-study-list-body">
       <template v-if="layouts.length">
-        <div v-for="layout in layouts" :key="layout.name" class="study-item" @click="emit('close', layout)">
-          <div class="study-item-body">
-            <div class="study-item-name">{{ layout.name }}</div>
-            <div class="study-item-details">{{ getDetails(layout) }}</div>
+        <div v-for="layout in layouts" :key="layout.name" class="mwc-study-item" @click="emit('close', layout)">
+          <div class="mwc-study-item-body">
+            <div class="mwc-study-item-name">{{ layout.name }}</div>
+            <div class="mwc-study-item-details">{{ getDetails(layout) }}</div>
           </div>
-          <div class="study-item-aside">
-            <div class="study-item-del" @click.stop="remove(layout)">
+          <div class="mwc-study-item-aside">
+            <div class="mwc-study-item-del" @click.stop="remove(layout)">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18">
                 <path
                   fill="currentColor"
@@ -48,7 +48,7 @@ const remove = (layout: Layout) => {
           </div>
         </div>
       </template>
-      <div v-else class="study-list-empty">No saved layouts</div>
+      <div v-else class="mwc-study-list-empty">No saved layouts</div>
     </div>
   </div>
 </template>

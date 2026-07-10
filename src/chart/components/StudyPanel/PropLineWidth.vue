@@ -19,9 +19,9 @@ const update = (width: number) => {
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
-      <div :ref="triggerRef" class="drw-btn drw-btn-w" @click="isOpened = true">
-        <div class="drw-btn-w-line" :style="{ height: `${width}px` }"></div>
-        <div class="drw-btn-w-label">{{ width }}px</div>
+      <div :ref="triggerRef" class="mwc-drw-btn mwc-drw-btn-w" @click="isOpened = true">
+        <div class="mwc-drw-btn-w-line" :style="{ height: `${width}px` }"></div>
+        <div class="mwc-drw-btn-w-label">{{ width }}px</div>
       </div>
     </template>
     <LineWidthPicker :values="[1, 2, 3, 4, 5, 6]" :width="width" @select="update" />

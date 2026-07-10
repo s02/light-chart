@@ -38,16 +38,16 @@ const changeOpacity = (value: string) => {
 </script>
 
 <template>
-  <div class="color-picker">
-    <div class="color-picker-colors">
+  <div class="mwc-color-picker">
+    <div class="mwc-color-picker-colors">
       <button
         v-for="c of DRAWING_COLORS"
         :key="c"
-        class="color"
+        class="mwc-color"
         :style="{ backgroundColor: c }"
         @click="selectBaseColor(c)"></button>
     </div>
-    <div class="color-picker-opacity">
+    <div class="mwc-color-picker-opacity">
       <label>Opacity {{ colorValue.opacity }}%</label>
       <input
         :value="colorValue.opacity"

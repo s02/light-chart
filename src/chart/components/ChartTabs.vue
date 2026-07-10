@@ -8,18 +8,18 @@ const emit = defineEmits<(e: 'selected', key: Tab) => void>()
 </script>
 
 <template>
-  <div class="tabs">
-    <div class="tabs-items">
+  <div class="mwc-tabs">
+    <div class="mwc-tabs-items">
       <div
         v-for="el in tabs"
         :key="el.key"
         :class="{ active: active === el.key }"
-        class="tabs-item"
+        class="mwc-tabs-item"
         @click="emit('selected', el.key)">
         {{ i18n.translate(el.key) }}
       </div>
     </div>
-    <div class="tabs-border"></div>
+    <div class="mwc-tabs-border"></div>
   </div>
 </template>
 

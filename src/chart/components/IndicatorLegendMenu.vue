@@ -7,8 +7,8 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="indicators-legend-menu">
-    <ChartMenuItem class="indicators-legend-menu-item" @click="emit('action', 'remove')">
+  <div class="mwc-indicators-legend-menu">
+    <ChartMenuItem class="mwc-indicators-legend-menu-item" @click="emit('action', 'remove')">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
         <path
           fill="currentColor"
@@ -16,7 +16,7 @@ const emit = defineEmits<{
       </svg>
       Remove</ChartMenuItem
     >
-    <ChartMenuItem class="indicators-legend-menu-item" @click="emit('action', 'edit')">
+    <ChartMenuItem class="mwc-indicators-legend-menu-item" @click="emit('action', 'edit')">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="currentColor">
         <path fill-rule="evenodd" d="M18 14a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-1 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
         <path

@@ -1,30 +1,30 @@
-.chart-legends {
+.mwc-chart-legends {
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 5px;
 }
 
-.chart-legend-line {
+.mwc-chart-legend-line {
   &:hover {
-    .chart-legend-menu {
+    .mwc-chart-legend-menu {
       opacity: 1;
     }
   }
 }
 
-.chart-legend-name,
-.chart-legend-label {
+.mwc-chart-legend-name,
+.mwc-chart-legend-label {
   color: #dbdbdb;
 }
 
-.chart-legend-label {
+.mwc-chart-legend-label {
   display: block;
   border: 1px solid transparent;
   padding: 1px 0;
 }
 
-.chart-legend-menu {
+.mwc-chart-legend-menu {
   background-color: #1a1a1a;
   gap: 14px;
   padding: 1px 4px;
@@ -42,12 +42,12 @@
   }
 }
 
-.chart-legend-menu-icon {
+.mwc-chart-legend-menu-icon {
   display: flex;
   align-items: center;
 }
 
-.chart-legend {
+.mwc-chart-legend {
   display: flex;
   gap: 6px;
   font-size: 13px;

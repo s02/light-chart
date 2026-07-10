@@ -9,15 +9,15 @@ const emit = defineEmits<(e: 'close', name?: string) => void>()
 </script>
 
 <template>
-  <div class="save-study">
-    <div class="save-study-header">
-      <button class="save-study-close" @click="emit('close')"><CloseIcon /></button>
+  <div class="mwc-save-study">
+    <div class="mwc-save-study-header">
+      <button class="mwc-save-study-close" @click="emit('close')"><CloseIcon /></button>
     </div>
-    <div class="save-study-title">Save New Chart Layout</div>
-    <div class="save-study-body">
-      <CInput v-model="name" class="save-study-input" />
+    <div class="mwc-save-study-title">Save New Chart Layout</div>
+    <div class="mwc-save-study-body">
+      <CInput v-model="name" class="mwc-save-study-input" />
     </div>
-    <div class="save-study-footer">
+    <div class="mwc-save-study-footer">
       <CButton type="primary" :disabled="!name || !name.length" @click="emit('close', name)">Save</CButton>
     </div>
   </div>

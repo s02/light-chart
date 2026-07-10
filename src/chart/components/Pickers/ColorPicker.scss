@@ -1,4 +1,4 @@
-.color {
+.mwc-color {
   border-radius: 2px;
   height: 15px;
   width: 15px;
@@ -7,14 +7,14 @@
   display: block;
 }
 
-.color-picker-colors {
+.mwc-color-picker-colors {
   display: flex;
   flex-wrap: wrap;
   padding: 12px;
   gap: 6px;
 }
 
-.color-picker-opacity {
+.mwc-color-picker-opacity {
   font-size: 13px;
   padding: 0 12px 12px;
   width: 100%;

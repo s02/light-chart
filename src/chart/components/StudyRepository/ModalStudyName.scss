@@ -1,4 +1,4 @@
-.save-study {
+.mwc-save-study {
   background-color: #262626;
   width: 380px;
   color: #dbdbdb;
@@ -10,7 +10,7 @@
   padding: 8px 16px 32px;
 }
 
-.save-study-close {
+.mwc-save-study-close {
   box-shadow: none;
   background-color: transparent;
   border: none;
@@ -22,14 +22,14 @@
   align-items: center;
 }
 
-.save-study-header {
+.mwc-save-study-header {
   display: flex;
   align-items: center;
   padding: 4px;
   justify-content: end;
 }
 
-.save-study-title {
+.mwc-save-study-title {
   font-size: 20px;
   font-weight: 600;
   line-height: 1;
@@ -39,11 +39,11 @@
   margin-bottom: 32px;
 }
 
-.save-study-input {
+.mwc-save-study-input {
   width: 100%;
 }
 
-.save-study-footer {
+.mwc-save-study-footer {
   display: flex;
   justify-content: end;
   margin-top: 16px;
