@@ -7,7 +7,7 @@ import ChartLegend from '@chart/components/ChartLegend.vue'
 import StudyPanel from '@chart/components/StudyPanel/StudyPanel.vue'
 import { useChart } from '@chart/useChart'
 import { useEngineApi } from '@chart/composables/useEngine'
-import type { AssetSymbol, ChartExpiration, ChartOption } from '@engine/types'
+import type { AssetSymbol, ChartExpiration, ChartOption, ResolutionId, SeriesId } from '@engine/types'
 import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
 
 const props = defineProps<{
@@ -17,6 +17,11 @@ const props = defineProps<{
   options?: ChartOption[]
   expiration?: ChartExpiration
   rootEl: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'resolutionChanged', resolution: ResolutionId): void
+  (e: 'seriesChanged', seriesId: SeriesId): void
 }>()
 
 const { state } = useChart()
@@ -42,7 +47,13 @@ onMounted(async () => {
     assetSymbol: toRef(props, 'assetSymbol'),
     resolutionId: toRef(state, 'resolutionId'),
     datafeedFactory: props.datafeedFactory,
-    rootEl: props.rootEl
+    rootEl: props.rootEl,
+    onResolutionChanged: (resolution: ResolutionId) => {
+      emit('resolutionChanged', resolution)
+    },
+    onSeriesChanged: (seriesId: SeriesId) => {
+      emit('seriesChanged', seriesId)
+    }
   })
 
   isReady.value = true

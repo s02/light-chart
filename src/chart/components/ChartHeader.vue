@@ -41,7 +41,7 @@ const isSeriesMenuOpened = ref(false)
 
       <div class="mwc-chart-header-separator"></div>
 
-      <button class="mwc-chart-header-btn chart-header-btn-indicator" @click="openScriptList()">
+      <button class="mwc-chart-header-btn mwc-chart-header-btn-indicator" @click="openScriptList()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="none">
           <path
             stroke="currentColor"

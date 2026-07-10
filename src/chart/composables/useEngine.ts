@@ -27,6 +27,8 @@ type EngineOptions = {
   resolutionId: Ref<ResolutionId>
   datafeedFactory: DatafeedFactory
   rootEl: string
+  onResolutionChanged(resolutionId: ResolutionId): void
+  onSeriesChanged(seriesId: SeriesId): void
 }
 
 function assertDrawingElement(el: DrawingElement | null): asserts el {
@@ -67,6 +69,17 @@ export const useEngineApi = () => {
     if (options.expiration.value) {
       pe.setExpiration(options.expiration.value)
     }
+
+    const plotEventsHandler = (ev: Parameters<Parameters<PlotEngine['subscribe']>[0]>[0]) => {
+      if (ev.type === 'resolutionChanged') {
+        options.onResolutionChanged(ev.data)
+      } else if (ev.type === 'seriesChanged') {
+        options.onSeriesChanged(ev.data)
+      }
+    }
+
+    pe.subscribe(plotEventsHandler)
+    unwatch.push(() => pe?.unsubscribe(plotEventsHandler))
 
     unwatch.push(
       pe.subscribeToLegends((l) => {

@@ -5,7 +5,14 @@ import { seriesOverlayFactory } from '@engine/series'
 import { PluginManager } from '@engine/plugins'
 import { WhitespaceSeries } from './series/WhitespaceSeries'
 import type { IChartApi, LogicalRange, MouseEventParams } from 'lightweight-charts'
-import type { ChartExpiration, ChartOption, Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
+import type {
+  ChartExpiration,
+  ChartOption,
+  Datafeed,
+  IndicatorOnPane,
+  ChartSeriesLegend,
+  ResolutionId
+} from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
 import type { IndicatorName } from '@engine/indicators'
 import { DrawingsManager } from '@engine/drawings'
@@ -18,6 +25,16 @@ type Params = {
   seriesId?: SeriesId
 }
 
+type PlotEvent =
+  | {
+      type: 'resolutionChanged'
+      data: ResolutionId
+    }
+  | {
+      type: 'seriesChanged'
+      data: SeriesId
+    }
+
 export class PlotEngine {
   #chart: IChartApi
   #datafeed: Datafeed
@@ -27,6 +44,7 @@ export class PlotEngine {
   #indicatorsManager: IndicatorsManager
   #drawingsManager: DrawingsManager
   #whitespace: WhitespaceSeries
+  #subscribers: Array<(event: PlotEvent) => void> = []
 
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
@@ -42,6 +60,14 @@ export class PlotEngine {
 
     this.#chart.timeScale().subscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
     console.log(`%c[Plot Engine: started]`, 'background: #90ac12; color:#fff')
+  }
+
+  subscribe(cb: (event: PlotEvent) => void) {
+    this.#subscribers.push(cb)
+  }
+
+  unsubscribe(cb: (event: PlotEvent) => void) {
+    this.#subscribers = this.#subscribers.filter((sub) => sub !== cb)
   }
 
   get ready() {
@@ -89,6 +115,10 @@ export class PlotEngine {
 
     this.#pluginManager.setSeries(series.getSeries())
     this.#drawingsManager.setSeries(series.getSeries())
+
+    this.#subscribers.forEach((sub) => {
+      sub({ type: 'seriesChanged', data: seriesId })
+    })
   }
 
   async setDatafeed(datafeed: Datafeed) {
@@ -99,6 +129,10 @@ export class PlotEngine {
     this.#indicatorsManager.setDatafeed(datafeed)
     this.#pluginManager.setResolution(datafeed.getResolutionId())
     this.#whitespace.setDatafeed(datafeed)
+
+    this.#subscribers.forEach((sub) => {
+      sub({ type: 'resolutionChanged', data: datafeed.getResolutionId() })
+    })
   }
 
   setOptions(options: ChartOption[]) {

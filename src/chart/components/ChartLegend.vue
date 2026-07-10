@@ -53,7 +53,7 @@ const handleMenuAction = (name: string) => {
             </div>
           </div>
 
-          <div v-for="(d, i) in legend.data" :key="i">
+          <div v-for="(d, i) in legend.data" :key="i" class="mwc-chart-legend-section">
             <span v-if="d.label">{{ d.label }}</span> <span :style="{ color: d.color }">{{ d.value }}</span>
           </div>
         </div>
