@@ -32,22 +32,30 @@ const setSeriesId = (seriesId: SeriesId) => {
     <div class="mwc-chart-header-side">
       <FloatingDropdown :open="isResolutionMenuOpened" @update:open="isResolutionMenuOpened = false">
         <template #trigger="{ triggerRef }">
-          <button :ref="triggerRef" class="mwc-chart-header-btn" @click="isResolutionMenuOpened = true">
+          <button
+            v-if="state.resolutionId"
+            :ref="triggerRef"
+            class="mwc-chart-header-btn"
+            @click="isResolutionMenuOpened = true">
             {{ RESOLUTION_SETTINGS[state.resolutionId].name }}
           </button>
         </template>
-        <ResolutionMenu :active="state.resolutionId" @selected="setResolutionId" />
+        <ResolutionMenu v-if="state.resolutionId" :active="state.resolutionId" @selected="setResolutionId" />
       </FloatingDropdown>
 
       <div class="mwc-chart-header-separator"></div>
 
       <FloatingDropdown :open="isSeriesMenuOpened" @update:open="isSeriesMenuOpened = false">
         <template #trigger="{ triggerRef }">
-          <button :ref="triggerRef" class="mwc-chart-header-btn" @click="isSeriesMenuOpened = true">
+          <button
+            v-if="state.seriesId"
+            :ref="triggerRef"
+            class="mwc-chart-header-btn"
+            @click="isSeriesMenuOpened = true">
             <SeriesIcon :series-id="state.seriesId" />
           </button>
         </template>
-        <SeriesMenu :active="state.seriesId" @selected="setSeriesId" />
+        <SeriesMenu v-if="state.seriesId" :active="state.seriesId" @selected="setSeriesId" />
       </FloatingDropdown>
 
       <div class="mwc-chart-header-separator"></div>
