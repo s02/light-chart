@@ -5,14 +5,15 @@ import type { IChartApi } from 'lightweight-charts'
 
 export class ExpirationLineModule extends BasePluginModule {
   #chart: IChartApi
-  #expiration: ChartExpiration | null = null
+  #expiration?: ChartExpiration
+  #offset?: number
 
   constructor(chart: IChartApi, resolutionId: ResolutionId) {
     super(resolutionId)
     this.#chart = chart
   }
 
-  setExpiration(expiration: ChartExpiration) {
+  setExpiration(expiration?: ChartExpiration) {
     this.#expiration = expiration
     this.detach()
     if (this.series) {
@@ -20,11 +21,15 @@ export class ExpirationLineModule extends BasePluginModule {
     }
   }
 
-  createPlugins() {
-    if (this.#expiration) {
-      return [new ExpirationLinesPlugin(this.#chart, this.#expiration, this.resolutionId)]
+  setOffset(offset?: number) {
+    this.#offset = offset
+    this.detach()
+    if (this.series) {
+      this.attach(this.series)
     }
+  }
 
-    return []
+  createPlugins() {
+    return [new ExpirationLinesPlugin(this.#chart, this.#expiration, this.#offset, this.resolutionId)]
   }
 }

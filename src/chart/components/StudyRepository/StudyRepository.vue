@@ -10,6 +10,7 @@ import ChartMenuGroup from '@chart/components/ChartMenuGroup.vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import type { Layout } from '@engine/indicators/types'
 import { getStudyRepository } from '@chart/components/StudyRepository/getStudyRepository'
+import { i18n } from '@chart/i18n'
 
 const { open } = useModal()
 const { getLayoutConfig, setLayoutConfig } = useEngineApi()
@@ -43,17 +44,17 @@ const openLayoutList = () => {
 
 <template>
   <div class="mwc-study-r">
-    <CButton type="transparent" @click="openLayoutName">Save</CButton>
+    <CButton type="transparent" @click="openLayoutName">{{ i18n.translate('menu-save-layout') }}</CButton>
     <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
       <template #trigger="{ triggerRef }">
         <CToggleButton :ref="triggerRef" :is-opened="isOpened" class="mwc-study-r-toggle" @click="isOpened = true" />
       </template>
       <div class="mwc-study-r-menu">
         <ChartMenuGroup>
-          <ChartMenuItem @click="openLayoutName">Save Layout</ChartMenuItem>
+          <ChartMenuItem @click="openLayoutName">{{ i18n.translate('menu-save-layout') }}</ChartMenuItem>
         </ChartMenuGroup>
         <ChartMenuGroup>
-          <ChartMenuItem @click="openLayoutList">Open Layout</ChartMenuItem>
+          <ChartMenuItem @click="openLayoutList">{{ i18n.translate('menu-open-layout') }}</ChartMenuItem>
         </ChartMenuGroup>
       </div>
     </FloatingDropdown>

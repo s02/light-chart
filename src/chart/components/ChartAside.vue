@@ -130,7 +130,7 @@ const selectDrawing = (script: DrawingScript) => {
           class="mwc-ca-menu-item"
           @click="selectDrawing(item)">
           <div v-html="item.icon"></div>
-          {{ i18n.translate(`draw-line-${item.drawing.ikey}`) }}
+          {{ i18n.translate(`study-${item.drawing.ikey}`) }}
         </ChartMenuItem>
       </ChartMenuGroup>
     </div>

@@ -1,4 +1,4 @@
-import { CloseLineView, LockLineView } from './ExpirationPluginPaneView'
+import { CloseLineView, LockLineView, OffsetLineView } from './ExpirationPluginPaneView'
 import type {
   IChartApi,
   ISeriesApi,
@@ -10,44 +10,58 @@ import type {
 } from 'lightweight-charts'
 import type { ChartExpiration, ResolutionId } from '@engine/types'
 
+const OFFSET_ALLOWED_RESOLUTIONS: ResolutionId[] = ['1S']
 const LOCK_ALLOWED_RESOLUTIONS: ResolutionId[] = ['1S', '5S', '10S', '15S', '30S']
 const CLOSE_ALLOWED_RESOLUTIONS: ResolutionId[] = ['1S', '5S', '10S', '15S', '30S', '1']
 
 export class ExpirationLinesPlugin implements ISeriesPrimitive<Time> {
   #chart: IChartApi
   #series: ISeriesApi<SeriesType> | null = null
-  #expiration: ChartExpiration
+  #expiration?: ChartExpiration
+  #offset?: number
   #resolutionId: ResolutionId
   #timerInterval: ReturnType<typeof setInterval> | null = null
 
   #lockLineView: LockLineView | null = null
   #closeLineView: CloseLineView | null = null
+  #offsetLineView: OffsetLineView | null = null
 
-  constructor(chart: IChartApi, expiration: ChartExpiration, resolutionId: ResolutionId) {
+  constructor(
+    chart: IChartApi,
+    expiration: ChartExpiration | undefined,
+    offset: number | undefined,
+    resolutionId: ResolutionId
+  ) {
     this.#chart = chart
     this.#expiration = expiration
     this.#resolutionId = resolutionId
+    this.#offset = offset
 
-    if (LOCK_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
+    if (this.#expiration && LOCK_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
       this.#lockLineView = new LockLineView(this, this.#expiration.lock)
     }
 
-    if (CLOSE_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
+    if (this.#expiration && CLOSE_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
       this.#closeLineView = new CloseLineView(this, this.#expiration.close)
+    }
+
+    if (typeof this.#offset !== 'undefined' && OFFSET_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
+      this.#offsetLineView = new OffsetLineView(this, this.#offset)
     }
   }
 
   attached({ series, requestUpdate }: SeriesAttachedParameter<Time>) {
     this.#series = series as ISeriesApi<SeriesType>
 
-    if (!this.#lockLineView) {
-      return
-    }
+    if (this.#lockLineView || this.#offsetLineView) {
+      this.#timerInterval = setInterval(() => {
+        if (this.#lockLineView) {
+          this.#lockLineView!.updateTimer()
+        }
 
-    this.#timerInterval = setInterval(() => {
-      this.#lockLineView!.updateTimer()
-      requestUpdate()
-    }, 1000)
+        requestUpdate()
+      }, 1000)
+    }
   }
 
   detached() {
@@ -90,6 +104,10 @@ export class ExpirationLinesPlugin implements ISeriesPrimitive<Time> {
 
     if (this.#lockLineView) {
       paneViews.push(this.#lockLineView)
+    }
+
+    if (this.#offsetLineView) {
+      paneViews.push(this.#offsetLineView)
     }
 
     return paneViews

@@ -8,4 +8,7 @@ export type TerminalChartConfig = {
   resolutionId: ResolutionId
   seriesId: SeriesId
 }
+
+export type Language = 'ru' | 'en'
+
 export type * from '@engine/types'

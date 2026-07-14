@@ -9,7 +9,7 @@ import type { Quote } from '@datafeed/types'
 let id = 1
 
 const lastQuotes = reactive<Record<Asset['id'], Quote>>({})
-const quoteSubIds = reactive<Record<Asset['id'], number>>({})
+const quoteSubIds = reactive<Record<Asset['id'], string>>({})
 
 export const useQuoteHandler = (assetIdRef: Ref<Asset['id']>) => {
   const subscribeToQuotes = (assetId: string) =>
@@ -17,7 +17,7 @@ export const useQuoteHandler = (assetIdRef: Ref<Asset['id']>) => {
       lastQuotes[toValue(assetIdRef)] = quote
     })
 
-  const unsubscribeFromQuotes = (assetId: string, id: number) => Transport.get().ws.unsubscribeFromQuotes(assetId, id)
+  const unsubscribeFromQuotes = (assetId: string, id: string) => Transport.get().ws.unsubscribeFromQuotes(assetId, id)
 
   onUnmounted(() => {
     const assetId = toValue(assetIdRef)

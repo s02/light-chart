@@ -1,7 +1,7 @@
 import { ASSETS, PROFITABILITY } from '@app/constants'
 import { computed, reactive, watch } from 'vue'
 import type { AppExpiration, Asset, Expiration, ProfitabilityType, Option } from '@app/types'
-import type { AssetSymbol, ResolutionId, SeriesId } from '@chart/types'
+import type { AssetSymbol, Language, ResolutionId, SeriesId } from '@chart/types'
 import { getActualExpiration, useExpirations } from '@app/composables/useExpirations'
 import { helpers } from '@chart/helpers'
 
@@ -13,6 +13,7 @@ type ChartUserState = {
   expiration?: Expiration
   timeZone: string
   options: Record<Asset['id'], Option[]>
+  language: Language
 }
 
 const storage = {
@@ -20,18 +21,19 @@ const storage = {
     localStorage.setItem('mwc-state', JSON.stringify(state))
   },
   load: () => {
-    const saved = localStorage.getItem('mwc-state')
-    return saved
-      ? JSON.parse(saved)
-      : {
-          resolutionId: '5S',
-          expiration: undefined,
-          seriesId: 'candlestick',
-          assetSymbol: ASSETS[0],
-          profitabilityType: PROFITABILITY.TURBO,
-          timeZone: 'Etc/UTC',
-          options: {}
-        }
+    const item = localStorage.getItem('mwc-state')
+    const saved = item ? JSON.parse(item) : {}
+
+    return {
+      resolutionId: saved.resolutionId || '5S',
+      expiration: saved.expiration,
+      seriesId: saved.seriesId || 'candlestick',
+      assetSymbol: saved.assetSymbol || ASSETS[0],
+      profitabilityType: saved.profitabilityType || PROFITABILITY.TURBO,
+      timeZone: saved.timeZone || 'Etc/UTC',
+      language: saved.language || 'en',
+      options: saved.options || {}
+    }
   }
 }
 
@@ -90,6 +92,10 @@ export const useState = () => {
     state.resolutionId = resolutionId
   }
 
+  const setLanguage = (lang: Language) => {
+    state.language = lang
+  }
+
   return {
     setChart,
     setSeries,
@@ -97,6 +103,7 @@ export const useState = () => {
     setTimeZone,
     addOption,
     setExpiration,
+    setLanguage,
     state: computed(() => ({
       ...state,
       expirations: expirations.value,

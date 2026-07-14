@@ -16,7 +16,7 @@ export class DatafeedAdapter implements Datafeed {
   #resolution: ResolutionId
   #quotesBuffer: Quote[] = []
   #earliestDate?: Date
-  #subscriptionId?: number
+  #subscriptionId?: string
   #loadingBars = false
   #inited: Promise<void>
   #callbacks: Map<string, DatafeedCallbackFn> = new Map()
@@ -153,6 +153,6 @@ export type CandlesHttpClient = {
 }
 
 export type QuotesWwebsocketClient = {
-  subscribeToQuotes(assetId: string, callback: (quote: Quote) => void): Promise<number>
-  unsubscribeFromQuotes(assetId: string, id: number): void
+  subscribeToQuotes(assetId: string, callback: (quote: Quote) => void): Promise<string>
+  unsubscribeFromQuotes(assetId: string, id: string): void
 }

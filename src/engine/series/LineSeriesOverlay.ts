@@ -20,22 +20,10 @@ export class LineSeriesOverlay extends AbstractSeriesOverlay<LineData<Time>> {
   protected override transformData(result: DatafeedResult) {
     if (result.type === 'set') {
       const data = result.data.map((bar) => this.getValue(bar))
-      try {
-        this.series.setData(data)
-      } catch (e) {
-        console.log('CATCHED')
-        console.log(e)
-        console.log(data, this.series.data)
-      }
+      this.series.setData(data)
     } else {
       result.data.forEach((bar) => {
-        try {
-          this.series.update(this.getValue(bar))
-        } catch (e) {
-          console.log('CATCHED')
-          console.log(e)
-          console.log(bar, this.series.data)
-        }
+        this.series.update(this.getValue(bar))
       })
     }
   }

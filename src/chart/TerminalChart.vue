@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, toRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref, toRef, watch } from 'vue'
 import ChartHeader from '@chart/components/ChartHeader.vue'
 import ChartAside from '@chart/components/ChartAside.vue'
 import ModalContainer from '@chart/ModalContainer.vue'
@@ -8,7 +8,7 @@ import StudyPanel from '@chart/components/StudyPanel/StudyPanel.vue'
 import { useChart } from '@chart/useChart'
 import { useEngineApi } from '@chart/composables/useEngine'
 import type { AssetSymbol, ChartExpiration, ChartOption, ResolutionId, SeriesId } from '@engine/types'
-import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
+import type { DatafeedFactory, Language, TerminalChartConfig } from '@chart/types'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
@@ -17,6 +17,8 @@ const props = defineProps<{
   defaultConfig: TerminalChartConfig
   options?: ChartOption[]
   expiration?: ChartExpiration
+  expirationOffset?: number
+  language: Language
   rootEl: string
 }>()
 
@@ -30,6 +32,13 @@ const isReady = ref(false)
 
 state.resolutionId = props.defaultConfig.resolutionId
 state.seriesId = props.defaultConfig.seriesId
+watch(
+  () => props.language,
+  (language) => {
+    state.language = language
+  },
+  { immediate: true }
+)
 
 const chartRef = ref<HTMLElement | null>(null)
 const mainPaneLegends = computed(() => legends.value.filter((legend) => legend.paneIndex === 0))
@@ -46,6 +55,7 @@ onMounted(async () => {
     timeZone: toRef(props, 'timeZone'),
     options: toRef(props, 'options'),
     expiration: toRef(props, 'expiration'),
+    expirationOffset: toRef(props, 'expirationOffset'),
     assetSymbol: toRef(props, 'assetSymbol'),
     datafeedFactory: props.datafeedFactory,
     rootEl: props.rootEl,

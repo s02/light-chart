@@ -125,7 +125,7 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
   #calculate(bars: ChartBar[]) {
     const source = getSourceSeries(bars, 'close')
     const basis = ta.ema(source, this.#params['kc-length'])
-    console.log(this.#params['kc-useTrueRange'])
+
     const trSeries = this.#params['kc-useTrueRange']
       ? ta.tr(bars)
       : getSourceSeries(bars, 'high').sub(getSourceSeries(bars, 'low'))

@@ -9,8 +9,9 @@ import { DatafeedFactory } from '@datafeed/DatafeedFactory'
 import { Transport } from '@app/transport'
 import TimezonesMenu from '@app/components/TimezonesMenu.vue'
 import { useState } from '@app/composables/useState'
+import type { Language } from '@chart/types'
 
-const { state, setSeries, setResolution, setTimeZone } = useState()
+const { state, setSeries, setResolution, setTimeZone, setLanguage } = useState()
 const { buyOption, options } = useTrading(toRef(() => state.value.assetSymbol.id))
 const datafeedFactory = new DatafeedFactory(Transport.get().http, Transport.get().ws)
 
@@ -41,6 +42,7 @@ const buy = (direction: 'up' | 'down') => {
     <div class="terminal-chart">
       <TerminalChart
         root-el="#teleport"
+        :language="state.language"
         :options="chartOptions"
         :expiration="state.currentExpiration?.chartExpiration"
         :asset-symbol="state.assetSymbol"
@@ -57,6 +59,10 @@ const buy = (direction: 'up' | 'down') => {
       <div class="terminal-menus">
         <ExpirationMenu />
         <TimezonesMenu :model-value="state.timeZone" @update:model-value="setTimeZone($event!)" />
+        <select :value="state.language" @change="setLanguage(($event.target as HTMLSelectElement).value as Language)">
+          <option value="ru">Русский</option>
+          <option value="en">English</option>
+        </select>
       </div>
 
       <div class="buy-buttons">

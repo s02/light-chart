@@ -34,7 +34,7 @@ const handleMenuAction = (name: string) => {
       v-for="legend in legends"
       :key="legend.id"
       placement="right-start"
-      :open="!!id"
+      :open="id === legend.id"
       @update:open="id = null">
       <template #trigger="{ triggerRef }">
         <div class="mwc-chart-legend" :class="legend.category">

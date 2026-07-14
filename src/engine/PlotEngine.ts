@@ -139,8 +139,12 @@ export class PlotEngine {
     this.#pluginManager.option.setOptions(options)
   }
 
-  setExpiration(expiration: ChartExpiration) {
+  setExpiration(expiration?: ChartExpiration) {
     this.#pluginManager.exp.setExpiration(expiration)
+  }
+
+  setExpirationOffset(offset?: number) {
+    this.#pluginManager.exp.setOffset(offset)
   }
 
   clearStudies() {

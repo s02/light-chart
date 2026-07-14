@@ -59,3 +59,36 @@ export class LockLineView extends CloseLineView {
     return new LockLineRenderer(this.x, this.#timer && this.#timer.diff <= 300 ? this.#timer.label : '')
   }
 }
+
+export class OffsetLineView implements IPrimitivePaneView, PaneView {
+  protected offset: number
+  protected source: ExpirationLinesPlugin
+  protected x: Coordinate | null = null
+
+  constructor(source: ExpirationLinesPlugin, offset: number) {
+    this.source = source
+    this.offset = offset
+  }
+
+  update() {
+    const timeScale = this.source.getChart().timeScale()
+    const lastBarTime = this.source.getLastBarTime()
+
+    if (!lastBarTime) {
+      return
+    }
+
+    const time = lastBarTime + this.offset
+    const posLogical = getBarLogical(timeScale, lastBarTime, time as UTCTimestamp, this.source.getResolutionId())
+
+    if (!posLogical) {
+      return
+    }
+
+    this.x = timeScale.logicalToCoordinate(posLogical)
+  }
+
+  renderer(): IPrimitivePaneRenderer {
+    return new CloseLineRenderer(this.x)
+  }
+}

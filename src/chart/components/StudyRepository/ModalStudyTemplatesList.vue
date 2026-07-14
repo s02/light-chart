@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import { getStudyRepository } from '@chart/components/StudyRepository/getStudyRepository'
+import { i18n } from '@chart/i18n'
 import type { Layout } from '@engine/indicators/types'
 import { ref } from 'vue'
 
@@ -27,7 +28,7 @@ const remove = (layout: Layout) => {
 <template>
   <div class="mwc-study-list">
     <div class="mwc-study-list-header">
-      <div class="mwc-study-list-title">Layouts</div>
+      <div class="mwc-study-list-title">{{ i18n.translate('modal-templates-title') }}</div>
       <button class="mwc-study-list-close" @click="emit('close')"><CloseIcon /></button>
     </div>
     <div class="mwc-study-list-body">
@@ -48,7 +49,7 @@ const remove = (layout: Layout) => {
           </div>
         </div>
       </template>
-      <div v-else class="mwc-study-list-empty">No saved layouts</div>
+      <div v-else class="mwc-study-list-empty">{{ i18n.translate('modal-templates-empty') }}</div>
     </div>
   </div>
 </template>

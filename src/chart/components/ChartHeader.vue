@@ -9,6 +9,7 @@ import { useIndicators } from '@chart/useIndicators'
 import StudyRepository from '@chart/components/StudyRepository/StudyRepository.vue'
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import type { ResolutionId, SeriesId } from '@engine/types'
+import { i18n } from '@chart/i18n'
 
 const { state } = useChart()
 const { openScriptList } = useIndicators()
@@ -66,7 +67,7 @@ const setSeriesId = (seriesId: SeriesId) => {
             stroke="currentColor"
             d="M20 17l-5 5M15 17l5 5M9 11.5h7M17.5 8a2.5 2.5 0 0 0-5 0v11a2.5 2.5 0 0 1-5 0"></path>
         </svg>
-        Indicators
+        {{ i18n.translate('menu-indicators') }}
       </button>
     </div>
 

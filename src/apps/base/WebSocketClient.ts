@@ -12,7 +12,7 @@ type Subscriptions = Record<
   ChannelName,
   {
     subscription: Centrifuge.Subscription
-    callbacks: { id: number; fn: CallbackFn }[]
+    callbacks: { id: string; fn: CallbackFn }[]
   }
 >
 
@@ -54,12 +54,12 @@ export class WebSocketClient {
     })
   }
 
-  unsubscribeFromQuotes(assetId: string, id: number) {
+  unsubscribeFromQuotes(assetId: string, id: string) {
     const channel = CHANNEL.quotes(assetId)
     return this.#removeCallback(channel, id)
   }
 
-  #removeCallback(channel: string, id: number) {
+  #removeCallback(channel: string, id: string) {
     const sub = this.#subscriptions[channel]
     if (sub && sub.callbacks) {
       sub.callbacks = sub.callbacks.filter((cb) => cb.id !== id)
@@ -71,15 +71,15 @@ export class WebSocketClient {
 
     if (this.#subscriptions[channel] && this.#subscriptions[channel].callbacks) {
       this.#subscriptions[channel].callbacks.push({
-        id: this.#id,
+        id: this.#id.toString(),
         fn: cb
       })
 
-      return this.#id++
+      return (this.#id++).toString()
     }
 
     this.#subscriptions[channel] = {
-      callbacks: [{ id: this.#id, fn: cb }],
+      callbacks: [{ id: this.#id.toString(), fn: cb }],
       subscription: ws.subscribe(channel, {
         publish: (data: unknown) => {
           this.#subscriptions[channel].callbacks.forEach((callback) => callback.fn(data))
@@ -87,6 +87,6 @@ export class WebSocketClient {
       })
     }
 
-    return this.#id++
+    return (this.#id++).toString()
   }
 }

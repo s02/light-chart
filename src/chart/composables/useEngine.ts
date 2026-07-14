@@ -24,6 +24,7 @@ type EngineOptions = {
   resolutionId: Ref<ResolutionId | null>
   options: Ref<ChartOption[] | undefined>
   expiration: Ref<ChartExpiration | undefined>
+  expirationOffset: Ref<number | undefined>
   assetSymbol: Ref<AssetSymbol>
   timeZone: Ref<string>
   datafeedFactory: DatafeedFactory
@@ -75,9 +76,8 @@ export const useEngineApi = () => {
       pe.setOptions(options.options.value)
     }
 
-    if (options.expiration.value) {
-      pe.setExpiration(options.expiration.value)
-    }
+    pe.setExpiration(options.expiration.value)
+    pe.setExpirationOffset(options.expirationOffset.value)
 
     const plotEventsHandler = (ev: Parameters<Parameters<PlotEngine['subscribe']>[0]>[0]) => {
       if (ev.type === 'resolutionChanged') {
@@ -101,9 +101,14 @@ export const useEngineApi = () => {
     unwatch.push(
       watch(options.expiration, (next) => {
         assertEngine(pe)
-        if (next) {
-          pe.setExpiration(next)
-        }
+        pe.setExpiration(next)
+      })
+    )
+
+    unwatch.push(
+      watch(options.expirationOffset, (next) => {
+        assertEngine(pe)
+        pe.setExpirationOffset(next)
       })
     )
 
