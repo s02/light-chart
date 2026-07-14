@@ -12,6 +12,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Configure Git Authentication
+        run: |
+          git config --local --unset-all http.https://github.com/.extraheader || true
+          git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "https://github.com/softwaffle-lab/"  
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
