@@ -1,12 +1,10 @@
 import { defineConfig } from 'vitest/config'
 import { fileURLToPath, URL } from 'node:url'
+import { alias } from './config'
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@engine': fileURLToPath(new URL('./src/libs/engine', import.meta.url)),
-      '@chart': fileURLToPath(new URL('./src/libs/chart', import.meta.url))
-    }
+    alias
   },
   test: {
     environment: 'node',
