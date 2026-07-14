@@ -1,48 +1,26 @@
 <script setup lang="ts">
-import { computed, ref, toRef } from 'vue'
+import { computed, toRef } from 'vue'
 import TerminalChart from '@chart/TerminalChart.vue'
-import { useChart } from '@app/composables/useChart'
 import { useQuoteHandler, useTrading } from '@app/composables/useTrading'
 import { helpers } from '@chart/helpers'
 import BuyButton from '@app/components/BuyButton.vue'
 import ExpirationMenu from '@app/components/ExpirationMenu.vue'
 import { DatafeedFactory } from '@datafeed/DatafeedFactory'
 import { Transport } from '@app/transport'
-import type { TerminalChartConfig } from '@chart/types'
+import TimezonesMenu from '@app/components/TimezonesMenu.vue'
+import { useState } from '@app/composables/useState'
 
-const { chartState } = useChart()
-const { buyOption, options } = useTrading(toRef(() => chartState.value.assetSymbol.id))
+const { state, setSeries, setResolution, setTimeZone } = useState()
+const { buyOption, options } = useTrading(toRef(() => state.value.assetSymbol.id))
 const datafeedFactory = new DatafeedFactory(Transport.get().http, Transport.get().ws)
 
-const config = ref<TerminalChartConfig>({
-  resolutionId: '5S',
-  seriesId: 'candlestick'
-})
-
-const configStorage = {
-  set: (data: Partial<TerminalChartConfig>) => {
-    config.value = {
-      ...config.value,
-      ...data
-    }
-    localStorage.setItem('mwc-config', JSON.stringify(config.value))
-  },
-  get: (): TerminalChartConfig => {
-    const data = localStorage.getItem('mwc-config')
-    if (data) {
-      config.value = JSON.parse(data)
-    }
-    return config.value
-  }
-}
-
-useQuoteHandler(toRef(() => chartState.value.assetSymbol.id))
+useQuoteHandler(toRef(() => state.value.assetSymbol.id))
 
 const chartOptions = computed(() =>
   options.value.map((option) => ({
     ...option,
-    createdAt: helpers.dateToEpoch(option.createdAt),
-    expirationDate: helpers.dateToEpoch(option.expirationDate),
+    createdAt: helpers.toZonedDate(option.createdAt, state.value.timeZone),
+    expirationDate: helpers.toZonedDate(option.expirationDate, state.value.timeZone),
     getSum() {
       return this.sum + '$'
     }
@@ -50,9 +28,9 @@ const chartOptions = computed(() =>
 )
 
 const buy = (direction: 'up' | 'down') => {
-  const currentExp = chartState.value.currentExpiration
+  const currentExp = state.value.currentExpiration
   if (!currentExp) {
-    throw `Expiration is required when buyi`
+    throw `Expiration is required when buying`
   }
   buyOption(direction, currentExp.expiration)
 }
@@ -64,15 +42,23 @@ const buy = (direction: 'up' | 'down') => {
       <TerminalChart
         root-el="#teleport"
         :options="chartOptions"
-        :expiration="chartState.currentExpiration?.chartExpiration"
-        :asset-symbol="chartState.assetSymbol"
-        :default-config="configStorage.get()"
+        :expiration="state.currentExpiration?.chartExpiration"
+        :asset-symbol="state.assetSymbol"
+        :default-config="{
+          resolutionId: state.resolutionId,
+          seriesId: state.seriesId
+        }"
+        :time-zone="state.timeZone"
         :datafeed-factory="datafeedFactory"
-        @series-changed="configStorage.set({ seriesId: $event })"
-        @resolution-changed="configStorage.set({ resolutionId: $event })" />
+        @series-changed="setSeries"
+        @resolution-changed="setResolution" />
     </div>
     <div class="terminal-aside">
-      <ExpirationMenu />
+      <div class="terminal-menus">
+        <ExpirationMenu />
+        <TimezonesMenu :model-value="state.timeZone" @update:model-value="setTimeZone($event!)" />
+      </div>
+
       <div class="buy-buttons">
         <BuyButton direction="up" @click="buy('up')" />
         <BuyButton direction="down" @click="buy('down')" />

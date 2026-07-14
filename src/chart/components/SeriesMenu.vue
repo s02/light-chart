@@ -2,19 +2,13 @@
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 import SeriesIcon from '@chart/components/SeriesIcon.vue'
 import { i18n } from '@chart/i18n'
-import { useChart } from '@chart/useChart'
 import type { SeriesId } from '@engine/types'
 
 const emit = defineEmits<{
-  (e: 'selected'): void
+  (e: 'selected', seriesId: SeriesId): void
 }>()
 
-const { state } = useChart()
-
-const setSeries = (seriesId: SeriesId) => {
-  state.seriesId = seriesId
-  emit('selected')
-}
+defineProps<{ active: SeriesId }>()
 
 const values: SeriesId[] = ['bar', 'candlestick', 'line', 'area', 'heikin', 'hollow']
 </script>
@@ -23,9 +17,9 @@ const values: SeriesId[] = ['bar', 'candlestick', 'line', 'area', 'heikin', 'hol
     <ChartMenuItem
       v-for="series in values"
       :key="series"
-      :active="state.seriesId === series"
+      :active="active === series"
       class="mwc-series-menu-item"
-      @click="setSeries(series)">
+      @click="emit('selected', series)">
       <SeriesIcon :series-id="series" />
       {{ i18n.translate(`series-${series}`) }}</ChartMenuItem
     >

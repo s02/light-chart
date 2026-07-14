@@ -17,6 +17,24 @@ const createNextDate = (date: Date) => {
   return nextTime
 }
 
+export const getActualExpiration = (userExpiration: Expiration | undefined, actualExpirations: Expiration[]) => {
+  if (!actualExpirations.length) {
+    return userExpiration
+  }
+
+  const defaultNextExpiration = actualExpirations[0]
+
+  if (!userExpiration) {
+    return defaultNextExpiration
+  }
+
+  const userActualExpiration = actualExpirations.find(
+    (exp) => exp.close === userExpiration.close && exp.type === userExpiration.type
+  )
+
+  return userActualExpiration || defaultNextExpiration
+}
+
 export const useExpirations = () => {
   const remove = (exp: Expiration) => {
     data.value = data.value.filter((e) => {

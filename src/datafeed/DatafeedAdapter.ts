@@ -25,12 +25,18 @@ export class DatafeedAdapter implements Datafeed {
   #candlesHttpService: CandleHttpService
   #candleStoreService: CandleStoreService
 
-  constructor(assetSymbol: AssetSymbol, resolution: ResolutionId, http: CandlesHttpClient, ws: QuotesWwebsocketClient) {
+  constructor(
+    assetSymbol: AssetSymbol,
+    resolution: ResolutionId,
+    timeZone: string,
+    http: CandlesHttpClient,
+    ws: QuotesWwebsocketClient
+  ) {
     this.#resolution = resolution
     this.#assetSymbol = assetSymbol
     this.#ws = ws
     this.#candlesHttpService = new CandleHttpService(resolution, assetSymbol, http)
-    this.#candleStoreService = new CandleStoreService(resolution)
+    this.#candleStoreService = new CandleStoreService(resolution, timeZone)
     this.#inited = this.#initSubscription()
   }
 
@@ -137,7 +143,7 @@ export class DatafeedAdapter implements Datafeed {
     this.#candleStoreService.addHistory(data)
 
     if (data.length) {
-      this.#earliestDate = new Date(data[0].time * 1000)
+      this.#earliestDate = new Date(data[0].time)
     }
   }
 }

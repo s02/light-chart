@@ -1,6 +1,5 @@
-import type { IndicatorName } from '@engine/indicators'
 import { PlotEngine } from '@engine/PlotEngine'
-import type { StudyParams } from '@engine/schema'
+import StudySettings from '@chart/components/Study/StudySettings.vue'
 import PaneLegend from '@chart/components/PaneLegend.vue'
 import { computed, h, ref, render, watch, type Ref } from 'vue'
 import { useModal } from '@chart/composables/useModal'
@@ -14,17 +13,19 @@ import type {
 } from '@engine/types'
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { DatafeedFactory } from '@chart/types'
-import StudySettings from '@chart/components/Study/StudySettings.vue'
+import type { StudyParams } from '@engine/schema'
 import type { LayoutConfig } from '@engine/indicators/types'
+import type { IndicatorName } from '@engine/indicators'
 
 type DrawingElement = Parameters<DrawingSelectFn>[0]
 
 type EngineOptions = {
-  seriesId: Ref<SeriesId>
+  seriesId: Ref<SeriesId | null>
+  resolutionId: Ref<ResolutionId | null>
   options: Ref<ChartOption[] | undefined>
   expiration: Ref<ChartExpiration | undefined>
   assetSymbol: Ref<AssetSymbol>
-  resolutionId: Ref<ResolutionId>
+  timeZone: Ref<string>
   datafeedFactory: DatafeedFactory
   rootEl: string
   onResolutionChanged(resolutionId: ResolutionId): void
@@ -57,8 +58,16 @@ export const useEngineApi = () => {
   const register = (el: HTMLElement, options: EngineOptions) => {
     rootEl.value = options.rootEl
 
+    if (!options.resolutionId.value || !options.seriesId.value) {
+      throw 'Resolution Id and Series Id are required for engine initialization'
+    }
+
     pe = new PlotEngine(el, {
-      datafeed: options.datafeedFactory.create(options.assetSymbol.value, options.resolutionId.value),
+      datafeed: options.datafeedFactory.create(
+        options.assetSymbol.value,
+        options.resolutionId.value,
+        options.timeZone.value
+      ),
       seriesId: options.seriesId.value
     })
 
@@ -101,6 +110,9 @@ export const useEngineApi = () => {
     unwatch.push(
       watch(options.seriesId, (next) => {
         assertEngine(pe)
+        if (!next) {
+          return
+        }
         pe.setSeriesId(next)
       })
     )
@@ -118,12 +130,13 @@ export const useEngineApi = () => {
       watch(
         () => ({
           assetSymbol: options.assetSymbol.value,
-          resolutionId: options.resolutionId.value
+          resolutionId: options.resolutionId.value,
+          timezone: options.timeZone.value
         }),
         (next) => {
           assertEngine(pe)
-          if (next) {
-            pe.setDatafeed(options.datafeedFactory.create(next.assetSymbol, next.resolutionId))
+          if (next && next.resolutionId) {
+            pe.setDatafeed(options.datafeedFactory.create(next.assetSymbol, next.resolutionId, next.timezone))
           }
         }
       )

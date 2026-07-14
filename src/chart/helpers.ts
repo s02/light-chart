@@ -1,6 +1,7 @@
-import { dateToEpoch, parseColor } from '@engine/helpers'
+import { dateToEpoch, parseColor, toZonedDate } from '@engine/helpers'
 
 export const helpers = {
   parseColor,
-  dateToEpoch
+  dateToEpoch,
+  toZonedDate
 }

@@ -30,3 +30,9 @@
   height: 100%;
   max-height: 150px;
 }
+
+.terminal-menus {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

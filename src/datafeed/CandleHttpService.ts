@@ -8,10 +8,10 @@
  * то его нужно разбить на несколько запросов.
  */
 
-import { candleHelpers } from './candleHelpers'
 import { RESOLUTION_SETTINGS } from '@chart/constants'
-import type { AssetSymbol, ChartBar, ResolutionId } from '@chart/types'
+import type { AssetSymbol, ResolutionId } from '@chart/types'
 import type { CandlesHttpClient } from '@datafeed/DatafeedAdapter'
+import type { Bar } from '@datafeed/types'
 
 const MAX_DETALIZATION = 90 * 24 * 60 * 60
 
@@ -42,13 +42,12 @@ export class CandleHttpService {
 
     const result = await Promise.all(periods.map((period) => this.#request(period)))
 
-    const data: ChartBar[] = []
+    const data: Bar[] = []
 
     result.forEach((candles) => {
       candles.forEach((candle) => {
-        const ct = candleHelpers.transform(candle)
-        if (!data.length || ct.time !== data[data.length - 1].time) {
-          data.push(ct)
+        if (!data.length || candle.time !== data[data.length - 1].time) {
+          data.push(candle)
         }
       })
     })

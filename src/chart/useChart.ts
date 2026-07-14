@@ -1,22 +1,15 @@
-import type { AssetSymbol, ResolutionId, SeriesId } from '@engine/types'
+import type { ResolutionId, SeriesId } from '@engine/types'
 import { reactive } from 'vue'
 
 type ChartState = {
-  assetSymbol: AssetSymbol
-  resolutionId: ResolutionId
-  seriesId: SeriesId
+  resolutionId: ResolutionId | null
+  seriesId: SeriesId | null
 }
 
-const initialState = {
-  assetSymbol: {
-    id: '1',
-    name: 'EUR/USD'
-  },
-  resolutionId: '5S',
-  seriesId: 'candlestick'
-} as const
-
-const state = reactive<ChartState>(initialState)
+const state = reactive<ChartState>({
+  resolutionId: null,
+  seriesId: null
+})
 
 export const useChart = () => {
   return {

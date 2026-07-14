@@ -8,12 +8,23 @@ import SeriesIcon from '@chart/components/SeriesIcon.vue'
 import { useIndicators } from '@chart/useIndicators'
 import StudyRepository from '@chart/components/StudyRepository/StudyRepository.vue'
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
+import type { ResolutionId, SeriesId } from '@engine/types'
 
 const { state } = useChart()
 const { openScriptList } = useIndicators()
 
 const isResolutionMenuOpened = ref(false)
 const isSeriesMenuOpened = ref(false)
+
+const setResolutionId = (resolutionId: ResolutionId) => {
+  state.resolutionId = resolutionId
+  isResolutionMenuOpened.value = false
+}
+
+const setSeriesId = (seriesId: SeriesId) => {
+  state.seriesId = seriesId
+  isSeriesMenuOpened.value = false
+}
 </script>
 
 <template>
@@ -25,7 +36,7 @@ const isSeriesMenuOpened = ref(false)
             {{ RESOLUTION_SETTINGS[state.resolutionId].name }}
           </button>
         </template>
-        <ResolutionMenu @selected="isResolutionMenuOpened = false" />
+        <ResolutionMenu :active="state.resolutionId" @selected="setResolutionId" />
       </FloatingDropdown>
 
       <div class="mwc-chart-header-separator"></div>
@@ -36,7 +47,7 @@ const isSeriesMenuOpened = ref(false)
             <SeriesIcon :series-id="state.seriesId" />
           </button>
         </template>
-        <SeriesMenu @selected="isSeriesMenuOpened = false" />
+        <SeriesMenu :active="state.seriesId" @selected="setSeriesId" />
       </FloatingDropdown>
 
       <div class="mwc-chart-header-separator"></div>

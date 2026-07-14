@@ -1,22 +1,11 @@
 import type { PROFITABILITY } from './constants'
-import type { AssetSymbol, ChartExpiration } from '@chart/types'
+import type { ChartExpiration } from '@chart/types'
 
 export type ProfitabilityType = (typeof PROFITABILITY)[keyof typeof PROFITABILITY]
-
-export type ChartUserState = {
-  assetSymbol: AssetSymbol
-  profitabilityType: ProfitabilityType
-  expiration?: Expiration
-}
 
 export type AppExpiration = {
   expiration: Expiration
   chartExpiration: ChartExpiration
-}
-
-export type ChartState = Omit<ChartUserState, 'expiration'> & {
-  expirations: Expiration[]
-  currentExpiration?: AppExpiration
 }
 
 export type Asset = {

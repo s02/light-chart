@@ -1,38 +1,13 @@
 import { computed, onUnmounted, reactive, toValue, watch } from 'vue'
 import { dateHelpers } from '@app/services/dateHelpers'
 import { Transport } from '@app/transport'
+import { useState } from '@app/composables/useState'
 import type { Ref } from 'vue'
-import type { Option, Asset, OptionKind, Expiration } from '@app/types'
+import type { Asset, OptionKind, Expiration } from '@app/types'
 import type { Quote } from '@datafeed/types'
-
-const lskey = 'tr-history'
-
-const saveHistory = () => {
-  const hasOptions = Object.keys(options).length
-
-  if (!hasOptions) {
-    localStorage.removeItem(lskey)
-  } else {
-    localStorage.setItem(lskey, JSON.stringify(options))
-  }
-}
-
-const loadHistory = () => {
-  const hist = localStorage.getItem(lskey)
-  if (hist) {
-    try {
-      const h = JSON.parse(hist)
-      return h
-    } catch (e) {
-      console.log('History is broken', e)
-    }
-  }
-  return {}
-}
 
 let id = 1
 
-const options = reactive<Record<Asset['id'], Option[]>>(loadHistory())
 const lastQuotes = reactive<Record<Asset['id'], Quote>>({})
 const quoteSubIds = reactive<Record<Asset['id'], number>>({})
 
@@ -69,49 +44,55 @@ export const useQuoteHandler = (assetIdRef: Ref<Asset['id']>) => {
 }
 
 export const useTrading = (assetIdRef: Ref<string>) => {
+  const { addOption, state } = useState()
+
   const buyOption = (kind: OptionKind, expiration: Expiration) => {
-    if (!lastQuotes[toValue(assetIdRef)]) {
+    const asset = toValue(assetIdRef)
+
+    if (!lastQuotes[asset]) {
       return
     }
 
-    const option: Option = {
+    addOption({
       id: id++,
-      asset: toValue(assetIdRef),
+      asset,
       sum: 10,
       kind,
       quoteOpen: lastQuotes[toValue(assetIdRef)].value,
       createdAt: dateHelpers.secondsToIso8601(lastQuotes[toValue(assetIdRef)].timestamp),
       expirationDate: new Date(expiration.close).toISOString()
-    }
-
-    if (!options[toValue(assetIdRef)]) {
-      options[toValue(assetIdRef)] = []
-    }
-
-    options[toValue(assetIdRef)] = [...options[toValue(assetIdRef)], option]
+    })
   }
 
   return {
     buyOption,
-    options: computed(() => options[toValue(assetIdRef)] || [])
+    options: computed(() => state.value.options[toValue(assetIdRef)] || [])
   }
 }
 
-watch(lastQuotes, (next) => {
-  for (const [assetId, lastQuote] of Object.entries(next)) {
-    const currentExpirationDate = dateHelpers.secondsToIso8601(lastQuote.timestamp)
-    if (!options[assetId]) {
-      continue
-    }
+export const runOptionsWatcher = () => {
+  const { state } = useState()
 
-    const hasExpiredOptions = !!options[assetId].find((opt) => opt.expirationDate <= currentExpirationDate)
-    if (hasExpiredOptions) {
-      options[assetId] = options[assetId].filter((opt) => opt.expirationDate > currentExpirationDate)
-      if (!options[assetId].length) {
-        delete options[assetId]
+  return watch(lastQuotes, (next) => {
+    for (const [assetId, lastQuote] of Object.entries(next)) {
+      const currentExpirationDate = dateHelpers.secondsToIso8601(lastQuote.timestamp)
+      if (!state.value.options[assetId]) {
+        continue
+      }
+
+      const hasExpiredOptions = !!state.value.options[assetId].find(
+        (opt) => opt.expirationDate <= currentExpirationDate
+      )
+
+      if (hasExpiredOptions) {
+        state.value.options[assetId] = state.value.options[assetId].filter(
+          (opt) => opt.expirationDate > currentExpirationDate
+        )
+
+        if (!state.value.options[assetId].length) {
+          delete state.value.options[assetId]
+        }
       }
     }
-  }
-})
-
-watch(options, () => saveHistory())
+  })
+}

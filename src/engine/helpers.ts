@@ -54,6 +54,29 @@ export const getBarTime = (bar?: DataItem<Time>) => {
 
 export const dateToEpoch = (date: string): UTCTimestamp => (new Date(date).getTime() / 1000) as UTCTimestamp
 
+export const toZonedDate = (originalTime: string | number, timeZone: string) => {
+  const date = typeof originalTime === 'string' ? new Date(originalTime) : new Date(originalTime * 1000)
+
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  })
+
+  const parts = Object.fromEntries(dtf.formatToParts(date).map((p) => [p.type, p.value]))
+
+  const hour = parts['hour'] === '24' ? '00' : parts['hour']
+  const ls = `${parts['year']}-${parts['month']}-${parts['day']}T${hour}:${parts['minute']}:${parts['second']}Z`
+  const epoch = dateToEpoch(ls)
+
+  return epoch
+}
+
 export const formatPrice = (price: number) => {
   return price.toFixed(SERIES_DEFAULTS.pricePrecision)
 }

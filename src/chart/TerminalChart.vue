@@ -12,6 +12,7 @@ import type { DatafeedFactory, TerminalChartConfig } from '@chart/types'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
+  timeZone: string
   datafeedFactory: DatafeedFactory
   defaultConfig: TerminalChartConfig
   options?: ChartOption[]
@@ -27,7 +28,6 @@ const emit = defineEmits<{
 const { state } = useChart()
 const isReady = ref(false)
 
-state.assetSymbol = props.assetSymbol
 state.resolutionId = props.defaultConfig.resolutionId
 state.seriesId = props.defaultConfig.seriesId
 
@@ -42,10 +42,11 @@ onMounted(async () => {
 
   await register(chartRef.value, {
     seriesId: toRef(state, 'seriesId'),
+    resolutionId: toRef(state, 'resolutionId'),
+    timeZone: toRef(props, 'timeZone'),
     options: toRef(props, 'options'),
     expiration: toRef(props, 'expiration'),
     assetSymbol: toRef(props, 'assetSymbol'),
-    resolutionId: toRef(state, 'resolutionId'),
     datafeedFactory: props.datafeedFactory,
     rootEl: props.rootEl,
     onResolutionChanged: (resolution: ResolutionId) => {

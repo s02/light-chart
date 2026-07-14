@@ -10,7 +10,7 @@ export class DatafeedFactory {
     this.#wsClient = ws
   }
 
-  create(assetSymbol: AssetSymbol, resolutionId: ResolutionId) {
-    return new DatafeedAdapter(assetSymbol, resolutionId, this.#httpClient, this.#wsClient)
+  create(assetSymbol: AssetSymbol, resolutionId: ResolutionId, timeZone: string) {
+    return new DatafeedAdapter(assetSymbol, resolutionId, timeZone, this.#httpClient, this.#wsClient)
   }
 }

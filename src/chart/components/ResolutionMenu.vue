@@ -2,15 +2,16 @@
 import ChartMenuGroup from '@chart/components/ChartMenuGroup.vue'
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 import { i18n } from '@chart/i18n'
-import { useChart } from '@chart/useChart'
 import { RESOLUTION_SETTINGS } from '@engine/constants'
 import type { ResolutionId } from '@engine/types'
 
 const emit = defineEmits<{
-  (e: 'selected'): void
+  (e: 'selected', value: ResolutionId): void
 }>()
 
-const { state } = useChart()
+defineProps<{
+  active: ResolutionId
+}>()
 
 const groups: { name: string; values: ResolutionId[] }[] = [
   {
@@ -26,11 +27,6 @@ const groups: { name: string; values: ResolutionId[] }[] = [
     values: ['60', '120', '360', '720']
   }
 ]
-
-const setResolution = (value: ResolutionId) => {
-  state.resolutionId = value
-  emit('selected')
-}
 </script>
 
 <template>
@@ -39,8 +35,8 @@ const setResolution = (value: ResolutionId) => {
       <ChartMenuItem
         v-for="resolutionId in group.values"
         :key="resolutionId"
-        :active="resolutionId === state.resolutionId"
-        @click="setResolution(resolutionId)"
+        :active="resolutionId === active"
+        @click="emit('selected', resolutionId)"
         >{{ i18n.translate(`resolution-${RESOLUTION_SETTINGS[resolutionId].name}`) }}</ChartMenuItem
       >
     </ChartMenuGroup>

@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { useChart } from '@app/composables/useChart'
 import { useExpirations } from '@app/composables/useExpirations'
+import { useState } from '@app/composables/useState'
 import type { Expiration } from '@app/types'
 
 const { format: formatExp } = useExpirations()
-const { chartState, setExpiration } = useChart()
+const { state, setExpiration } = useState()
 
 const compare = (exp1: Expiration, exp2: Expiration) => {
   return exp1.type === exp2.type && exp1.close === exp2.close && exp1.lock === exp2.lock
 }
 
 const step = (v: number) => {
-  const currentExpiration = chartState.value.currentExpiration
-  const expirations = chartState.value.expirations
+  const currentExpiration = state.value.currentExpiration
+  const expirations = state.value.expirations
   if (!currentExpiration) {
     return
   }
@@ -41,7 +41,7 @@ const step = (v: number) => {
             </g>
           </svg>
         </div>
-        <span v-if="chartState.currentExpiration">{{ formatExp(chartState.currentExpiration.expiration.close) }}</span>
+        <span v-if="state.currentExpiration">{{ formatExp(state.currentExpiration.expiration.close) }}</span>
         <span v-else>...</span>
       </div>
     </div>

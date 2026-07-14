@@ -2,11 +2,12 @@
 import AppTerminal from '@app/components/AppTerminal.vue'
 import AssetButton from '@app/components/AssetButton.vue'
 import { ASSETS, PROFITABILITY } from '@app/constants'
-import { useChart } from '@app/composables/useChart'
 import { useExpirations } from '@app/composables/useExpirations'
+import { runStateWatcher, useState } from '@app/composables/useState'
+import { runOptionsWatcher } from '@app/composables/useTrading'
 
 const { schedule: scheduleExpirationsUpdate } = useExpirations()
-const { chartState, setChart } = useChart()
+const { state, setChart } = useState()
 scheduleExpirationsUpdate()
 
 const assetMenu = [
@@ -23,6 +24,9 @@ const assetMenu = [
 const openChart = (el: (typeof assetMenu)[0]) => {
   setChart(el.asset, el.profitability)
 }
+
+runOptionsWatcher()
+runStateWatcher()
 </script>
 
 <template>
@@ -32,7 +36,7 @@ const openChart = (el: (typeof assetMenu)[0]) => {
         v-for="el of assetMenu"
         :key="el.asset.id"
         :name="el.asset.name"
-        :active="el.asset.id === chartState.assetSymbol.id"
+        :active="el.asset.id === state.assetSymbol.id"
         :profitability="el.profitability"
         @click="openChart(el)" />
     </div>
