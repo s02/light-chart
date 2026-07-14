@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build Locales
+        run: node i18n.build.js  
+
       - name: Lint
         run: npm run lint
 
