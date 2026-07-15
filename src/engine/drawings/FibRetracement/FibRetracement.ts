@@ -1,3 +1,5 @@
+import { AxisHighlighterLabelView } from '@engine/drawings/AxisHighlighter/AxisHighlighterLabelView'
+import { AxisHighlighterPaneView } from '@engine/drawings/AxisHighlighter/AxisHighlighterPaneView'
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { FibRetracementPaneView } from '@engine/drawings/FibRetracement/FibRetracementPaneView'
 import type { DrawingOptions } from '@engine/drawings/types'
@@ -73,6 +75,56 @@ export class FibRetracement extends BaseDrawing {
       schema: FIB_SCHEMA,
       params: this.#params
     }
+  }
+
+  priceAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: true })]
+    }
+
+    return []
+  }
+
+  timeAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: false })]
+    }
+
+    return []
+  }
+
+  priceAxisViews() {
+    return this.#axisLabelViews(true)
+  }
+
+  timeAxisViews() {
+    return this.#axisLabelViews(false)
+  }
+
+  #axisLabelViews(vertical: boolean) {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (!viewport || this.anchors.length < 2) {
+      return []
+    }
+
+    return [
+      new AxisHighlighterLabelView(viewport, this.anchors[0], { vertical }),
+      new AxisHighlighterLabelView(viewport, this.anchors[1], { vertical })
+    ]
   }
 
   override paneViews() {

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { i18n } from '@chart/i18n'
-import type { StudyParams, StudySchema } from '@engine/schema'
 import { ref } from 'vue'
 import CButton from '@chart/components/Controls/CButton.vue'
 import CInput from '@chart/components/Controls/CInput.vue'
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import StudyColor from './StudyColor.vue'
 import StudyFontSize from './StudyFontSize.vue'
+import type { StudyParamDescriptor, StudyParams, StudySchema } from '@engine/schema'
 
 const emit = defineEmits<{
   (e: 'close', result?: StudyParams): void
@@ -18,7 +18,8 @@ const params = ref<StudyParams>({ ...props.params })
 const c = props.schema.style.filter((s) => s.key.indexOf('fr-c') === 0)
 const items = props.schema.style.filter((s) => s.key.indexOf('fr-c') !== 0)
 
-const levels = []
+const levels: { level: number; ratio: StudyParamDescriptor; color: StudyParamDescriptor }[] = []
+
 for (let i = 0; i < c.length; i = i + 2) {
   if (props.schema.style[i].key.indexOf('fr-c') === 0) {
     levels.push({
@@ -72,7 +73,7 @@ const apply = () => {
     </div>
 
     <div class="mwc-studysett-footer mwc-studysett-container">
-      <CButton type="primary" @click="apply()">Apply</CButton>
+      <CButton type="primary" @click="apply()">{{ i18n.translate('modal-study-apply') }}</CButton>
     </div>
   </div>
 </template>

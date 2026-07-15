@@ -114,7 +114,7 @@ const setTab = (v: string) => {
     </div>
 
     <div class="mwc-studysett-footer mwc-studysett-container">
-      <CButton type="primary" @click="apply()">Apply</CButton>
+      <CButton type="primary" @click="apply()">{{ i18n.translate('modal-study-apply') }}</CButton>
     </div>
   </div>
 </template>
