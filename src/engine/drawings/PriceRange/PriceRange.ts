@@ -12,7 +12,7 @@ const PRICE_RANGE_SCHEMA = {
   inputs: [],
   style: [
     { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
-    { type: 'color', key: 'line-color', default: 'rgb(41 98 255)', fastPanel: true },
+    { type: 'line-color', key: 'line-color', default: 'rgb(41 98 255)', fastPanel: true },
     { type: 'color', key: 'fill-color', default: 'rgb(41 98 255 / 15%)', fastPanel: true },
 
     { type: 'line-width', key: 'pr-border-width', default: 1 },

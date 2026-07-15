@@ -15,7 +15,7 @@ const RECTANGLE_SCHEMA = {
   style: [
     { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
     { type: 'line-style', key: 'line-style', default: 'solid', fastPanel: true },
-    { type: 'color', key: 'line-color', default: 'rgb(41 98 255)', fastPanel: true },
+    { type: 'line-color', key: 'line-color', default: 'rgb(41 98 255)', fastPanel: true },
     { type: 'color', key: 'fill-color', default: 'rgb(41 98 255 / 15%)', fastPanel: true }
   ]
 } as const satisfies StudySchema

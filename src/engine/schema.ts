@@ -33,6 +33,11 @@ type StudyLineWidthParam = {
   default: number
 } & StudyParam
 
+type StudyLineColorParam = {
+  type: 'line-color'
+  default: string
+} & StudyParam
+
 type StudyLineStyleParam = {
   type: 'line-style'
   default: 'solid' | 'dashed' | 'dotted'
@@ -57,6 +62,7 @@ export type StudyParamDescriptor =
   | StudyLineStyleParam
   | StudyFontSizeParam
   | StudyBoolParam
+  | StudyLineColorParam
 
 export type StudyParams = Record<string, number | string | boolean>
 export type StudyParamValue = StudyParams[string]

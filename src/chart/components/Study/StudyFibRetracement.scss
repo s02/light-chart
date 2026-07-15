@@ -1,0 +1,13 @@
+.mwc-fr {
+  width: 460px;
+}
+
+.mwc-fr-group {
+  grid-template-columns: repeat(2, min-content);
+}
+
+.mwc-fr-el {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

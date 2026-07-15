@@ -3,40 +3,47 @@ import { FibRetracementPaneView } from '@engine/drawings/FibRetracement/FibRetra
 import type { DrawingOptions } from '@engine/drawings/types'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 import type { IChartApi, Point } from 'lightweight-charts'
-import { geometry } from '../geometry'
-
-export const FIB_LEVELS = [
-  { ratio: 0, key: 'c0' as const, label: '0' },
-  { ratio: 0.236, key: 'c236' as const, label: '0.236' },
-  { ratio: 0.383, key: 'c383' as const, label: '0.383' },
-  { ratio: 0.5, key: 'c500' as const, label: '0.5' },
-  { ratio: 0.618, key: 'c618' as const, label: '0.618' },
-  { ratio: 0.786, key: 'c786' as const, label: '0.786' },
-  { ratio: 1, key: 'c1000' as const, label: '1' },
-  { ratio: 1.618, key: 'c1618' as const, label: '1.618' },
-  { ratio: 2.618, key: 'c2618' as const, label: '2.618' },
-  { ratio: 3.618, key: 'c3618' as const, label: '3.618' },
-  { ratio: 4.236, key: 'c4236' as const, label: '4.236' }
-] as const
 
 const FIB_SCHEMA = {
   text: [],
   inputs: [],
   style: [
-    { type: 'color', key: 'fill-color', default: 'rgb(255 241 118 / 10%)', fastPanel: true },
-    { type: 'color', key: 'line-color', default: 'rgb(255 241 118)', fastPanel: true },
-    { type: 'number', key: 'font-size', default: 12 },
-    { type: 'color', key: 'c0', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c236', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c383', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c500', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c618', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c786', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c1000', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c1618', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c2618', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c3618', default: 'rgb(255 241 118)' },
-    { type: 'color', key: 'c4236', default: 'rgb(255 241 118)' }
+    { type: 'line-width', key: 'fr-line-width', default: 2, fastPanel: true },
+    { type: 'font-size', key: 'font-size', default: 12 },
+    { type: 'line-color', key: 'fr-trend-line', default: 'rgb(128 128 128)' },
+
+    { type: 'number', key: 'fr-c0-ratio', default: 0, step: 0.1 },
+    { type: 'color', key: 'fr-c0-color', default: 'rgb(128 128 128 / 20%)' },
+
+    { type: 'number', key: 'fr-c1-ratio', default: 0.236, step: 0.1 },
+    { type: 'color', key: 'fr-c1-color', default: 'rgb(242 54 69 / 20%)' },
+
+    { type: 'number', key: 'fr-c2-ratio', default: 0.383, step: 0.1 },
+    { type: 'color', key: 'fr-c2-color', default: 'rgb(255 152 0 / 20%)' },
+
+    { type: 'number', key: 'fr-c3-ratio', default: 0.5, step: 0.1 },
+    { type: 'color', key: 'fr-c3-color', default: 'rgb(76 175 80 / 20%)' },
+
+    { type: 'number', key: 'fr-c4-ratio', default: 0.618, step: 0.1 },
+    { type: 'color', key: 'fr-c4-color', default: 'rgb(8 153 129 / 20%)' },
+
+    { type: 'number', key: 'fr-c5-ratio', default: 0.786, step: 0.1 },
+    { type: 'color', key: 'fr-c5-color', default: 'rgb(0 188 212 / 20%)' },
+
+    { type: 'number', key: 'fr-c6-ratio', default: 1, step: 0.1 },
+    { type: 'color', key: 'fr-c6-color', default: 'rgb(128 128 128 / 20%)' },
+
+    { type: 'number', key: 'fr-c7-ratio', default: 1.618, step: 0.1 },
+    { type: 'color', key: 'fr-c7-color', default: 'rgb(41 98 255 / 20%)' },
+
+    { type: 'number', key: 'fr-c8-ratio', default: 2.618, step: 0.1 },
+    { type: 'color', key: 'fr-c8-color', default: 'rgb(242 54 69 / 20%)' },
+
+    { type: 'number', key: 'fr-c9-ratio', default: 3.618, step: 0.1 },
+    { type: 'color', key: 'fr-c9-color', default: 'rgb(156 39 176 / 20%)' },
+
+    { type: 'number', key: 'fr-c10-ratio', default: 4.236, step: 0.1 },
+    { type: 'color', key: 'fr-c10-color', default: 'rgb(233 30 99 / 20%)' }
   ]
 } as const satisfies StudySchema
 
@@ -87,18 +94,9 @@ export class FibRetracement extends BaseDrawing {
 
     const minX = Math.min(p1.x, p2.x)
     const maxX = Math.max(p1.x, p2.x)
+    const minY = Math.min(p1.y, p2.y)
+    const maxY = Math.max(p1.y, p2.y)
 
-    if (point.x < minX - FibRetracement.hitThreashold || point.x > maxX + FibRetracement.hitThreashold) {
-      return false
-    }
-
-    if (geometry.distanceToLineSegment(point, p1, p2) < FibRetracement.hitThreashold) return true
-
-    for (const { ratio } of FIB_LEVELS) {
-      const levelY = p2.y + ratio * (p1.y - p2.y)
-      if (Math.abs(point.y - levelY) <= FibRetracement.hitThreashold) return true
-    }
-
-    return false
+    return point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY
   }
 }

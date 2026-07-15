@@ -10,7 +10,7 @@ const CIRCLE_SCHEMA = {
   inputs: [],
   style: [
     { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
-    { type: 'color', key: 'line-color', default: 'rgb(144 41 255)', fastPanel: true },
+    { type: 'line-color', key: 'line-color', default: 'rgb(144 41 255)', fastPanel: true },
     { type: 'color', key: 'fill-color', default: 'rgb(144 41 255 / 0%)', fastPanel: true }
   ]
 } as const satisfies StudySchema

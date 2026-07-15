@@ -79,7 +79,7 @@ const setTab = (v: string) => {
             <template v-for="el in schema[tab]" :key="el.key">
               <label>{{ i18n.translate(`study-prop-${el.key}`) }}</label>
               <StudyColor
-                v-if="el.type === 'color'"
+                v-if="el.type === 'color' || el.type === 'line-color'"
                 :color="String(params[el.key])"
                 @update="params[el.key] = $event" />
               <StudyLineWidth

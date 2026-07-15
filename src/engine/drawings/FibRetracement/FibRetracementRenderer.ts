@@ -1,4 +1,5 @@
-import { FIB_LEVELS, type FibRetracementParams } from '@engine/drawings/FibRetracement/FibRetracement'
+import { type FibRetracementParams } from '@engine/drawings/FibRetracement/FibRetracement'
+import { parseColor } from '@engine/helpers'
 import { dot } from '@engine/primitives/dot'
 import { line } from '@engine/primitives/line'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
@@ -30,31 +31,31 @@ export class FibRetracementRenderer implements IPrimitivePaneRenderer {
       const minX = Math.min(this.#p1.x, this.#p2.x)
       const maxX = Math.max(this.#p1.x, this.#p2.x)
 
-      const lw = 1
+      const lw = this.#params['fr-line-width']
       const fontSize = this.#params['font-size'] * pr
-      const trendColor = this.#params['line-color']
+      const trendColor = this.#params['fr-trend-line']
 
-      const levels = FIB_LEVELS.map(({ ratio, key, label }) => ({
-        y: this.#p2.y + ratio * (this.#p1.y - this.#p2.y),
-        price: this.#price2 + ratio * (this.#price1 - this.#price2),
-        color: this.#params[key] as string,
-        label
+      const mm = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const
+      const levels = mm.map((level) => ({
+        y: this.#p2.y + this.#params[`fr-c${level}-ratio`] * (this.#p1.y - this.#p2.y),
+        price: this.#price2 + this.#params[`fr-c${level}-ratio`] * (this.#price1 - this.#price2),
+        color: this.#params[`fr-c${level}-color`],
+        label: this.#params[`fr-c${level}-ratio`]
       }))
 
-      ctx.fillStyle = this.#params['fill-color']
       for (let i = 1; i < levels.length; i++) {
+        ctx.fillStyle = levels[i].color
         const yTop = Math.min(levels[i - 1].y, levels[i].y) * vpr
         const yH = Math.abs(levels[i].y - levels[i - 1].y) * vpr
         ctx.fillRect(minX * hpr, yTop, (maxX - minX) * hpr, yH)
       }
 
-      line(scope, this.#p1, this.#p2, { width: lw, color: trendColor, dash: [5, 5] })
+      line(scope, this.#p1, this.#p2, { width: lw, color: trendColor, dash: [20, 20] })
 
       for (const level of levels) {
         line(scope, { x: minX, y: level.y } as Point, { x: maxX, y: level.y } as Point, {
           width: lw,
-          color: this.#params['line-color']
-          //color: level.color
+          color: parseColor(level.color).baseColor
         })
       }
 
@@ -62,8 +63,7 @@ export class FibRetracementRenderer implements IPrimitivePaneRenderer {
       ctx.textAlign = 'right'
       ctx.textBaseline = 'middle'
       for (const level of levels) {
-        //ctx.fillStyle = level.color
-        ctx.fillStyle = this.#params['line-color']
+        ctx.fillStyle = parseColor(level.color).baseColor
         ctx.fillText(`${level.label} (${level.price.toFixed(2)})`, (minX - LABEL_PAD_X) * hpr, level.y * vpr)
       }
 

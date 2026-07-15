@@ -17,7 +17,7 @@ const BRUSH_SCHEMA = {
   inputs: [],
   style: [
     { type: 'line-width', key: 'line-width', default: DEFAULTS['line-width'], fastPanel: true },
-    { type: 'color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true },
+    { type: 'line-color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true },
     { type: 'color', key: 'fill-color', default: DEFAULTS['fill-color'], fastPanel: true }
   ]
 } as const satisfies StudySchema

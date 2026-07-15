@@ -101,3 +101,7 @@ export const parseColor = (color: string) => {
     opacity: Math.round(isPercent ? value : value * 100)
   }
 }
+
+export const combineColor = (color: string, opacity: number) => {
+  return color.replace(')', ` / ${opacity}%)`)
+}

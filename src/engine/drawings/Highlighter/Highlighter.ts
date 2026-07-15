@@ -16,7 +16,7 @@ const HIGHLIGHTER_SCHEMA = {
   inputs: [],
   style: [
     { type: 'number', key: 'brush-width', default: DEFAULTS['brush-width'], fastPanel: true },
-    { type: 'color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true }
+    { type: 'line-color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true }
   ]
 } as const satisfies StudySchema
 

@@ -8,7 +8,7 @@ const HORIZONTAL_LINE_SCHEMA = {
   text: [],
   inputs: [],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(255 152 0)', fastPanel: true },
+    { type: 'line-color', key: 'line-color', default: 'rgb(255 152 0)', fastPanel: true },
     { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
     { type: 'line-style', key: 'line-style', default: 'solid', fastPanel: true }
   ]

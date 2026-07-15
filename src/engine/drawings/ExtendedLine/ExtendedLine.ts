@@ -15,7 +15,7 @@ const EXTENDED_LINE_SCHEMA = {
   ],
   inputs: [],
   style: [
-    { type: 'color', key: 'line-color', default: 'rgb(41 98 255)', fastPanel: true },
+    { type: 'line-color', key: 'line-color', default: 'rgb(41 98 255)', fastPanel: true },
     { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
     { type: 'line-style', key: 'line-style', default: 'solid', fastPanel: true }
   ]

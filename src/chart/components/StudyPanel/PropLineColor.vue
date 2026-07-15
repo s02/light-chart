@@ -2,12 +2,12 @@
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import ColorPicker from '@chart/components/Pickers/ColorPicker.vue'
 import { helpers } from '@chart/helpers'
-import { computed } from 'vue'
 
 const props = defineProps<{ color: string }>()
 
 const isOpened = defineModel<boolean>({ default: false })
-const parsedColor = computed(() => helpers.parseColor(props.color))
+
+const base = (color: string) => helpers.parseColor(color).baseColor
 
 const emit = defineEmits<{
   (e: 'update', color: string): void
@@ -23,7 +23,13 @@ const emit = defineEmits<{
             fill="currentColor"
             d="M10.62.72a2.47 2.47 0 0 1 3.5 0l1.16 1.16c.96.97.96 2.54 0 3.5l-.58.58-8.9 8.9-1 1-.14.14H0v-4.65l.14-.15 1-1 8.9-8.9.58-.58Zm2.8.7a1.48 1.48 0 0 0-2.1 0l-.23.23 3.26 3.26.23-.23c.58-.58.58-1.52 0-2.1l-1.16-1.16Zm.23 4.2-3.26-3.27-8.2 8.2 3.25 3.27 8.2-8.2Zm-8.9 8.9-3.27-3.26-.5.5V15h3.27l.5-.5Z"></path>
         </svg>
-        <div class="mwc-drw-btn-c-line" :style="{ backgroundColor: `${parsedColor.baseColor}` }"></div>
+        <div
+          class="mwc-drw-btn-c-line"
+          :style="
+            props.color === 'custom'
+              ? { background: 'linear-gradient(270deg, #ff2e00, #ffe600 27.27%, #61ff00 50%, #00c2ff 72.44%, #8f00ff)' }
+              : { backgroundColor: `${base(props.color)}` }
+          "></div>
       </div>
     </template>
     <ColorPicker :color="color" @select="emit('update', $event)" @close="isOpened = false" />

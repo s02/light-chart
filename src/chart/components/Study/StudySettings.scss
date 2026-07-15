@@ -93,11 +93,21 @@
 }
 
 .mwc-studysett-group {
-  grid-template-columns: auto 130px;
+  grid-template-columns: auto min-content;
   align-items: center;
   gap: 16px;
   padding-bottom: 16px;
   display: inline-grid;
+}
+
+.mwc-studysett-input {
+  min-width: 130px;
+}
+
+.mwc-studysett-header-border {
+  background-color: #4a4a4a;
+  height: 4px;
+  border-radius: 2px;
 }
 
 label {

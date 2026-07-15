@@ -13,6 +13,7 @@ import { useModal } from '@chart/composables/useModal'
 import StudySettings from '@chart/components/Study/StudySettings.vue'
 import type { DrawingSchema } from '@engine/drawings/types'
 import type { StudyParamDescriptor, StudySchema } from '@engine/schema'
+import StudyFibRetracement from '@chart/components/Study/StudyFibRetracement.vue'
 
 type ParamKey = keyof DrawingSchema['params']
 type ParamValue = DrawingSchema['params'][ParamKey]
@@ -90,7 +91,13 @@ const openSettings = async () => {
 
   try {
     const p = { ikey: drawingSchema.value.ikey, schema: availableSettings.value, params: drawingSchema.value.params }
-    const settings = await openModal(StudySettings, { props: p })
+    let settings
+
+    if (drawingSchema.value.ikey === 'fib-retracement') {
+      settings = await openModal(StudyFibRetracement, { props: p })
+    } else {
+      settings = await openModal(StudySettings, { props: p })
+    }
 
     if (!drawingSchema.value || !settings) {
       return
@@ -135,6 +142,11 @@ onUnmounted(() => {
           :line-style="String(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
+        <PropLineColor
+          v-else-if="el.type === 'line-color'"
+          :color="String(drawingSchema.params[el.key])"
+          @update:model-value="isPanelMenuOpened = $event"
+          @update="apply(el.key, $event)" />
         <PropBrushWidth
           v-else-if="el.key === 'brush-width'"
           :width="Number(drawingSchema.params[el.key])"
@@ -145,11 +157,7 @@ onUnmounted(() => {
           :size="Number(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
-        <PropLineColor
-          v-else-if="el.key === 'line-color'"
-          :color="String(drawingSchema.params[el.key])"
-          @update:model-value="isPanelMenuOpened = $event"
-          @update="apply(el.key, $event)" />
+
         <PropFillColor
           v-else-if="el.key === 'fill-color'"
           :color="String(drawingSchema.params[el.key])"
