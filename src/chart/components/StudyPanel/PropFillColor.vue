@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import ColorPicker from '@chart/components/Pickers/ColorPicker.vue'
+import { helpers } from '@chart/helpers'
+import { computed } from 'vue'
 
-defineProps<{ color: string }>()
+const props = defineProps<{ color: string }>()
 
 const isOpened = defineModel<boolean>({ default: false })
+const parsedColor = computed(() => helpers.parseColor(props.color))
 
 const emit = defineEmits<{
   (e: 'update', color: string): void
@@ -22,7 +25,7 @@ const emit = defineEmits<{
           <path fill="currentColor" d="M0 16.5C0 15 2.5 12 2.5 12S5 15 5 16.5 4 19 2.5 19 0 18 0 16.5z"></path>
           <circle fill="currentColor" cx="9.5" cy="9.5" r="1.5"></circle>
         </svg>
-        <div class="mwc-drw-btn-c-line" :style="{ backgroundColor: `${color}` }"></div>
+        <div class="mwc-drw-btn-c-line" :style="{ backgroundColor: `${parsedColor.baseColor}` }"></div>
       </div>
     </template>
     <ColorPicker :color="color" @select="emit('update', $event)" @close="isOpened = false" />

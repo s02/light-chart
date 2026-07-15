@@ -6,12 +6,16 @@ import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
 
 const RECTANGLE_SCHEMA = {
-  text: [],
+  text: [
+    { type: 'string', key: 'text', default: '' },
+    { type: 'number', key: 'font-size', default: 12 },
+    { type: 'color', key: 'text-color', default: 'rgb(41 98 255)' }
+  ],
   inputs: [],
   style: [
     { type: 'number', key: 'line-width', default: 2, fastPanel: true },
-    { type: 'color', key: 'line-color', default: 'rgb(76 175 80)', fastPanel: true },
-    { type: 'color', key: 'fill-color', default: 'rgb(41 98 255 / 0%)', fastPanel: true }
+    { type: 'color', key: 'line-color', default: 'rgb(41 98 255)', fastPanel: true },
+    { type: 'color', key: 'fill-color', default: 'rgb(41 98 255 / 15%)', fastPanel: true }
   ]
 } as const satisfies StudySchema
 
