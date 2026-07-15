@@ -8,6 +8,7 @@ import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawi
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { BaseDrawing } from './BaseDrawing'
 import type { StudyParams } from '@engine/schema'
+import { DrawingKeyManager } from '@engine/drawings/DrawingKeyManager'
 
 export type DrawingElement = {
   id: number
@@ -20,23 +21,29 @@ export class DrawingsManager {
   #id = 10
   #dragHandler: DrawingDragHandler
   #selectHandler: DrawingSelectHandler
+  #keyManager: DrawingKeyManager
   #subscribers: DrawingSelectFn[] = []
   #pendingAdd?: { pc: PointsManager; drawing: BaseDrawing; reject: (reason?: unknown) => void }
+  #selectedId?: DrawingElement['id']
 
   constructor(chart: IChartApi, series: ISeriesApi<SeriesType>) {
     this.#chart = chart
     this.#series = series
+
     this.#dragHandler = new DrawingDragHandler(
       this.#chart,
       () => this.#drawings.map((el) => el.drawing),
       () => !this.#pendingAdd
     )
+
     this.#selectHandler = new DrawingSelectHandler(
       this.#chart,
       () => this.#drawings,
       this.#onSelect,
       () => !this.#pendingAdd
     )
+
+    this.#keyManager = new DrawingKeyManager(this.#chart, this.#onDeleteSelected)
   }
 
   clear() {
@@ -86,6 +93,11 @@ export class DrawingsManager {
 
   init(name: DrawingName, options?: DrawingOptions) {
     this.cancelCurrent()
+
+    if (this.#selectedId) {
+      const el = this.#findElement(this.#selectedId)
+      this.#selectHandler.deselect(el)
+    }
 
     const script = findDrawingScript(name)
     if (!script) {
@@ -138,6 +150,9 @@ export class DrawingsManager {
     const el = this.#findElement(id)
     el.drawing.detach()
     this.#drawings = this.#drawings.filter((d) => d.id !== id)
+    if (this.#selectedId === id) {
+      this.#selectedId = undefined
+    }
   }
 
   subscribe(cb: DrawingSelectFn) {
@@ -150,10 +165,18 @@ export class DrawingsManager {
     })
     this.#selectHandler.destroy()
     this.#dragHandler.destroy()
+    this.#keyManager.destroy()
   }
 
   #onSelect = (res: Parameters<DrawingSelectFn>[0]) => {
+    this.#selectedId = res.id
     this.#subscribers.forEach((cb) => cb(res))
+  }
+
+  #onDeleteSelected = () => {
+    if (this.#selectedId !== undefined) {
+      this.remove(this.#selectedId)
+    }
   }
 
   #findElement(id: DrawingElement['id']) {

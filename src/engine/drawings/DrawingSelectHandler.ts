@@ -25,6 +25,10 @@ export class DrawingSelectHandler {
     this.#el.removeEventListener('click', this.#clickHandler)
   }
 
+  deselect(el: DrawingElement) {
+    el.drawing.setSelected(false)
+  }
+
   select(el: DrawingElement) {
     el.drawing.setSelected(true)
     this.#onSelect({ id: el.id, ds: el.drawing.getSchema() })
