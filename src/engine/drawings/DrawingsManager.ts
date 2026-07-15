@@ -39,6 +39,14 @@ export class DrawingsManager {
     )
   }
 
+  clear() {
+    this.#drawings.forEach((drawing) => {
+      drawing.drawing.detach()
+    })
+
+    this.#drawings = []
+  }
+
   getAllSchemas() {
     return this.#drawings.map((el) => {
       const schema = el.drawing.getSchema()
@@ -70,6 +78,10 @@ export class DrawingsManager {
     const drawing = new script.drawing(this.#chart, options)
     drawing.setAnchors(anchors)
     drawing.attach(this.#series)
+
+    const id = this.#id++
+    const el = { id, drawing }
+    this.#drawings.push(el)
   }
 
   init(name: DrawingName, options?: DrawingOptions) {

@@ -1,7 +1,7 @@
 import { LocalStorageRepository } from '@chart/components/StudyRepository/LocalStorageRepository'
-import type { Repository } from '@chart/components/StudyRepository/types'
+import type { StudyRepository } from '@chart/components/StudyRepository/types'
 
-const repository: Repository = new LocalStorageRepository()
+const repository: StudyRepository = new LocalStorageRepository()
 
 export const getStudyRepository = () => {
   return repository

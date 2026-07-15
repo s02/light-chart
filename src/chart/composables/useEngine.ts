@@ -167,6 +167,7 @@ export const useEngineApi = () => {
   const setLayoutConfig = (config: LayoutConfig) => {
     assertEngine(pe)
     pe.clearStudies()
+    pe.clearDrawings()
 
     config.indicators.forEach((ind) => {
       addIndicator(ind.ikey as IndicatorName, ind.params)

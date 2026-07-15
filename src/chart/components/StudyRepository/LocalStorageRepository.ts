@@ -1,7 +1,7 @@
-import type { Repository } from '@chart/components/StudyRepository/types'
+import type { StudyRepository } from '@chart/components/StudyRepository/types'
 import type { Layout, LayoutConfig } from '@engine/indicators/types'
 
-export class LocalStorageRepository implements Repository {
+export class LocalStorageRepository implements StudyRepository {
   #layouts: Layout[] = []
 
   constructor() {

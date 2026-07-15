@@ -151,6 +151,10 @@ export class PlotEngine {
     this.#indicatorsManager.clear()
   }
 
+  clearDrawings() {
+    this.#drawingsManager.clear()
+  }
+
   async addIndicator(key: IndicatorName, params?: StudyParams): Promise<IndicatorOnPane> {
     const iop = await this.#indicatorsManager.add(key, params)
     this.#seriesOverlay.moveToTop()
