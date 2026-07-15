@@ -2,6 +2,7 @@ import type { PathParams } from '@engine/drawings/Path/Path'
 import { arrowHead } from '@engine/primitives/arrow-head'
 import { dot } from '@engine/primitives/dot'
 import { line } from '@engine/primitives/line'
+import { lineDash } from '@engine/primitives/line-style'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 
@@ -18,10 +19,13 @@ export class PathRenderer implements IPrimitivePaneRenderer {
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
+      const dash = lineDash(this.#params['line-style'], this.#params['line-width'])
+
       for (let i = 0; i < this.#points.length - 1; i++) {
         line(scope, this.#points[i], this.#points[i + 1], {
           width: this.#params['line-width'],
-          color: this.#params['line-color']
+          color: this.#params['line-color'],
+          ...dash
         })
       }
 

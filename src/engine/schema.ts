@@ -33,6 +33,11 @@ type StudyLineWidthParam = {
   default: number
 } & StudyParam
 
+type StudyLineStyleParam = {
+  type: 'line-style'
+  default: 'solid' | 'dashed' | 'dotted'
+} & StudyParam
+
 type StudyFontSizeParam = {
   type: 'font-size'
   default: number
@@ -49,6 +54,7 @@ export type StudyParamDescriptor =
   | StudyStringParam
   | StudySelectParam
   | StudyLineWidthParam
+  | StudyLineStyleParam
   | StudyFontSizeParam
   | StudyBoolParam
 

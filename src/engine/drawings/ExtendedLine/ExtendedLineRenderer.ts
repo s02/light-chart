@@ -1,6 +1,7 @@
 import type { ExtendedLineParams } from '@engine/drawings/ExtendedLine/ExtendedLine'
 import { dot } from '@engine/primitives/dot'
 import { extendedLine } from '@engine/primitives/extended-line'
+import { lineDash } from '@engine/primitives/line-style'
 import { textLabel, textLabelBounds } from '@engine/primitives/text-label'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { Coordinate, IPrimitivePaneRenderer, Point } from 'lightweight-charts'
@@ -22,7 +23,8 @@ export class ExtendedLineRenderer implements IPrimitivePaneRenderer {
     target.useBitmapCoordinateSpace((scope) => {
       extendedLine(scope, this.#p1, this.#p2, {
         width: this.#params['line-width'],
-        color: this.#params['line-color']
+        color: this.#params['line-color'],
+        ...lineDash(this.#params['line-style'], this.#params['line-width'])
       })
 
       if (this.#params.text) {

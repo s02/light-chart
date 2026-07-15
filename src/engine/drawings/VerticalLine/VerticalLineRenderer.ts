@@ -1,5 +1,6 @@
 import { dot } from '@engine/primitives/dot'
 import { line } from '@engine/primitives/line'
+import { lineDash } from '@engine/primitives/line-style'
 import type { VerticalLineParams } from '@engine/drawings/VerticalLine/VerticalLine'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
@@ -19,7 +20,8 @@ export class VerticalLineRenderer implements IPrimitivePaneRenderer {
     target.useBitmapCoordinateSpace((scope) => {
       line(scope, { x: this.#p.x, y: 0 } as Point, { x: this.#p.x, y: scope.bitmapSize.height } as Point, {
         width: this.#params['line-width'],
-        color: this.#params['line-color']
+        color: this.#params['line-color'],
+        ...lineDash(this.#params['line-style'], this.#params['line-width'])
       })
 
       if (this.#withDots) {

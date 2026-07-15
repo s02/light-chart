@@ -5,6 +5,8 @@ type Params = {
   'line-width'?: number
   'line-color'?: string
   'fill-color'?: string
+  dash?: number[]
+  cap?: CanvasLineCap
 }
 
 export const rect = (scope: BitmapCoordinatesRenderingScope, p1: Point, p2: Point, params: Params) => {
@@ -28,7 +30,11 @@ export const rect = (scope: BitmapCoordinatesRenderingScope, p1: Point, p2: Poin
   }
 
   if (params['line-color']) {
+    ctx.setLineDash(params.dash ?? [])
+    ctx.lineCap = params.cap ?? 'butt'
     ctx.strokeStyle = params['line-color']
     ctx.stroke()
+    ctx.setLineDash([])
+    ctx.lineCap = 'butt'
   }
 }

@@ -11,7 +11,8 @@ const PATH_SCHEMA = {
   inputs: [],
   style: [
     { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
-    { type: 'color', key: 'line-color', default: 'rgb(233 30 99)', fastPanel: true }
+    { type: 'color', key: 'line-color', default: 'rgb(233 30 99)', fastPanel: true },
+    { type: 'line-style', key: 'line-style', default: 'solid', fastPanel: true }
   ]
 } as const satisfies StudySchema
 

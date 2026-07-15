@@ -1,0 +1,13 @@
+.mwc-drw-btn-s-line {
+  width: 18px;
+  height: 0;
+  border-top: 2px solid currentcolor;
+
+  &-dashed {
+    border-top-style: dashed;
+  }
+
+  &-dotted {
+    border-top-style: dotted;
+  }
+}

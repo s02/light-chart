@@ -4,6 +4,8 @@ import type { Point } from 'lightweight-charts'
 type Params = {
   width: number
   color: string
+  dash?: number[]
+  cap?: CanvasLineCap
 }
 
 function extendToEdge(p1: Point, p2: Point, canvasW: number, canvasH: number) {
@@ -33,9 +35,13 @@ export const ray = (scope: BitmapCoordinatesRenderingScope, p1: Point, p2: Point
   const end = extendToEdge(p1, p2, canvasW, canvasH)
 
   ctx.beginPath()
+  ctx.setLineDash(params.dash ?? [])
+  ctx.lineCap = params.cap ?? 'butt'
   ctx.moveTo(p1.x * hpr, p1.y * vpr)
   ctx.lineTo(end.x * hpr, end.y * vpr)
   ctx.strokeStyle = params.color
   ctx.lineWidth = params.width
   ctx.stroke()
+  ctx.setLineDash([])
+  ctx.lineCap = 'butt'
 }

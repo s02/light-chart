@@ -1,6 +1,7 @@
 import type { RectangleParams } from '@engine/drawings/Rectangle/Rectangle'
 import { dot } from '@engine/primitives/dot'
 import { rect } from '@engine/primitives/rect'
+import { lineDash } from '@engine/primitives/line-style'
 import type { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 
@@ -61,7 +62,10 @@ export class RectangleRenderer implements IPrimitivePaneRenderer {
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
-      rect(scope, this.#p1, this.#p2, this.#params)
+      rect(scope, this.#p1, this.#p2, {
+        ...this.#params,
+        ...lineDash(this.#params['line-style'], this.#params['line-width'])
+      })
 
       if (this.#params.text) {
         this.#drawText(scope)

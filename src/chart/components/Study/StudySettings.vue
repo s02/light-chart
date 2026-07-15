@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import type { SchemaKey, StudyParams, StudySchema } from '@engine/schema'
 import StudyColor from './StudyColor.vue'
 import StudyLineWidth from './StudyLineWidth.vue'
+import StudyLineStyle from './StudyLineStyle.vue'
 import StudyFontSize from './StudyFontSize.vue'
 import CInput from '@chart/components/Controls/CInput.vue'
 import CCheckbox from '@chart/components/Controls/CCheckbox.vue'
@@ -84,6 +85,10 @@ const setTab = (v: string) => {
               <StudyLineWidth
                 v-else-if="el.type === 'line-width'"
                 :width="Number(params[el.key])"
+                @update="params[el.key] = $event" />
+              <StudyLineStyle
+                v-else-if="el.type === 'line-style'"
+                :line-style="String(params[el.key])"
                 @update="params[el.key] = $event" />
               <StudyFontSize
                 v-else-if="el.type === 'font-size'"

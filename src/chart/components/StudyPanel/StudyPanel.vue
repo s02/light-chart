@@ -4,6 +4,7 @@ import { computed, onUnmounted, ref, useTemplateRef } from 'vue'
 import PropLineColor from '@chart/components/StudyPanel/PropLineColor.vue'
 import PropFontSize from '@chart/components/StudyPanel/PropFontSize.vue'
 import PropLineWidth from '@chart/components/StudyPanel/PropLineWidth.vue'
+import PropLineStyle from '@chart/components/StudyPanel/PropLineStyle.vue'
 import PropBrushWidth from '@chart/components/StudyPanel/PropBrushWidth.vue'
 import PropFillColor from '@chart/components/StudyPanel/PropFillColor.vue'
 import PropTextColor from '@chart/components/StudyPanel/PropTextColor.vue'
@@ -127,6 +128,11 @@ onUnmounted(() => {
         <PropLineWidth
           v-if="el.type === 'line-width'"
           :width="Number(drawingSchema.params[el.key])"
+          @update:model-value="isPanelMenuOpened = $event"
+          @update="apply(el.key, $event)" />
+        <PropLineStyle
+          v-else-if="el.type === 'line-style'"
+          :line-style="String(drawingSchema.params[el.key])"
           @update:model-value="isPanelMenuOpened = $event"
           @update="apply(el.key, $event)" />
         <PropBrushWidth

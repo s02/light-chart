@@ -1,6 +1,7 @@
 import type { HorizontalLineParams } from '@engine/drawings/HorizontalLine/HorizontalLine'
 import { dot } from '@engine/primitives/dot'
 import { line } from '@engine/primitives/line'
+import { lineDash } from '@engine/primitives/line-style'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 
@@ -19,7 +20,8 @@ export class HorizontalLineRenderer implements IPrimitivePaneRenderer {
     target.useBitmapCoordinateSpace((scope) => {
       line(scope, { x: 0, y: this.#p.y } as Point, { x: scope.bitmapSize.width, y: this.#p.y } as Point, {
         width: this.#params['line-width'],
-        color: this.#params['line-color']
+        color: this.#params['line-color'],
+        ...lineDash(this.#params['line-style'], this.#params['line-width'])
       })
 
       if (this.#withDots) {

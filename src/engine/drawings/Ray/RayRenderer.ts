@@ -1,5 +1,6 @@
 import { dot } from '@engine/primitives/dot'
 import { ray } from '@engine/primitives/ray'
+import { lineDash } from '@engine/primitives/line-style'
 import { textLabel, textLabelBounds } from '@engine/primitives/text-label'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { Coordinate, IPrimitivePaneRenderer, Point } from 'lightweight-charts'
@@ -20,7 +21,11 @@ export class RayRenderer implements IPrimitivePaneRenderer {
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
-      ray(scope, this.#p1, this.#p2, { width: this.#params['line-width'], color: this.#params['line-color'] })
+      ray(scope, this.#p1, this.#p2, {
+        width: this.#params['line-width'],
+        color: this.#params['line-color'],
+        ...lineDash(this.#params['line-style'], this.#params['line-width'])
+      })
 
       if (this.#params.text) {
         const fontSize = this.#params['font-size']

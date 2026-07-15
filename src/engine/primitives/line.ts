@@ -5,6 +5,7 @@ type Params = {
   width: number
   color: string
   dash?: number[]
+  cap?: CanvasLineCap
 }
 
 export const line = (scope: BitmapCoordinatesRenderingScope, p1: Point, p2: Point, params: Params) => {
@@ -14,10 +15,12 @@ export const line = (scope: BitmapCoordinatesRenderingScope, p1: Point, p2: Poin
 
   ctx.beginPath()
   ctx.setLineDash(params.dash ?? [])
+  ctx.lineCap = params.cap ?? 'butt'
   ctx.moveTo(p1.x * hpr, p1.y * vpr)
   ctx.lineTo(p2.x * hpr, p2.y * vpr)
   ctx.strokeStyle = params.color
   ctx.lineWidth = params.width
   ctx.stroke()
   ctx.setLineDash([])
+  ctx.lineCap = 'butt'
 }
