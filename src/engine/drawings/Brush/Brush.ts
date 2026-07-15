@@ -16,7 +16,7 @@ const BRUSH_SCHEMA = {
   text: [],
   inputs: [],
   style: [
-    { type: 'number', key: 'line-width', default: DEFAULTS['line-width'], fastPanel: true },
+    { type: 'line-width', key: 'line-width', default: DEFAULTS['line-width'], fastPanel: true },
     { type: 'color', key: 'line-color', default: DEFAULTS['line-color'], fastPanel: true },
     { type: 'color', key: 'fill-color', default: DEFAULTS['fill-color'], fastPanel: true }
   ]

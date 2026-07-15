@@ -13,7 +13,7 @@ const SIGNPOST_SCHEMA = {
   inputs: [],
   style: [
     { type: 'color', key: 'fill-color', default: 'rgb(0, 188, 212)', fastPanel: true },
-    { type: 'number', key: 'line-width', default: 1, fastPanel: true }
+    { type: 'line-width', key: 'line-width', default: 1, fastPanel: true }
   ]
 } as const satisfies StudySchema
 

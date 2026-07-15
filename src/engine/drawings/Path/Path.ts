@@ -10,7 +10,7 @@ const PATH_SCHEMA = {
   text: [],
   inputs: [],
   style: [
-    { type: 'number', key: 'line-width', default: 2, fastPanel: true },
+    { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
     { type: 'color', key: 'line-color', default: 'rgb(233 30 99)', fastPanel: true }
   ]
 } as const satisfies StudySchema

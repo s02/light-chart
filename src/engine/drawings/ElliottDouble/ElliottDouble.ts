@@ -11,7 +11,7 @@ const ELLIOTT_DOUBLE_SCHEMA = {
   text: [],
   inputs: [],
   style: [
-    { type: 'number', key: 'line-width', default: 1, fastPanel: true },
+    { type: 'line-width', key: 'line-width', default: 1, fastPanel: true },
     { type: 'number', key: 'font-size', default: 16, fastPanel: true },
     { type: 'color', key: 'line-color', default: 'rgb(33 150 243)', fastPanel: true },
     { type: 'color', key: 'text-color', default: 'rgb(33 150 243)', fastPanel: true }

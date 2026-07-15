@@ -17,7 +17,7 @@ const PARALLEL_CHANNEL_SCHEMA = {
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(156 39 176)', fastPanel: true },
     { type: 'color', key: 'fill-color', default: 'rgb(156 39 176 / 5%)', fastPanel: true },
-    { type: 'number', key: 'line-width', default: 2, fastPanel: true }
+    { type: 'line-width', key: 'line-width', default: 2, fastPanel: true }
   ]
 } as const satisfies StudySchema
 
