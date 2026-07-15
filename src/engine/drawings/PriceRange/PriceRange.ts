@@ -4,20 +4,22 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import { resolveStudyParams, type InferStudyValues, type StudyParams, type StudySchema } from '@engine/schema'
 import type { IChartApi, Point } from 'lightweight-charts'
 import { geometry } from '../geometry'
+import { AxisHighlighterPaneView } from '@engine/drawings/AxisHighlighter/AxisHighlighterPaneView'
+import { AxisHighlighterLabelView } from '@engine/drawings/AxisHighlighter/AxisHighlighterLabelView'
 
 const PRICE_RANGE_SCHEMA = {
   text: [],
   inputs: [],
   style: [
     { type: 'number', key: 'line-width', default: 2, fastPanel: true },
-    { type: 'color', key: 'line-color', default: 'rgb(76 175 80)', fastPanel: true },
-    { type: 'color', key: 'fill-color', default: 'rgb(76 175 80 / 15%)', fastPanel: true },
+    { type: 'color', key: 'line-color', default: 'rgb(41 98 255)', fastPanel: true },
+    { type: 'color', key: 'fill-color', default: 'rgb(41 98 255 / 15%)', fastPanel: true },
 
     { type: 'line-width', key: 'pr-border-width', default: 1 },
     { type: 'color', key: 'pr-border-color', default: 'rgb(76 175 80 / 0%)' },
     { type: 'font-size', key: 'pr-label-font-size', default: 12 },
     { type: 'color', key: 'pr-label-color', default: 'rgb(255 255 255)' },
-    { type: 'color', key: 'pr-label-fill', default: 'rgb(76 175 80)' }
+    { type: 'color', key: 'pr-label-fill', default: 'rgb(41 98 255)' }
   ]
 } as const satisfies StudySchema
 
@@ -67,6 +69,56 @@ export class PriceRange extends BaseDrawing {
     }
 
     return []
+  }
+
+  priceAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: true })]
+    }
+
+    return []
+  }
+
+  timeAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: false })]
+    }
+
+    return []
+  }
+
+  priceAxisViews() {
+    return this.#axisLabelViews(true)
+  }
+
+  timeAxisViews() {
+    return this.#axisLabelViews(false)
+  }
+
+  #axisLabelViews(vertical: boolean) {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (!viewport || this.anchors.length < 2) {
+      return []
+    }
+
+    return [
+      new AxisHighlighterLabelView(viewport, this.anchors[0], { vertical }),
+      new AxisHighlighterLabelView(viewport, this.anchors[1], { vertical })
+    ]
   }
 
   override checkTap(point: Point) {
