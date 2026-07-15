@@ -5,6 +5,8 @@ import { PathPaneView } from './PathPaneView'
 import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
 import { POINTS_MODE } from '@engine/points'
+import { AxisHighlighterPaneView } from '@engine/drawings/AxisHighlighter/AxisHighlighterPaneView'
+import { AxisHighlighterLabelView } from '@engine/drawings/AxisHighlighter/AxisHighlighterLabelView'
 
 const PATH_SCHEMA = {
   text: [],
@@ -43,6 +45,53 @@ export class Path extends BaseDrawing {
       schema: PATH_SCHEMA,
       params: this.#params
     }
+  }
+
+  priceAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: true })]
+    }
+
+    return []
+  }
+
+  timeAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: false })]
+    }
+
+    return []
+  }
+
+  priceAxisViews() {
+    return this.#axisLabelViews(true)
+  }
+
+  timeAxisViews() {
+    return this.#axisLabelViews(false)
+  }
+
+  #axisLabelViews(vertical: boolean) {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (!viewport || this.anchors.length < 2) {
+      return []
+    }
+
+    return this.anchors.map((anchor) => new AxisHighlighterLabelView(viewport, anchor, { vertical }))
   }
 
   override paneViews() {
