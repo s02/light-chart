@@ -108,7 +108,7 @@ const setTab = (v: string) => {
       </div>
     </div>
 
-    <div class="mwc-studysett-footer studysett-container">
+    <div class="mwc-studysett-footer mwc-studysett-container">
       <CButton type="primary" @click="apply()">Apply</CButton>
     </div>
   </div>

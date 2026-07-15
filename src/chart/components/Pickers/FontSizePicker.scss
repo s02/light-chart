@@ -1,16 +1,15 @@
 .mwc-font-size-picker {
   display: grid;
-  grid-template-columns: repeat(3, 70px);
+  grid-template-columns: repeat(3, 48px);
 }
 
 .mwc-font-size-picker-btn {
-  width: 70px;
   display: block;
   color: inherit;
   font-family: inherit;
   background-color: transparent;
   border: 0;
-  box-shadow: 0;
+  box-shadow: none;
   gap: 5px;
   cursor: pointer;
   padding: 8px;

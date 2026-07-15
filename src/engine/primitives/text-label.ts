@@ -6,6 +6,7 @@ type Params = {
   'text-color': string
   'font-size': number
   fill?: string
+  angle?: number
 }
 
 export const textLabel = (scope: BitmapCoordinatesRenderingScope, p: Point, params: Params) => {
@@ -25,6 +26,16 @@ export const textLabel = (scope: BitmapCoordinatesRenderingScope, p: Point, para
 
   const x = p.x * hpr
   const y = p.y * vpr
+
+  ctx.save()
+
+  if (params.angle) {
+    const cx = x + boxWidth / 2
+    const cy = y + boxHeight / 2
+    ctx.translate(cx, cy)
+    ctx.rotate(params.angle)
+    ctx.translate(-cx, -cy)
+  }
 
   if (params.fill) {
     ctx.beginPath()
@@ -46,6 +57,8 @@ export const textLabel = (scope: BitmapCoordinatesRenderingScope, p: Point, para
   ctx.textAlign = 'left'
   ctx.textBaseline = 'top'
   ctx.fillText(params.text, x + paddingW, y + paddingH)
+
+  ctx.restore()
 }
 
 export const textLabelBounds = (text: string, fontSize: number) => {

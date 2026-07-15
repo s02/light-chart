@@ -14,9 +14,7 @@ const emit = defineEmits<{
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
-      <button :ref="triggerRef" class="mwc-study-fs-btn" @click="isOpened = true">
-        {{ size }}
-      </button>
+      <button :ref="triggerRef" class="mwc-study-fs-btn" @click="isOpened = true">{{ size }}px</button>
     </template>
     <FontSizePicker
       :values="[8, 10, 11, 12, 14, 16, 18, 20, 22, 28, 32, 40]"
