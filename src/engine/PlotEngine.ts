@@ -4,7 +4,8 @@ import { IndicatorsManager } from '@engine/indicators'
 import { seriesOverlayFactory } from '@engine/series'
 import { PluginManager } from '@engine/plugins'
 import { WhitespaceSeries } from './series/WhitespaceSeries'
-import type { IChartApi, LogicalRange, MouseEventParams } from 'lightweight-charts'
+import { LegendsManager } from '@engine/legends/LegendsManager'
+import type { IChartApi, LogicalRange } from 'lightweight-charts'
 import type {
   ChartExpiration,
   ChartOption,
@@ -43,6 +44,7 @@ export class PlotEngine {
   #seriesOverlay: SeriesOverlay
   #indicatorsManager: IndicatorsManager
   #drawingsManager: DrawingsManager
+  #legendsManager: LegendsManager
   #whitespace: WhitespaceSeries
   #subscribers: Array<(event: PlotEvent) => void> = []
 
@@ -54,6 +56,7 @@ export class PlotEngine {
     this.#seriesOverlay = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
     this.#indicatorsManager = new IndicatorsManager(this.#chart, this.#datafeed)
     this.#drawingsManager = new DrawingsManager(this.#chart, this.#seriesOverlay.getSeries())
+    this.#legendsManager = new LegendsManager(this.#chart, this.#seriesOverlay, this.#indicatorsManager)
     this.#pluginManager = new PluginManager(this.#chart, this.#datafeed.getResolutionId())
     this.#pluginManager.attach(this.#seriesOverlay.getSeries())
     this.#whitespace = new WhitespaceSeries(this.#chart, this.#datafeed)
@@ -75,32 +78,7 @@ export class PlotEngine {
   }
 
   subscribeToLegends(cb: (legends: ChartSeriesLegend[]) => void) {
-    const handler = (params: MouseEventParams) => {
-      if (!params.time) {
-        return
-      }
-
-      const result: ChartSeriesLegend[] = []
-      const series = this.#seriesOverlay.getSeries()
-      const data = params.seriesData.get(series)
-      if (data) {
-        result.push({
-          category: 'main',
-          id: -1,
-          ...this.#seriesOverlay.getLegend(data)
-        })
-      }
-
-      const legends = this.#indicatorsManager.getLegends(params.seriesData)
-      result.push(...legends)
-
-      if (result.length) {
-        cb(result)
-      }
-    }
-
-    this.#chart.subscribeCrosshairMove(handler)
-    return () => this.#chart.unsubscribeCrosshairMove(handler)
+    return this.#legendsManager.subscribe(cb)
   }
 
   subscribeToSelectDrawing(cb: DrawingSelectFn) {
@@ -115,6 +93,7 @@ export class PlotEngine {
 
     this.#pluginManager.setSeries(series.getSeries())
     this.#drawingsManager.setSeries(series.getSeries())
+    this.#legendsManager.setSeriesOverlay(series)
 
     this.#subscribers.forEach((sub) => {
       sub({ type: 'seriesChanged', data: seriesId })
