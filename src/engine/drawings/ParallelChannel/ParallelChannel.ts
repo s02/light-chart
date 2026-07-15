@@ -1,3 +1,5 @@
+import { AxisHighlighterLabelView } from '@engine/drawings/AxisHighlighter/AxisHighlighterLabelView'
+import { AxisHighlighterPaneView } from '@engine/drawings/AxisHighlighter/AxisHighlighterPaneView'
 import { BaseDrawing } from '@engine/drawings/BaseDrawing'
 import { geometry } from '@engine/drawings/geometry'
 import { ParallelChannelPaneView } from '@engine/drawings/ParallelChannel/ParallelChannelPaneView'
@@ -14,7 +16,7 @@ const PARALLEL_CHANNEL_SCHEMA = {
   inputs: [],
   style: [
     { type: 'color', key: 'line-color', default: 'rgb(156 39 176)', fastPanel: true },
-    { type: 'color', key: 'fill-color', default: 'rgb(41 98 255 / 5%)', fastPanel: true },
+    { type: 'color', key: 'fill-color', default: 'rgb(156 39 176 / 5%)', fastPanel: true },
     { type: 'number', key: 'line-width', default: 2, fastPanel: true }
   ]
 } as const satisfies StudySchema
@@ -64,6 +66,60 @@ export class ParallelChannel extends BaseDrawing {
       return [new ParallelChannelPaneView(viewport, this.anchors, this.anchorsVisible, this.#params)]
     }
     return []
+  }
+
+  priceAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: true })]
+    }
+
+    return []
+  }
+
+  timeAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: false })]
+    }
+
+    return []
+  }
+
+  priceAxisViews() {
+    return this.#axisLabelViews(true)
+  }
+
+  timeAxisViews() {
+    return this.#axisLabelViews(false)
+  }
+
+  #axisLabelViews(vertical: boolean) {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (!viewport || this.anchors.length < 2) {
+      return []
+    }
+
+    if (vertical) {
+      return this.anchors.map((anchor) => new AxisHighlighterLabelView(viewport, anchor, { vertical }))
+    }
+
+    return [
+      new AxisHighlighterLabelView(viewport, this.anchors[0], { vertical }),
+      new AxisHighlighterLabelView(viewport, this.anchors[1], { vertical })
+    ]
   }
 
   override startDrag() {

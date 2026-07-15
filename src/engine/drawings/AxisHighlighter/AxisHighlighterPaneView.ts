@@ -30,14 +30,20 @@ export class AxisHighlighterPaneView implements IPrimitivePaneView {
       return null
     }
 
-    const p1 = this.#viewport.anchorToPoint(this.#anchors[0])
-    const p2 = this.#viewport.anchorToPoint(this.#anchors[1])
+    const values: number[] = []
+    for (const anchor of this.#anchors) {
+      const point = this.#viewport.anchorToPoint(anchor)
+      if (point) {
+        values.push(this.#vertical ? point.y : point.x)
+      }
+    }
 
-    if (!p1 || !p2) {
+    if (values.length < 2) {
       return null
     }
 
-    const [from, to] = this.#vertical ? [p1.y, p2.y] : [p1.x, p2.x]
+    const from = Math.min(...values)
+    const to = Math.max(...values)
 
     return new AxisHighlighterPaneRenderer(from, to, this.#fillColor, this.#vertical)
   }
