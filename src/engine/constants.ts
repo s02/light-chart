@@ -21,7 +21,6 @@ export const CHART_PARAMS = {
     timeVisible: true,
     barSpacing: 10,
     rightOffset: 10,
-    uniformDistribution: true,
     borderColor: 'rgba(255, 255, 255, .25)'
   },
   rightPriceScale: {
