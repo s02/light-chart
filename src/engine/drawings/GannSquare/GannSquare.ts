@@ -11,6 +11,7 @@ const GANN_SQUARE_SCHEMA = {
   style: [
     { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
     { type: 'line-color', key: 'line-color', default: 'rgb(0, 188, 212)', fastPanel: true },
+    { type: 'font-size', key: 'font-size', default: 12 },
 
     { type: 'color', key: 'square-0-color', default: 'rgb(128 128 128)' },
     { type: 'color', key: 'square-1-color', default: 'rgb(255 152 0)' },

@@ -1,6 +1,7 @@
 import type { GannSquareParams } from '@engine/drawings/GannSquare/GannSquare'
 import { GannSquareArcRenderer } from '@engine/drawings/GannSquare/GannSquareArcRenderer'
 import { GannSquareFanRenderer } from '@engine/drawings/GannSquare/GannSquareFanRenderer'
+import { GannSquareLabelsRenderer } from '@engine/drawings/GannSquare/GannSquareLabelsRenderer'
 import { GannSquareRenderer } from '@engine/drawings/GannSquare/GannSquareRenderer'
 import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
@@ -59,11 +60,25 @@ export class GannSquarePaneView {
 
     const lineWidth = this.#params['line-width']
     const divisions = Math.max(1, Math.round(this.#params['divisions']))
+    const barCount = this.#viewport.barsBetween(a1.time, a2.time)
+    const priceDiff = a2.price - a1.price
 
     const zOrder = (): PrimitivePaneViewZOrder => 'normal'
 
     return [
       { zOrder, renderer: () => new GannSquareRenderer(p1, p2, this.#withDots, this.#params) },
+      {
+        zOrder,
+        renderer: () =>
+          new GannSquareLabelsRenderer(
+            p1,
+            p2,
+            this.#params['line-color'],
+            this.#params['font-size'],
+            barCount,
+            priceDiff
+          )
+      },
       {
         zOrder,
         renderer: () =>
