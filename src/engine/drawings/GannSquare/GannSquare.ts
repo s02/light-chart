@@ -9,8 +9,20 @@ const GANN_SQUARE_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'divisions', default: 5 }],
   style: [
-    { type: 'line-width', key: 'line-width', default: 1, fastPanel: true },
-    { type: 'line-color', key: 'line-color', default: 'rgb(0, 188, 212)', fastPanel: true }
+    { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
+    { type: 'line-color', key: 'line-color', default: 'rgb(0, 188, 212)', fastPanel: true },
+
+    { type: 'color', key: 'arc-1-0-color', default: 'rgb(255 152 0 / 20%)' },
+    { type: 'color', key: 'arc-1-1-color', default: 'rgb(255 152 0 / 20%)' },
+    { type: 'color', key: 'arc-1.5-0-color', default: 'rgb(255 152 0 / 20%)' },
+    { type: 'color', key: 'arc-2-0-color', default: 'rgb(0 188 212 / 20%)' },
+    { type: 'color', key: 'arc-2-1-color', default: 'rgb(0 188 212 / 20%)' },
+    { type: 'color', key: 'arc-3-0-color', default: 'rgb(76 175 80 / 20%)' },
+    { type: 'color', key: 'arc-3-1-color', default: 'rgb(76 175 80 / 20%)' },
+    { type: 'color', key: 'arc-4-0-color', default: 'rgb(8 153 129 / 20%)' },
+    { type: 'color', key: 'arc-4-1-color', default: 'rgb(8 153 129 / 20%)' },
+    { type: 'color', key: 'arc-5-0-color', default: 'rgb(41 98 255 / 20%)' },
+    { type: 'color', key: 'arc-5-1-color', default: 'rgb(41 98 255 / 20%)' }
   ]
 } as const satisfies StudySchema
 

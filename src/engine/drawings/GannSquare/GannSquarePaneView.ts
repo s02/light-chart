@@ -6,18 +6,19 @@ import type { DrawingViewport } from '../types'
 import type { IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 import type { Anchor } from '@engine/points'
 
-const ARCS: { x: number; y: number }[] = [
-  { x: 1, y: 0 },
-  { x: 1, y: 1 },
-  { x: 2, y: 0 },
-  { x: 2, y: 1 },
-  { x: 3, y: 0 },
-  { x: 3, y: 1 },
-  { x: 4, y: 0 },
-  { x: 4, y: 1 },
-  { x: 5, y: 0 },
-  { x: 5, y: 1 }
-]
+const ARCS = [
+  { x: 1, y: 0, color: 'arc-1-0-color' },
+  { x: 1, y: 1, color: 'arc-1-1-color' },
+  { x: 1.5, y: 0, color: 'arc-1.5-0-color' },
+  { x: 2, y: 0, color: 'arc-2-0-color' },
+  { x: 2, y: 1, color: 'arc-2-1-color' },
+  { x: 3, y: 0, color: 'arc-3-0-color' },
+  { x: 3, y: 1, color: 'arc-3-1-color' },
+  { x: 4, y: 0, color: 'arc-4-0-color' },
+  { x: 4, y: 1, color: 'arc-4-1-color' },
+  { x: 5, y: 0, color: 'arc-5-0-color' },
+  { x: 5, y: 1, color: 'arc-5-1-color' }
+] as const
 
 export class GannSquarePaneView {
   #anchors: Anchor[]
@@ -51,7 +52,17 @@ export class GannSquarePaneView {
     return [
       { zOrder, renderer: () => new GannSquareRenderer(p1, p2, this.#withDots, this.#params) },
       { zOrder, renderer: () => new GannSquareFanRenderer(p1, p2, color, lineWidth) },
-      { zOrder, renderer: () => new GannSquareArcRenderer(p1, p2, divisions, color, lineWidth, ARCS) }
+      {
+        zOrder,
+        renderer: () =>
+          new GannSquareArcRenderer(
+            p1,
+            p2,
+            divisions,
+            lineWidth,
+            ARCS.map((arc) => ({ ...arc, color: this.#params[arc.color] }))
+          )
+      }
     ]
   }
 }
