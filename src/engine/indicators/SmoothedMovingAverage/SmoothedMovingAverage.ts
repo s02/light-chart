@@ -14,6 +14,12 @@ const SMMA_SCHEMA = {
   text: [],
   inputs: [
     { type: 'number', key: 'smma-length', default: 7, min: 1, max: 9999 },
+    {
+      type: 'select',
+      key: 'smma-source',
+      values: ['close', 'open'],
+      default: 'close'
+    },
     { type: 'number', key: 'smma-offset', default: 0, min: 0, max: 9999 }
   ],
   style: [{ type: 'color', key: 'smma-color', default: 'rgb(255 109 0)' }]
@@ -60,8 +66,8 @@ export class SmoothedMovingAverage extends AbstractIndicator implements Indicato
     const data = seriesData.get(this.#series)
     legend.data.push(
       { value: this.#params['smma-length'].toString(), color: 'rgb(140, 140, 140)' },
-      { value: this.#params['smma-offset'].toString(), color: 'rgb(140, 140, 140)' },
-      { value: 'close', color: 'rgb(140, 140, 140)' }
+      { value: this.#params['smma-source'], color: 'rgb(140, 140, 140)' },
+      { value: this.#params['smma-offset'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (data) {
       legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['smma-color'] })
@@ -78,7 +84,7 @@ export class SmoothedMovingAverage extends AbstractIndicator implements Indicato
   }
 
   #calculate(bars: ChartBar[]) {
-    const source = getSourceSeries(bars, 'close')
+    const source = getSourceSeries(bars, this.#params['smma-source'])
     const shifted = this.applyOffset(ta.rma(source, this.#params['smma-length']).toArray(), this.#params['smma-offset'])
 
     const toBar = (value: number, i: number) => ({

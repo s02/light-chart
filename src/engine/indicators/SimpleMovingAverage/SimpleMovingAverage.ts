@@ -12,7 +12,16 @@ import { getSourceSeries, ta } from 'oakscriptjs'
 
 const SMA_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'sma-length', default: 9, min: 1, max: 9999 }],
+  inputs: [
+    { type: 'number', key: 'sma-length', default: 9, min: 1, max: 9999 },
+    {
+      type: 'select',
+      key: 'sma-source',
+      values: ['close', 'open'],
+      default: 'close'
+    },
+    { type: 'number', key: 'sma-offset', default: 0, min: 0, max: 9999 }
+  ],
   style: [{ type: 'color', key: 'sma-color', default: 'rgb(41 98 255)' }]
 } as const satisfies StudySchema
 
@@ -57,6 +66,8 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
     const data = seriesData.get(this.#series)
 
     legend.data.push({ value: this.#params['sma-length'].toString(), color: `rgb(140, 140, 140)` })
+    legend.data.push({ value: this.#params['sma-source'], color: `rgb(140, 140, 140)` })
+    legend.data.push({ value: this.#params['sma-offset'].toString(), color: `rgb(140, 140, 140)` })
 
     if (data) {
       legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['sma-color'] })
@@ -81,21 +92,15 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   }
 
   #calculate(bars: ChartBar[]) {
-    const source = getSourceSeries(bars, 'close')
-    const smaResult = ta.sma(source, this.#params['sma-length'])
+    const source = getSourceSeries(bars, this.#params['sma-source'])
+    const maResult = ta.sma(source, this.#params['sma-length'])
+    const ma = this.applyOffset(maResult.toArray(), this.#params['sma-offset'])
 
-    const toBar = (value: number, i: number) => {
-      const time = bars[i].time
-      return value
-        ? {
-            time,
-            value
-          }
-        : {
-            time
-          }
-    }
+    const toBar = (value: number, i: number) => ({
+      time: bars[i].time,
+      value: value ?? NaN
+    })
 
-    return smaResult.toArray().map(toBar)
+    return this.filter(ma.map(toBar))
   }
 }

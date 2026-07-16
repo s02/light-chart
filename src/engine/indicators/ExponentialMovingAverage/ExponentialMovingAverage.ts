@@ -16,6 +16,12 @@ const EMA_SCHEMA = {
   text: [],
   inputs: [
     { type: 'number', key: 'ema-length', default: 9, min: 1, max: 9999 },
+    {
+      type: 'select',
+      key: 'ema-source',
+      values: ['close', 'open'],
+      default: 'close'
+    },
     { type: 'number', key: 'ema-offset', default: 0, min: 0, max: 9999 }
   ],
   style: [{ type: 'color', key: 'ema-color', default: 'rgb(255 109 0)' }]
@@ -66,6 +72,7 @@ export class ExponentialMovingAverage extends AbstractIndicator implements Indic
     const data = seriesData.get(this.#series)
     legend.data.push(
       { value: this.#params['ema-length'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['ema-source'], color: 'rgb(140, 140, 140)' },
       { value: this.#params['ema-offset'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (data) {
@@ -83,7 +90,7 @@ export class ExponentialMovingAverage extends AbstractIndicator implements Indic
   }
 
   #calculate(bars: ChartBar[]) {
-    const source = getSourceSeries(bars, 'close')
+    const source = getSourceSeries(bars, this.#params['ema-source'])
     const shifted = this.applyOffset(ta.ema(source, this.#params['ema-length']).toArray(), this.#params['ema-offset'])
 
     const toBar = (value: number, i: number) => ({

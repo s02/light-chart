@@ -14,6 +14,12 @@ const WMA_SCHEMA = {
   text: [],
   inputs: [
     { type: 'number', key: 'wma-length', default: 9, min: 1, max: 9999 },
+    {
+      type: 'select',
+      key: 'wma-source',
+      values: ['close', 'open'],
+      default: 'close'
+    },
     { type: 'number', key: 'wma-offset', default: 0, min: 0, max: 9999 }
   ],
   style: [{ type: 'color', key: 'wma-color', default: 'rgb(255 109 0)' }]
@@ -60,8 +66,8 @@ export class WeightedMovingAverage extends AbstractIndicator implements Indicato
     const data = seriesData.get(this.#series)
     legend.data.push(
       { value: this.#params['wma-length'].toString(), color: 'rgb(140, 140, 140)' },
-      { value: this.#params['wma-offset'].toString(), color: 'rgb(140, 140, 140)' },
-      { value: 'close', color: 'rgb(140, 140, 140)' }
+      { value: this.#params['wma-source'], color: 'rgb(140, 140, 140)' },
+      { value: this.#params['wma-offset'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (data) {
       legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['wma-color'] })
@@ -78,7 +84,7 @@ export class WeightedMovingAverage extends AbstractIndicator implements Indicato
   }
 
   #calculate(bars: ChartBar[]) {
-    const source = getSourceSeries(bars, 'close')
+    const source = getSourceSeries(bars, this.#params['wma-source'])
     const shifted = this.applyOffset(ta.wma(source, this.#params['wma-length']).toArray(), this.#params['wma-offset'])
 
     const toBar = (value: number, i: number) => ({
