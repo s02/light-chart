@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onKeyStroke } from '@vueuse/core'
 import { useModal, useModalState } from '@chart/composables/useModal'
 
 const { current } = useModalState()
@@ -12,6 +13,12 @@ const closeModal = (result?: unknown) => {
   current.value.result.resolve(result)
   setTimeout(close)
 }
+
+onKeyStroke('Escape', () => {
+  if (current.value) {
+    closeModal()
+  }
+})
 </script>
 
 <template>

@@ -161,6 +161,7 @@ export class DrawingsManager {
   }
 
   destroy() {
+    this.cancelCurrent()
     this.#drawings.forEach((el) => {
       el.drawing.detach()
     })

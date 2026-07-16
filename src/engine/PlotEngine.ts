@@ -184,6 +184,7 @@ export class PlotEngine {
     this.#pluginManager.detach()
     this.#indicatorsManager.clear()
     this.#seriesOverlay.destroy()
+    this.#drawingsManager.destroy()
     this.#chart.timeScale().unsubscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
     this.#chart.remove()
   }

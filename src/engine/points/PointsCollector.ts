@@ -66,8 +66,9 @@ export class PointsCollector implements PointsManager {
       this.#points.push(this.#currentPoint)
     }
 
-    const status = this.#points.length === this.#limit ? 'done' : 'pending'
-    this.#handler({ status, points: this.#filterPoints(this.#points) })
+    const points = this.#filterPoints(this.#points)
+    const status = points.length === this.#limit ? 'done' : 'pending'
+    this.#handler({ status, points })
 
     if (status === 'done') {
       this.destroy()
