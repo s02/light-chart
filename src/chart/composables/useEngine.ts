@@ -189,6 +189,16 @@ export const useEngineApi = () => {
     return t.id
   }
 
+  const removeAllDrawings = () => {
+    assertEngine(pe)
+    pe.clearDrawings()
+  }
+
+  const removeAllIndicators = () => {
+    assertEngine(pe)
+    pe.clearStudies()
+  }
+
   const removeIndicator = (id: number) => {
     assertEngine(pe)
     pe.removeIndicator(id)
@@ -239,6 +249,8 @@ export const useEngineApi = () => {
     removeIndicator,
     editIndicator,
     startDrawing,
+    removeAllDrawings,
+    removeAllIndicators,
     cancelDrawing,
     updateDrawing,
     removeDrawing,

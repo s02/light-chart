@@ -52,6 +52,7 @@ export class DrawingsManager {
     })
 
     this.#drawings = []
+    this.#selectedId = undefined
   }
 
   getAllSchemas() {

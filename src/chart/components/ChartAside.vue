@@ -45,13 +45,13 @@ const getDrawingInitials = () => {
   return result
 }
 
-const { startDrawing, cancelDrawing } = useEngineApi()
+const { startDrawing, cancelDrawing, removeAllDrawings, removeAllIndicators } = useEngineApi()
 
 const groups = getDrawingGroups()
 const menu = ref<AsideMenu>(getDrawingInitials())
 
 const initialized = ref<DrawingName | null>()
-const currentDrawingGroup = ref<DrawingGroup | null>(null)
+const openedMenu = ref<{ type: 'drawing'; el: DrawingGroup } | { type: 'action'; el: 'remove' } | undefined>(undefined)
 
 const init = async (name: DrawingName, { options, manualStop }: { options?: DrawingOptions; manualStop?: boolean }) => {
   try {
@@ -71,7 +71,8 @@ const init = async (name: DrawingName, { options, manualStop }: { options?: Draw
 }
 
 const handleStart = (name: DrawingName, options?: DrawingOptions) => {
-  currentDrawingGroup.value = null
+  openedMenu.value = undefined
+  console.log('start', name, initialized.value)
   if (name === initialized.value) {
     initialized.value = null
     cancelDrawing()
@@ -83,13 +84,28 @@ const handleStart = (name: DrawingName, options?: DrawingOptions) => {
 }
 
 const selectDrawing = (script: DrawingScript) => {
-  if (!currentDrawingGroup.value) {
+  if (!openedMenu.value || openedMenu.value.type !== 'drawing') {
     return
   }
 
-  menu.value[currentDrawingGroup.value] = script
+  menu.value[openedMenu.value.el] = script
   handleStart(script.drawing.ikey)
   close()
+}
+
+const removeDrawings = () => {
+  removeAllDrawings()
+  openedMenu.value = undefined
+}
+
+const removeIndicators = () => {
+  removeAllIndicators()
+  openedMenu.value = undefined
+}
+
+const removeStudies = () => {
+  removeDrawings()
+  removeIndicators()
 }
 </script>
 
@@ -97,9 +113,9 @@ const selectDrawing = (script: DrawingScript) => {
   <FloatingDropdown
     v-for="g in groups"
     :key="g"
-    :open="currentDrawingGroup === g"
+    :open="openedMenu?.el === g"
     placement="right-start"
-    @update:open="currentDrawingGroup = null">
+    @update:open="openedMenu = undefined">
     <template #trigger="{ triggerRef }">
       <div :ref="triggerRef" class="mwc-ca-btn">
         <div
@@ -109,8 +125,8 @@ const selectDrawing = (script: DrawingScript) => {
           v-html="menu[g].icon"></div>
         <div
           class="mwc-ca-btn-collapse"
-          :class="{ opened: currentDrawingGroup === g }"
-          @click="currentDrawingGroup ? (currentDrawingGroup = null) : (currentDrawingGroup = g)">
+          :class="{ opened: openedMenu?.el === g }"
+          @click="openedMenu ? (openedMenu = undefined) : (openedMenu = { type: 'drawing', el: g })">
           <svg class="mwc-ca-btn-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" width="4" height="7">
             <path d="M.6 1.4l1.4-1.4 8 8-8 8-1.4-1.4 6.389-6.532-6.389-6.668z" stroke="currentColor"></path>
           </svg>
@@ -118,7 +134,7 @@ const selectDrawing = (script: DrawingScript) => {
       </div>
     </template>
 
-    <div v-if="currentDrawingGroup == 'emoji'" class="mwc-ca-emoji-menu">
+    <div v-if="openedMenu?.el == 'emoji'" class="mwc-ca-emoji-menu">
       <EmojiList @click="handleStart('emoji', { params: { emoji: $event } })" />
     </div>
 
@@ -132,6 +148,44 @@ const selectDrawing = (script: DrawingScript) => {
           <div v-html="item.icon"></div>
           {{ i18n.translate(`study-${item.drawing.ikey}`) }}
         </ChartMenuItem>
+      </ChartMenuGroup>
+    </div>
+  </FloatingDropdown>
+
+  <div class="mwc-ca-splitter"></div>
+
+  <FloatingDropdown :open="openedMenu?.el === 'remove'" placement="right-start" @update:open="openedMenu = undefined">
+    <template #trigger="{ triggerRef }">
+      <div :ref="triggerRef" class="mwc-ca-btn">
+        <div class="mwc-ca-btn-icon" @click="removeStudies">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
+            <path
+              fill="currentColor"
+              d="M18 7h5v1h-2.01l-1.33 14.64a1.5 1.5 0 0 1-1.5 1.36H9.84a1.5 1.5 0 0 1-1.49-1.36L7.01 8H5V7h5V6c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v1Zm-6-2a1 1 0 0 0-1 1v1h6V6a1 1 0 0 0-1-1h-4ZM8.02 8l1.32 14.54a.5.5 0 0 0 .5.46h8.33a.5.5 0 0 0 .5-.46L19.99 8H8.02Z"></path>
+          </svg>
+        </div>
+        <div
+          class="mwc-ca-btn-collapse"
+          :class="{ opened: openedMenu?.el === 'remove' }"
+          @click="openedMenu = { type: 'action', el: 'remove' }">
+          <svg class="mwc-ca-btn-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" width="4" height="7">
+            <path d="M.6 1.4l1.4-1.4 8 8-8 8-1.4-1.4 6.389-6.532-6.389-6.668z" stroke="currentColor"></path>
+          </svg>
+        </div>
+      </div>
+    </template>
+
+    <div class="mwc-ca-drawing-menu">
+      <ChartMenuGroup>
+        <ChartMenuItem class="mwc-ca-menu-item" @click="removeDrawings">{{
+          i18n.translate('menu-remove-drawings')
+        }}</ChartMenuItem>
+        <ChartMenuItem class="mwc-ca-menu-item" @click="removeIndicators">{{
+          i18n.translate('menu-remove-indicators')
+        }}</ChartMenuItem>
+        <ChartMenuItem class="mwc-ca-menu-item" @click="removeStudies">{{
+          i18n.translate('menu-remove-drawings-indicators')
+        }}</ChartMenuItem>
       </ChartMenuGroup>
     </div>
   </FloatingDropdown>
