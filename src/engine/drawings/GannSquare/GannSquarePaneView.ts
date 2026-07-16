@@ -20,6 +20,20 @@ const ARCS = [
   { x: 5, y: 1, color: 'arc-5-1-color' }
 ] as const
 
+const FAN_LINES = [
+  { rise: 8, run: 1, color: 'fan-8x1-color' },
+  { rise: 5, run: 1, color: 'fan-5x1-color' },
+  { rise: 4, run: 1, color: 'fan-4x1-color' },
+  { rise: 3, run: 1, color: 'fan-3x1-color' },
+  { rise: 2, run: 1, color: 'fan-2x1-color' },
+  { rise: 1, run: 1, color: 'fan-1x1-color' },
+  { rise: 1, run: 2, color: 'fan-1x2-color' },
+  { rise: 1, run: 3, color: 'fan-1x3-color' },
+  { rise: 1, run: 4, color: 'fan-1x4-color' },
+  { rise: 1, run: 5, color: 'fan-1x5-color' },
+  { rise: 1, run: 6, color: 'fan-1x6-color' }
+] as const
+
 export class GannSquarePaneView {
   #anchors: Anchor[]
   #withDots: boolean
@@ -43,7 +57,6 @@ export class GannSquarePaneView {
 
     if (!p1 || !p2) return []
 
-    const color = this.#params['line-color']
     const lineWidth = this.#params['line-width']
     const divisions = Math.max(1, Math.round(this.#params['divisions']))
 
@@ -51,7 +64,16 @@ export class GannSquarePaneView {
 
     return [
       { zOrder, renderer: () => new GannSquareRenderer(p1, p2, this.#withDots, this.#params) },
-      { zOrder, renderer: () => new GannSquareFanRenderer(p1, p2, color, lineWidth) },
+      {
+        zOrder,
+        renderer: () =>
+          new GannSquareFanRenderer(
+            p1,
+            p2,
+            lineWidth,
+            FAN_LINES.map((f) => ({ ...f, color: this.#params[f.color] }))
+          )
+      },
       {
         zOrder,
         renderer: () =>

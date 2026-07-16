@@ -19,6 +19,18 @@ const GANN_SQUARE_SCHEMA = {
     { type: 'color', key: 'square-4-color', default: 'rgb(8 153 129)' },
     { type: 'color', key: 'square-5-color', default: 'rgb(128 128 128)' },
 
+    { type: 'color', key: 'fan-8x1-color', default: 'rgb(179 157 219)' },
+    { type: 'color', key: 'fan-5x1-color', default: 'rgb(242 54 69)' },
+    { type: 'color', key: 'fan-4x1-color', default: 'rgb(128 128 128)' },
+    { type: 'color', key: 'fan-3x1-color', default: 'rgb(255 152 0)' },
+    { type: 'color', key: 'fan-2x1-color', default: 'rgb(0 188,212)' },
+    { type: 'color', key: 'fan-1x1-color', default: 'rgb(76 175 80)' },
+    { type: 'color', key: 'fan-1x2-color', default: 'rgb(8 153 129)' },
+    { type: 'color', key: 'fan-1x3-color', default: 'rgb(8 153 129)' },
+    { type: 'color', key: 'fan-1x4-color', default: 'rgb(41 98 255)' },
+    { type: 'color', key: 'fan-1x5-color', default: 'rgb(149 117 205)' },
+    { type: 'color', key: 'fan-1x6-color', default: 'rgb(149 117 205)' },
+
     { type: 'color', key: 'arc-1-0-color', default: 'rgb(255 152 0 / 20%)' },
     { type: 'color', key: 'arc-1-1-color', default: 'rgb(255 152 0 / 20%)' },
     { type: 'color', key: 'arc-1.5-0-color', default: 'rgb(255 152 0 / 20%)' },
