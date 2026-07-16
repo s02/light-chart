@@ -9,6 +9,7 @@ import { useChart } from '@chart/useChart'
 import { useEngineApi } from '@chart/composables/useEngine'
 import type { AssetSymbol, ChartExpiration, ChartOption, ResolutionId, SeriesId } from '@engine/types'
 import type { DatafeedFactory, Language, TerminalChartConfig } from '@chart/types'
+import HintsContainer from '@chart/HintsContainer.vue'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
@@ -93,6 +94,7 @@ onUnmounted(() => {
     </div>
 
     <ModalContainer />
+    <HintsContainer />
   </div>
 </template>
 

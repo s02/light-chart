@@ -181,6 +181,7 @@ export const DRAWINGS = [
     group: 'geometric-shapes' as const,
     subgroup: 'shapes',
     drawing: Path,
+    hint: 'hint-stop-drawing-path',
     icon: icons['./Path/icon.svg']
   },
   {
@@ -224,6 +225,7 @@ export const DRAWINGS = [
   subgroup: string
   icon: string
   manualStop?: boolean
+  hint?: string
   drawing: {
     new (chart: IChartApi): BaseDrawing
     readonly ikey: string

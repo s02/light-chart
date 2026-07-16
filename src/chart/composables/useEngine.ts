@@ -16,6 +16,7 @@ import type { DatafeedFactory } from '@chart/types'
 import type { StudyParams } from '@engine/schema'
 import type { LayoutConfig } from '@engine/indicators/types'
 import type { IndicatorName } from '@engine/indicators'
+import { useHints } from '@chart/composables/useHints'
 
 type DrawingElement = Parameters<DrawingSelectFn>[0]
 
@@ -55,6 +56,7 @@ export const useEngineApi = () => {
   const legends = ref<ChartSeriesLegend[]>([])
 
   const { open: openModal } = useModal()
+  const { show: showHint, hide: hideHint } = useHints()
 
   const register = (el: HTMLElement, options: EngineOptions) => {
     rootEl.value = options.rootEl
@@ -214,9 +216,13 @@ export const useEngineApi = () => {
     }
   }
 
-  const startDrawing = (id: DrawingName, options?: DrawingOptions) => {
+  const startDrawing = (id: DrawingName, options?: DrawingOptions, hint?: string) => {
     assertEngine(pe)
-    return pe.initDrawing(id, options)
+    if (hint) {
+      showHint(hint)
+    }
+
+    return pe.initDrawing(id, options).then(() => hideHint())
   }
 
   const cancelDrawing = () => {

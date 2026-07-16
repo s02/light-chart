@@ -1,0 +1,17 @@
+.mwc-hint {
+  border-radius: 4px;
+  background-color: #2962ff;
+  padding: 6px 8px;
+  position: absolute;
+  bottom: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+}
+
+.mwc-hints-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}

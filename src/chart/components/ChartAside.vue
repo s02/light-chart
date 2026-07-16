@@ -53,11 +53,14 @@ const menu = ref<AsideMenu>(getDrawingInitials())
 const initialized = ref<DrawingName | null>()
 const openedMenu = ref<{ type: 'drawing'; el: DrawingGroup } | { type: 'action'; el: 'remove' } | undefined>(undefined)
 
-const init = async (name: DrawingName, { options, manualStop }: { options?: DrawingOptions; manualStop?: boolean }) => {
+const init = async (
+  name: DrawingName,
+  { options, manualStop, hint }: { options?: DrawingOptions; manualStop?: boolean; hint?: string }
+) => {
   try {
-    await startDrawing(name, options)
+    await startDrawing(name, options, hint)
     if (manualStop) {
-      init(name, { options, manualStop })
+      init(name, { options, manualStop, hint })
     }
   } catch {
     // cancelled by a subsequent add() call — expected
@@ -72,14 +75,13 @@ const init = async (name: DrawingName, { options, manualStop }: { options?: Draw
 
 const handleStart = (name: DrawingName, options?: DrawingOptions) => {
   openedMenu.value = undefined
-  console.log('start', name, initialized.value)
   if (name === initialized.value) {
     initialized.value = null
     cancelDrawing()
   } else {
     initialized.value = name
     const drawing = DRAWINGS.find((d) => d.drawing.ikey === name)
-    init(name, { options, manualStop: drawing?.manualStop })
+    init(name, { options, manualStop: drawing?.manualStop, hint: drawing?.hint })
   }
 }
 
