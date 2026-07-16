@@ -59,7 +59,6 @@ export class GannSquarePaneView {
     if (!p1 || !p2) return []
 
     const lineWidth = this.#params['line-width']
-    const divisions = Math.max(1, Math.round(this.#params['divisions']))
     const barCount = this.#viewport.barsBetween(a1.time, a2.time)
     const priceDiff = a2.price - a1.price
 
@@ -73,7 +72,7 @@ export class GannSquarePaneView {
           new GannSquareLabelsRenderer(
             p1,
             p2,
-            this.#params['line-color'],
+            this.#params['font-color'],
             this.#params['font-size'],
             barCount,
             priceDiff
@@ -95,7 +94,6 @@ export class GannSquarePaneView {
           new GannSquareArcRenderer(
             p1,
             p2,
-            divisions,
             lineWidth,
             ARCS.map((arc) => ({ ...arc, color: this.#params[arc.color] }))
           )

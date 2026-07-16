@@ -1,3 +1,4 @@
+import { GANN_DIVISIONS } from '@engine/drawings/GannSquare/constants'
 import { parseColor } from '@engine/helpers'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
@@ -5,20 +6,12 @@ import type { IPrimitivePaneRenderer, Point } from 'lightweight-charts'
 export class GannSquareArcRenderer implements IPrimitivePaneRenderer {
   #p1: Point
   #p2: Point
-  #divisions: number
   #lineWidth: number
   #arcs: { x: number; y: number; color: string }[]
 
-  constructor(
-    p1: Point,
-    p2: Point,
-    divisions: number,
-    lineWidth: number,
-    arcs: { x: number; y: number; color: string }[]
-  ) {
+  constructor(p1: Point, p2: Point, lineWidth: number, arcs: { x: number; y: number; color: string }[]) {
     this.#p1 = p1
     this.#p2 = p2
-    this.#divisions = divisions
     this.#lineWidth = lineWidth
     this.#arcs = arcs
   }
@@ -44,8 +37,8 @@ export class GannSquareArcRenderer implements IPrimitivePaneRenderer {
       ctx.clip()
 
       const radii = this.#arcs.map((arc) => {
-        const px = (arc.x / this.#divisions) * boxW
-        const py = (arc.y / this.#divisions) * boxH
+        const px = (arc.x / GANN_DIVISIONS) * boxW
+        const py = (arc.y / GANN_DIVISIONS) * boxH
 
         return {
           value: Math.sqrt(px * px + (py / s) * (py / s)),

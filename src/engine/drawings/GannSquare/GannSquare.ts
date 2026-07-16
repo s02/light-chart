@@ -7,10 +7,10 @@ import type { DrawingOptions } from '@engine/drawings/types'
 
 const GANN_SQUARE_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'divisions', default: 5 }],
+  inputs: [],
   style: [
     { type: 'line-width', key: 'line-width', default: 2, fastPanel: true },
-    { type: 'line-color', key: 'line-color', default: 'rgb(0, 188, 212)', fastPanel: true },
+    { type: 'color', key: 'font-color', default: 'rgb(255 255 255)' },
     { type: 'font-size', key: 'font-size', default: 12 },
 
     { type: 'color', key: 'square-0-color', default: 'rgb(128 128 128)' },
