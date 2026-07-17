@@ -1,25 +1,25 @@
 <script lang="ts" setup>
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import FontSizePicker from '@chart/components/Pickers/FontSizePicker.vue'
+import { ref } from 'vue'
 
-defineProps<{ size: number }>()
+withDefaults(defineProps<{ disabled?: boolean }>(), { disabled: false })
 
-const isOpened = defineModel<boolean>({ default: false })
-
-const emit = defineEmits<{
-  (e: 'update', size: number): void
-}>()
+const isOpened = ref(false)
+const size = defineModel<number>({ default: 16 })
 </script>
 
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
-      <button :ref="triggerRef" class="mwc-study-fs-btn" @click="isOpened = true">{{ size }}px</button>
+      <button :ref="triggerRef" :disabled="disabled" class="mwc-study-fs-btn" @click="isOpened = true">
+        {{ size }}px
+      </button>
     </template>
     <FontSizePicker
       :values="[8, 10, 11, 12, 14, 16, 18, 20, 22, 28, 32, 40]"
       :size="size"
-      @select="emit('update', $event)"
+      @select="size = $event"
       @close="isOpened = false" />
   </FloatingDropdown>
 </template>

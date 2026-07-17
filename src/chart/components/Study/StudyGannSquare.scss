@@ -1,0 +1,24 @@
+.mwc-gs {
+  width: 460px;
+}
+
+.mwc-gs-section {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 48px;
+}
+
+.mwc-gs-row {
+  display: grid;
+  grid-template-columns: 1fr 34px;
+  gap: 8px;
+  align-items: center;
+}
+
+.mwc-gs-font {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

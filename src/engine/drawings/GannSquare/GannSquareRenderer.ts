@@ -31,6 +31,8 @@ export class GannSquareRenderer implements IPrimitivePaneRenderer {
       const maxY = Math.max(p1.y, p2.y)
 
       for (const level of LEVELS) {
+        if (!this.#params[`square-${level}-visible`]) continue
+
         const color = this.#params[`square-${level}-color`]
         const lineParams = { width, color }
 

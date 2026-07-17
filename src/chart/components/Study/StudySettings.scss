@@ -111,6 +111,22 @@
   border-radius: 2px;
 }
 
-label {
+.mwc-studysett-section {
+  & + & {
+    margin-top: 22px;
+  }
+}
+
+.mwc-studysett-section-name {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #8c8c8c;
+  letter-spacing: 0.2px;
+}
+
+.mwc-studysett-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
 }

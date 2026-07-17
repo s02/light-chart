@@ -14,6 +14,7 @@ import StudySettings from '@chart/components/Study/StudySettings.vue'
 import type { DrawingSchema } from '@engine/drawings/types'
 import type { StudyParamDescriptor, StudySchema } from '@engine/schema'
 import StudyFibRetracement from '@chart/components/Study/StudyFibRetracement.vue'
+import StudyGannSquare from '@chart/components/Study/StudyGannSquare.vue'
 
 type ParamKey = keyof DrawingSchema['params']
 type ParamValue = DrawingSchema['params'][ParamKey]
@@ -95,6 +96,8 @@ const openSettings = async () => {
 
     if (drawingSchema.value.ikey === 'fib-retracement') {
       settings = await openModal(StudyFibRetracement, { props: p })
+    } else if (drawingSchema.value.ikey === 'gann-square') {
+      settings = await openModal(StudyGannSquare, { props: p })
     } else {
       settings = await openModal(StudySettings, { props: p })
     }
