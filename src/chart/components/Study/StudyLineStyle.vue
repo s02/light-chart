@@ -6,7 +6,7 @@ import { ref } from 'vue'
 withDefaults(defineProps<{ disabled?: boolean }>(), { disabled: false })
 
 const isOpened = ref(false)
-const style = defineModel<number>({ default: 1 })
+const style = defineModel<string>({ default: 'solid' })
 </script>
 
 <template>

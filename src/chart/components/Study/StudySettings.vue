@@ -85,7 +85,7 @@ const setTab = (v: string) => {
               <!-- prettier-ignore -->
               <StudyLineWidth v-else-if="el.type === 'line-width'" v-model="(params[el.key] as number)" />
               <!-- prettier-ignore -->
-              <StudyLineStyle v-else-if="el.type === 'line-style'" v-model="(params[el.key] as number)" />
+              <StudyLineStyle v-else-if="el.type === 'line-style'" v-model="(params[el.key] as string)" />
               <!-- prettier-ignore -->
               <StudyFontSize v-else-if="el.type === 'font-size'" v-model="(params[el.key] as number)" />
               <CInput

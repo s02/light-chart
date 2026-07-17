@@ -1,12 +1,12 @@
 <script setup lang="ts">
-defineProps<{ lineStyle: number; values: string[] }>()
+defineProps<{ lineStyle: string; values: string[] }>()
 
 const emit = defineEmits<{
-  (e: 'select', lineStyle: number): void
+  (e: 'select', lineStyle: string): void
   (e: 'close'): void
 }>()
 
-const select = (v: number) => {
+const select = (v: string) => {
   emit('select', v)
   emit('close')
 }
