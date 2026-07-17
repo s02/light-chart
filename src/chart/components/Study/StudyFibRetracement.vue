@@ -5,9 +5,8 @@ import CButton from '@chart/components/Controls/CButton.vue'
 import CInput from '@chart/components/Controls/CInput.vue'
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import StudyColor from './StudyColor.vue'
-import StudyFontSize from './StudyFontSize.vue'
 import CCheckbox from '@chart/components/Controls/CCheckbox.vue'
-import type { StudyParamDescriptor, StudyParams, StudySchema } from '@engine/schema'
+import type { StudyParams, StudySchema } from '@engine/schema'
 import type { FibRetracementParams } from '@engine/drawings/FibRetracement/FibRetracement.ts'
 
 const emit = defineEmits<{
