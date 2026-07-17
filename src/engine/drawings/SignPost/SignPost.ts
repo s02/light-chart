@@ -6,7 +6,7 @@ import { SignPostPaneView } from './SignPostPaneView'
 
 const SIGNPOST_SCHEMA = {
   text: [
-    { type: 'string', key: 'text', default: 'Text' },
+    { type: 'string', key: 'text', default: 'Text', textEditPanel: true },
     { type: 'number', key: 'font-size', default: 12, fastPanel: true },
     { type: 'color', key: 'text-color', default: 'rgb(255 255 255)', fastPanel: true }
   ],

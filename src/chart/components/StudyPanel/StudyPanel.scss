@@ -5,9 +5,42 @@
   display: flex;
   align-items: center;
   position: relative;
+}
 
+.mwc-study-panel {
   &.hidden {
     visibility: hidden;
+  }
+}
+
+.mwc-study-text-editor {
+  background-color: #001020;
+  box-shadow: 0 2px 4px 0 #0006;
+  border-radius: 6px;
+  margin-top: 6px;
+  width: 100%;
+  padding: 4px;
+  display: flex;
+
+  input {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    background-color: transparent;
+    box-shadow: none;
+    border: 1px solid #575757;
+    border-radius: 6px;
+    font-family: inherit;
+    color: inherit;
+    outline: none;
+    padding: 0 6px;
+    height: 26px;
+    font-size: 14px;
+    transition: border-color 200ms ease;
+
+    &:hover {
+      border-color: #707070;
+    }
   }
 }
 

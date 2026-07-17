@@ -8,7 +8,6 @@ import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawi
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { BaseDrawing } from './BaseDrawing'
 import type { StudyParams } from '@engine/schema'
-import { DrawingKeyManager } from '@engine/drawings/DrawingKeyManager'
 
 export type DrawingElement = {
   id: number
@@ -21,7 +20,6 @@ export class DrawingsManager {
   #id = 10
   #dragHandler: DrawingDragHandler
   #selectHandler: DrawingSelectHandler
-  #keyManager: DrawingKeyManager
   #subscribers: DrawingSelectFn[] = []
   #pendingAdd?: { pc: PointsManager; drawing: BaseDrawing; reject: (reason?: unknown) => void }
   #selectedId?: DrawingElement['id']
@@ -42,8 +40,6 @@ export class DrawingsManager {
       this.#onSelect,
       () => !this.#pendingAdd
     )
-
-    this.#keyManager = new DrawingKeyManager(this.#chart, this.#onDeleteSelected)
   }
 
   clear() {
@@ -167,18 +163,11 @@ export class DrawingsManager {
     })
     this.#selectHandler.destroy()
     this.#dragHandler.destroy()
-    this.#keyManager.destroy()
   }
 
   #onSelect = (res: Parameters<DrawingSelectFn>[0]) => {
     this.#selectedId = res.id
     this.#subscribers.forEach((cb) => cb(res))
-  }
-
-  #onDeleteSelected = () => {
-    if (this.#selectedId !== undefined) {
-      this.remove(this.#selectedId)
-    }
   }
 
   #findElement(id: DrawingElement['id']) {

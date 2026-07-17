@@ -6,7 +6,7 @@ import type { DrawingOptions } from '@engine/drawings/types'
 import type { IChartApi, Point } from 'lightweight-charts'
 
 const TEXT_SCHEMA = {
-  text: [{ type: 'string', key: 'text', default: 'Text' }],
+  text: [{ type: 'string', key: 'text', default: 'Text', textEditPanel: true }],
   inputs: [],
   style: [
     { type: 'color', key: 'text-color', default: 'rgb(255 255 255)', fastPanel: true },

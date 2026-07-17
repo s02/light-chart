@@ -1,6 +1,7 @@
 type StudyParam = {
   key: string
   fastPanel?: boolean
+  textEditPanel?: boolean
 }
 
 type StudyNumberParam = {
