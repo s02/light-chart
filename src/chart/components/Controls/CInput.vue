@@ -9,6 +9,7 @@ const props = withDefaults(
     min?: number
     max?: number
     step?: number
+    disabled?: boolean
   }>(),
   { type: 'text', min: undefined, max: undefined, step: undefined }
 )
@@ -26,7 +27,13 @@ const inputValue = computed({
 </script>
 
 <template>
-  <input v-model="inputValue" :type="props.type" :min="props.min" :max="props.max" :step="props.step ?? 1" />
+  <input
+    v-model="inputValue"
+    :disabled="disabled"
+    :type="props.type"
+    :min="props.min"
+    :max="props.max"
+    :step="props.step ?? 1" />
 </template>
 
 <style lang="scss" scoped>

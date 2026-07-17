@@ -1,14 +1,12 @@
 <script lang="ts" setup>
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import LineWidthPicker from '@chart/components/Pickers/LineWidthPicker.vue'
+import { ref } from 'vue'
 
-defineProps<{ width: number }>()
+withDefaults(defineProps<{ disabled?: boolean }>(), { disabled: false })
 
-const isOpened = defineModel<boolean>({ default: false })
-
-const emit = defineEmits<{
-  (e: 'update', width: number): void
-}>()
+const isOpened = ref(false)
+const width = defineModel<number>({ default: 1 })
 </script>
 
 <template>
@@ -18,11 +16,7 @@ const emit = defineEmits<{
         <span class="study-line-w" :style="{ height: `${width}px` }"></span>
       </button>
     </template>
-    <LineWidthPicker
-      :values="[1, 2, 3, 4, 5, 6]"
-      :width="width"
-      @select="emit('update', $event)"
-      @close="isOpened = false" />
+    <LineWidthPicker :values="[1, 2, 3, 4, 5, 6]" :width="width" @select="width = $event" @close="isOpened = false" />
   </FloatingDropdown>
 </template>
 

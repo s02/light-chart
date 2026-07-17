@@ -62,10 +62,12 @@ const setTab = (v: string) => {
         <template v-if="tab === 'text'">
           <div class="mwc-studysett-row">
             <div v-if="schema.text?.find((ps) => ps.key === 'text-color')" class="mwc-studysett-ctrl-color">
-              <StudyColor :color="String(params['text-color'])" @update="params['text-color'] = $event" />
+              <!-- prettier-ignore -->
+              <StudyColor v-model="(params['text-color'] as string)" />
             </div>
             <div v-if="schema.text?.find((ps) => ps.key === 'font-size')" class="mwc-studysett-ctrl-font">
-              <StudyFontSize :size="Number(params['font-size'])" @update="params['font-size'] = $event" />
+              <!-- prettier-ignore -->
+              <StudyFontSize v-model="(params['font-size'] as number)" />
             </div>
           </div>
           <div v-if="schema.text?.find((ps) => ps.key === 'text')" class="mwc-studysett-ctrl-text">
@@ -77,23 +79,15 @@ const setTab = (v: string) => {
         <template v-else>
           <div class="mwc-studysett-group">
             <template v-for="el in schema[tab]" :key="el.key">
-              <label>{{ i18n.translate(`study-prop-${el.key}`) }}</label>
-              <StudyColor
-                v-if="el.type === 'color' || el.type === 'line-color'"
-                :color="String(params[el.key])"
-                @update="params[el.key] = $event" />
-              <StudyLineWidth
-                v-else-if="el.type === 'line-width'"
-                :width="Number(params[el.key])"
-                @update="params[el.key] = $event" />
-              <StudyLineStyle
-                v-else-if="el.type === 'line-style'"
-                :line-style="String(params[el.key])"
-                @update="params[el.key] = $event" />
-              <StudyFontSize
-                v-else-if="el.type === 'font-size'"
-                :size="Number(params[el.key])"
-                @update="params[el.key] = $event" />
+              <label class="mwc-studysett-label">{{ i18n.translate(`study-prop-${el.key}`) }}</label>
+              <!-- prettier-ignore -->
+              <StudyColor v-if="el.type === 'color' || el.type === 'line-color'" v-model="(params[el.key] as string)" />
+              <!-- prettier-ignore -->
+              <StudyLineWidth v-else-if="el.type === 'line-width'" v-model="(params[el.key] as number)" />
+              <!-- prettier-ignore -->
+              <StudyLineStyle v-else-if="el.type === 'line-style'" v-model="(params[el.key] as number)" />
+              <!-- prettier-ignore -->
+              <StudyFontSize v-else-if="el.type === 'font-size'" v-model="(params[el.key] as number)" />
               <CInput
                 v-if="el.type === 'number'"
                 v-model="params[el.key]"

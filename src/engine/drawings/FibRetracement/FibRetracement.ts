@@ -16,36 +16,47 @@ const FIB_SCHEMA = {
 
     { type: 'number', key: 'fr-c0-ratio', default: 0, step: 0.1 },
     { type: 'color', key: 'fr-c0-color', default: 'rgb(128 128 128 / 20%)' },
+    { type: 'bool', key: 'fr-c0-visible', default: true },
 
     { type: 'number', key: 'fr-c1-ratio', default: 0.236, step: 0.1 },
     { type: 'color', key: 'fr-c1-color', default: 'rgb(242 54 69 / 20%)' },
+    { type: 'bool', key: 'fr-c1-visible', default: true },
 
     { type: 'number', key: 'fr-c2-ratio', default: 0.383, step: 0.1 },
     { type: 'color', key: 'fr-c2-color', default: 'rgb(255 152 0 / 20%)' },
+    { type: 'bool', key: 'fr-c2-visible', default: true },
 
     { type: 'number', key: 'fr-c3-ratio', default: 0.5, step: 0.1 },
     { type: 'color', key: 'fr-c3-color', default: 'rgb(76 175 80 / 20%)' },
+    { type: 'bool', key: 'fr-c3-visible', default: true },
 
     { type: 'number', key: 'fr-c4-ratio', default: 0.618, step: 0.1 },
     { type: 'color', key: 'fr-c4-color', default: 'rgb(8 153 129 / 20%)' },
+    { type: 'bool', key: 'fr-c4-visible', default: true },
 
     { type: 'number', key: 'fr-c5-ratio', default: 0.786, step: 0.1 },
     { type: 'color', key: 'fr-c5-color', default: 'rgb(0 188 212 / 20%)' },
+    { type: 'bool', key: 'fr-c5-visible', default: true },
 
     { type: 'number', key: 'fr-c6-ratio', default: 1, step: 0.1 },
     { type: 'color', key: 'fr-c6-color', default: 'rgb(128 128 128 / 20%)' },
+    { type: 'bool', key: 'fr-c6-visible', default: true },
 
     { type: 'number', key: 'fr-c7-ratio', default: 1.618, step: 0.1 },
     { type: 'color', key: 'fr-c7-color', default: 'rgb(41 98 255 / 20%)' },
+    { type: 'bool', key: 'fr-c7-visible', default: true },
 
     { type: 'number', key: 'fr-c8-ratio', default: 2.618, step: 0.1 },
     { type: 'color', key: 'fr-c8-color', default: 'rgb(242 54 69 / 20%)' },
+    { type: 'bool', key: 'fr-c8-visible', default: true },
 
     { type: 'number', key: 'fr-c9-ratio', default: 3.618, step: 0.1 },
     { type: 'color', key: 'fr-c9-color', default: 'rgb(156 39 176 / 20%)' },
+    { type: 'bool', key: 'fr-c9-visible', default: true },
 
     { type: 'number', key: 'fr-c10-ratio', default: 4.236, step: 0.1 },
-    { type: 'color', key: 'fr-c10-color', default: 'rgb(233 30 99 / 20%)' }
+    { type: 'color', key: 'fr-c10-color', default: 'rgb(233 30 99 / 20%)' },
+    { type: 'bool', key: 'fr-c10-visible', default: true }
   ]
 } as const satisfies StudySchema
 

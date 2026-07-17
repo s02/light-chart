@@ -13,7 +13,11 @@ input {
   font-size: 14px;
   transition: border-color 200ms ease;
 
-  &:hover {
+  &:hover:not([disabled]) {
     border-color: #707070;
+  }
+
+  &[disabled] {
+    opacity: 0.75;
   }
 }

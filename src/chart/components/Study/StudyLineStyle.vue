@@ -1,27 +1,25 @@
 <script lang="ts" setup>
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import LineStylePicker from '@chart/components/Pickers/LineStylePicker.vue'
+import { ref } from 'vue'
 
-defineProps<{ lineStyle: string }>()
+withDefaults(defineProps<{ disabled?: boolean }>(), { disabled: false })
 
-const isOpened = defineModel<boolean>({ default: false })
-
-const emit = defineEmits<{
-  (e: 'update', lineStyle: string): void
-}>()
+const isOpened = ref(false)
+const style = defineModel<number>({ default: 1 })
 </script>
 
 <template>
   <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
     <template #trigger="{ triggerRef }">
       <button :ref="triggerRef" class="mwc-study-line-btn" @click="isOpened = true">
-        <span class="study-line-s" :class="`study-line-s-${lineStyle}`"></span>
+        <span class="study-line-s" :class="`study-line-s-${style}`"></span>
       </button>
     </template>
     <LineStylePicker
       :values="['solid', 'dashed', 'dotted']"
-      :line-style="lineStyle"
-      @select="emit('update', $event)"
+      :line-style="style"
+      @select="style = $event"
       @close="isOpened = false" />
   </FloatingDropdown>
 </template>

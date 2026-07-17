@@ -36,12 +36,14 @@ export class FibRetracementRenderer implements IPrimitivePaneRenderer {
       const trendColor = this.#params['fr-trend-line']
 
       const mm = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const
-      const levels = mm.map((level) => ({
-        y: this.#p2.y + this.#params[`fr-c${level}-ratio`] * (this.#p1.y - this.#p2.y),
-        price: this.#price2 + this.#params[`fr-c${level}-ratio`] * (this.#price1 - this.#price2),
-        color: this.#params[`fr-c${level}-color`],
-        label: this.#params[`fr-c${level}-ratio`]
-      }))
+      const levels = mm
+        .filter((level) => this.#params[`fr-c${level}-visible`])
+        .map((level) => ({
+          y: this.#p2.y + this.#params[`fr-c${level}-ratio`] * (this.#p1.y - this.#p2.y),
+          price: this.#price2 + this.#params[`fr-c${level}-ratio`] * (this.#price1 - this.#price2),
+          color: this.#params[`fr-c${level}-color`],
+          label: this.#params[`fr-c${level}-ratio`]
+        }))
 
       for (let i = 1; i < levels.length; i++) {
         ctx.fillStyle = levels[i].color
