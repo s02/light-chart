@@ -44,15 +44,16 @@ jobs:
         echo "✅ Build completed"
 
     - name: Configure NPM Registry
+      working-directory: dist/component
       run: |
         echo "▶ Configuring NPM registry..."
-        echo "//jenkins.binarium.com:4873/:_authToken=${{ secrets.JENKINS_AUTH_TOKEN }}" >> dist/component/.npmrc
+        echo "registry=http://jenkins.binarium.com:4873" >> .npmrc
+        echo "//jenkins.binarium.com:4873/:_authToken=${{ secrets.JENKINS_AUTH_TOKEN }}" >> .npmrc
         echo "✅ Registry configured"
 
     - name: Publish Package
       working-directory: dist/component
       run: |
         echo "▶ Publishing @bm/light-chart@$(node -p "require('./package.json').version") to registry..."
-
         npm publish
         echo "✅ Published successfully"
