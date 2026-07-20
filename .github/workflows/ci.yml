@@ -1,0 +1,57 @@
+name: light-chart CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  ci:
+    name: CI
+    runs-on: self-hosted
+    environment: ci
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+    - name: Check Out Sources
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GH_TOKEN }}
+
+    - name: Configure Git Authentication
+      run: |
+        git config --local --unset-all http.https://github.com/.extraheader || true
+        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "https://github.com/softwaffle-lab/"
+        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "ssh://git@github.com/softwaffle-lab/"
+        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "git@github.com:softwaffle-lab/"
+
+    - name: Configure Git
+      run: |
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@binarium.com"
+
+    - name: Install NPM Dependencies
+      run: |
+        echo "▶ Installing dependencies..."
+        npm install
+        echo "✅ Dependencies installed"
+
+    - name: Run Build
+      run: |
+        echo "▶ Building project..."
+        npm run build:component
+        echo "✅ Build completed"
+
+    - name: Configure NPM Registry
+      run: |
+        echo "▶ Configuring NPM registry..."
+        echo "//jenkins.binarium.com:4873/:_authToken=${{ secrets.JENKINS_AUTH_TOKEN }}" >> dist/component/.npmrc
+        echo "✅ Registry configured"
+
+    - name: Publish Package
+      working-directory: dist/component
+      run: |
+        echo "▶ Publishing @bm/light-chart@$(node -p "require('./package.json').version") to registry..."
+
+        npm publish
+        echo "✅ Published successfully"

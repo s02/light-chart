@@ -1,0 +1,24 @@
+{
+  "name": "@bm/light-chart",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./light-chart.js",
+  "module": "./light-chart.js",
+  "types": "./light-chart.d.ts",
+  "exports": {
+    ".": {
+      "types": "./light-chart.d.ts",
+      "import": "./light-chart.js"
+    },
+    "./style.css": "./light-chart.css"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "peerDependencies": {
+    "vue": "^3.5.32",
+    "@floating-ui/dom": "^1.7.6",
+    "@floating-ui/vue": "^1.1.11",
+    "@vueuse/core": "^14.2.1"
+  }
+}

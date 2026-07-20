@@ -1,12 +1,23 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
+import { copyFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import { alias, outdirs } from '../../config'
+
+function copyPackageJson(): Plugin {
+  return {
+    name: 'copy-package-json',
+    closeBundle() {
+      copyFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), `${outdirs.component}/package.json`)
+    }
+  }
+}
 
 export default defineConfig({
   plugins: [
     vue(),
+    copyPackageJson(),
     dts({
       tsconfigPath: fileURLToPath(new URL('../../tsconfig.app.json', import.meta.url)),
       outDirs: outdirs.component,
@@ -22,8 +33,8 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: fileURLToPath(new URL('./index.ts', import.meta.url)),
-      name: 'MidChart',
-      fileName: 'mid-chart',
+      name: 'LightChart',
+      fileName: 'light-chart',
       formats: ['es']
     },
     rollupOptions: {
