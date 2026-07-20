@@ -21,9 +21,10 @@ jobs:
     - name: Configure Git Authentication
       run: |
         git config --local --unset-all http.https://github.com/.extraheader || true
-        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "https://github.com/softwaffle-lab/"
-        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "ssh://git@github.com/softwaffle-lab/"
-        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "git@github.com:softwaffle-lab/"
+        git config --global --unset-all url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf || true
+        git config --global --add url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "https://github.com/softwaffle-lab/"
+        git config --global --add url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "ssh://git@github.com/softwaffle-lab/"
+        git config --global --add url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "git@github.com:softwaffle-lab/"
 
     - name: Configure Git
       run: |
