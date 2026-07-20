@@ -6,6 +6,7 @@ import prettier from 'eslint-config-prettier'
 import globals from 'globals'
 
 export default [
+  { ignores: ['dist/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...pluginVue.configs['flat/recommended'],
@@ -19,7 +20,15 @@ export default [
     }
   },
   {
-    files: ['**/*.{js,ts,vue}'],
+    files: ['*.{js,ts}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: globals.node
+    }
+  },
+  {
+    files: ['src/**/*.{js,ts,vue}'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
