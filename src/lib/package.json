@@ -1,6 +1,6 @@
 {
   "name": "@bm/light-chart",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "main": "./light-chart.js",
   "module": "./light-chart.js",
