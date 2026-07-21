@@ -94,4 +94,9 @@ body {
   display: flex;
   gap: 8px;
 }
+
+p {
+  margin: 0;
+  padding: 0;
+}
 </style>
