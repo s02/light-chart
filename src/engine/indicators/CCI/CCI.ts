@@ -1,4 +1,4 @@
-import { BaselineSeries, LineSeries, LineStyle } from 'lightweight-charts'
+import { BaselineSeries, LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -10,11 +10,46 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const CCI_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'cci-length', default: 20, min: 1, max: 9999 }],
+  inputs: [
+    { type: 'number', key: 'cci-length', default: 20, min: 1, max: 9999 },
+    {
+      type: 'select',
+      key: 'cci-smoothing-line',
+      values: ['SMA', 'EMA', 'WMA'],
+      default: 'SMA'
+    },
+    { type: 'number', key: 'cci-smoothing-length', default: 20, min: 1, max: 9999 }
+  ],
   style: [
-    { type: 'color', key: 'cci-color', default: 'rgb(126 87 194)' },
+    {
+      type: 'line',
+      key: 'cci-line',
+      default: {
+        color: 'rgb(126 87 194)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'bool',
+      key: 'cci-smoothingLineVisible',
+      default: false
+    },
+    {
+      type: 'line',
+      key: 'cci-smoothingLine',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'number', key: 'cci-upperLimit', default: 100, min: -9999, max: 9999 },
     { type: 'number', key: 'cci-lowerLimit', default: -100, min: -9999, max: 9999 },
     { type: 'color', key: 'cci-fill-color', default: 'rgb(41 98 255 / 10%)' }
@@ -33,6 +68,7 @@ export class CCI extends AbstractIndicator implements Indicator {
 
   #series: {
     cci: ISeriesApi<SeriesType>
+    smoothing: ISeriesApi<SeriesType>
     upperLine: ISeriesApi<SeriesType>
     lowerLine: ISeriesApi<SeriesType>
     fill: ISeriesApi<SeriesType>
@@ -46,7 +82,23 @@ export class CCI extends AbstractIndicator implements Indicator {
     this.#series = {
       cci: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['cci-color'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['cci-line'],
+          priceLineVisible: false
+        },
+        this.paneIndex
+      ),
+      smoothing: this.#chart.addSeries(
+        LineSeries,
+        {
+          ...COMMON_SERIES_SETTINGS,
+          ...this.#params['cci-smoothingLine'],
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          priceLineVisible: false,
+          lineVisible: false
+        },
         this.paneIndex
       ),
       upperLine: this.#chart.addSeries(
@@ -103,7 +155,11 @@ export class CCI extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(CCI_SCHEMA.inputs, CCI_SCHEMA.style, CCI_SCHEMA.text, params)
-    this.#series.cci.applyOptions({ color: this.#params['cci-color'] })
+    this.#series.cci.applyOptions(this.#params['cci-line'])
+    this.#series.smoothing.applyOptions({
+      ...this.#params['cci-smoothingLine'],
+      lineVisible: this.#params['cci-smoothingLineVisible']
+    })
     this.#series.fill.applyOptions({
       topFillColor1: this.#params['cci-fill-color'],
       topFillColor2: this.#params['cci-fill-color'],
@@ -114,15 +170,22 @@ export class CCI extends AbstractIndicator implements Indicator {
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'CCI', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.cci)
+    const smoothingData = seriesData.get(this.#series.smoothing)
     legend.data.push({ value: this.#params['cci-length'].toString(), color: 'rgb(140, 140, 140)' })
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['cci-color'] })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['cci-line'].color })
+    }
+    if (smoothingData) {
+      legend.data.push({
+        value: formatPrice((smoothingData as LineData<Time>).value),
+        color: this.#params['cci-smoothingLine'].color
+      })
     }
     return legend
   }
 
   protected onData(data: ChartBar[]) {
-    const cciData = this.#calculate(data)
+    const { cci, smoothing } = this.#calculate(data)
     const firstTime = data[0].time
     const lastTime = data[data.length - 1].time
 
@@ -138,20 +201,43 @@ export class CCI extends AbstractIndicator implements Indicator {
       { time: firstTime, value: this.#params['cci-upperLimit'] },
       { time: lastTime, value: this.#params['cci-upperLimit'] }
     ])
-    this.#series.cci.setData(cciData)
+    this.#series.cci.setData(cci)
+    this.#series.smoothing.setData(smoothing)
   }
 
   protected removeSeries() {
     this.#chart.removeSeries(this.#series.cci)
+    this.#chart.removeSeries(this.#series.smoothing)
     this.#chart.removeSeries(this.#series.upperLine)
     this.#chart.removeSeries(this.#series.lowerLine)
     this.#chart.removeSeries(this.#series.fill)
   }
 
+  #ma(source: Series, length: number, type: CCIParams['cci-smoothing-line']) {
+    if (type === 'EMA') {
+      return ta.ema(source, length)
+    }
+    if (type === 'WMA') {
+      return ta.wma(source, length)
+    }
+    return ta.sma(source, length)
+  }
+
   #calculate(bars: ChartBar[]) {
     const typical = new Series(bars, (b) => (b.high + b.low + b.close) / 3)
-    const values = ta.cci(typical, this.#params['cci-length']).toArray()
+    const cciSeries = ta.cci(typical, this.#params['cci-length'])
+    const smoothingSeries = this.#ma(
+      cciSeries,
+      this.#params['cci-smoothing-length'],
+      this.#params['cci-smoothing-line']
+    )
 
-    return this.filter(values.map((value, i) => ({ time: bars[i].time, value: value ?? NaN })))
+    const cciValues = cciSeries.toArray()
+    const smoothingValues = smoothingSeries.toArray()
+
+    return {
+      cci: this.filter(cciValues.map((value, i) => ({ time: bars[i].time, value: value ?? NaN }))),
+      smoothing: this.filter(smoothingValues.map((value, i) => ({ time: bars[i].time, value: value ?? NaN })))
+    }
   }
 }
