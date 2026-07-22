@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -21,12 +21,30 @@ const KST_SCHEMA = {
     { type: 'number', key: 'kst-sma2', default: 10, min: 1, max: 9999 },
     { type: 'number', key: 'kst-sma3', default: 10, min: 1, max: 9999 },
     { type: 'number', key: 'kst-sma4', default: 15, min: 1, max: 9999 },
-    { type: 'number', key: 'kst-signal', default: 9, min: 1, max: 9999 }
+    { type: 'number', key: 'kst-signal', default: 9, min: 1, max: 9999 },
+    { type: 'number', key: 'kst-zero-limit', default: 0, min: -9999, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'kst-kstLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'kst-signalLine', default: 'rgb(255 109 0)' },
-    { type: 'number', key: 'kst-zero', default: 0, min: -9999, max: 9999 }
+    {
+      type: 'line',
+      key: 'kst-kstLine',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'kst-signalLine',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -54,7 +72,7 @@ export class KnowSureThing extends AbstractIndicator implements Indicator {
     this.#series = {
       kst: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['kst-kstLine'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['kst-kstLine'], priceLineVisible: false },
         this.paneIndex
       ),
       zero: this.#chart.addSeries(
@@ -71,7 +89,7 @@ export class KnowSureThing extends AbstractIndicator implements Indicator {
       ),
       signal: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['kst-signalLine'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['kst-signalLine'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -87,8 +105,8 @@ export class KnowSureThing extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(KST_SCHEMA.inputs, KST_SCHEMA.style, KST_SCHEMA.text, params)
-    this.#series.kst.applyOptions({ color: this.#params['kst-kstLine'] })
-    this.#series.signal.applyOptions({ color: this.#params['kst-signalLine'] })
+    this.#series.kst.applyOptions(this.#params['kst-kstLine'])
+    this.#series.signal.applyOptions(this.#params['kst-signalLine'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -110,8 +128,8 @@ export class KnowSureThing extends AbstractIndicator implements Indicator {
 
     if (kstData && signalData) {
       legend.data.push(
-        { value: formatPrice((kstData as LineData<Time>).value), color: this.#params['kst-kstLine'] },
-        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params['kst-signalLine'] }
+        { value: formatPrice((kstData as LineData<Time>).value), color: this.#params['kst-kstLine'].color },
+        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params['kst-signalLine'].color }
       )
     }
 
@@ -127,8 +145,8 @@ export class KnowSureThing extends AbstractIndicator implements Indicator {
     this.#series.kst.setData(kst)
     this.#series.signal.setData(signal)
     this.#series.zero.setData([
-      { time: firstTime, value: this.#params['kst-zero'] },
-      { time: lastTime, value: this.#params['kst-zero'] }
+      { time: firstTime, value: this.#params['kst-zero-limit'] },
+      { time: lastTime, value: this.#params['kst-zero-limit'] }
     ])
   }
 
