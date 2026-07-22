@@ -1,6 +1,6 @@
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { BollingerBandsFill } from '@engine/indicators/BollingerBands/BollingerBandsFill'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -18,9 +18,36 @@ const BB_SCHEMA = {
     { type: 'number', key: 'bb-mul', default: 2, min: 1, max: 9 }
   ],
   style: [
-    { type: 'color', key: 'bb-upper', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'bb-middle', default: 'rgb(255 171 64)' },
-    { type: 'color', key: 'bb-lower', default: 'rgb(41 98 255)' },
+    {
+      type: 'line',
+      key: 'bb-upper',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'bb-middle',
+      default: {
+        color: 'rgb(255 171 64)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'bb-lower',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'color', key: 'bb-fill-color', default: 'rgb(41 98 255 / 5%)' }
   ]
 } as const satisfies StudySchema
@@ -50,17 +77,17 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
     this.#series = {
       upper: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['bb-upper'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['bb-upper'], priceLineVisible: false },
         this.paneIndex
       ),
       middle: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['bb-middle'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['bb-middle'], priceLineVisible: false },
         this.paneIndex
       ),
       lower: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['bb-lower'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['bb-lower'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -79,9 +106,10 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(BB_SCHEMA.inputs, BB_SCHEMA.style, BB_SCHEMA.style, params)
 
-    this.#series.upper.applyOptions({ color: this.#params['bb-upper'] })
-    this.#series.middle.applyOptions({ color: this.#params['bb-middle'] })
-    this.#series.lower.applyOptions({ color: this.#params['bb-lower'] })
+    this.#series.upper.applyOptions(this.#params['bb-upper'])
+    this.#series.middle.applyOptions(this.#params['bb-middle'])
+    this.#series.lower.applyOptions(this.#params['bb-lower'])
+
     this.#fill.setParams(this.#params)
   }
 
@@ -98,9 +126,9 @@ export class BollingerBands extends AbstractIndicator implements Indicator {
 
     if (uData && mData && lData) {
       legend.data.push(
-        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['bb-middle'] },
-        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['bb-lower'] },
-        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['bb-upper'] }
+        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['bb-middle'].color },
+        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['bb-lower'].color },
+        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['bb-upper'].color }
       )
     }
 

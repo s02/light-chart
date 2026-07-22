@@ -1,0 +1,78 @@
+.mwc-line-picker {
+  padding-bottom: 12px;
+}
+
+.mwc-study-line-btn {
+  border: 1px solid #575757;
+  box-shadow: none;
+  background-color: transparent;
+  outline: none;
+  height: 34px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mwc-study-line-color {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.mwc-study-line-width {
+  width: 30px;
+  display: block;
+}
+
+.mwc-line-picker-container {
+  padding: 0 12px;
+}
+
+.mwc-line-picker-buttons {
+  border: 1px solid #575757;
+  border-radius: 3px;
+  display: grid;
+}
+
+.mwc-line-picker-width-buttons {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  span {
+    display: block;
+    width: 30px;
+    background-color: #fff;
+  }
+}
+
+.mwc-line-picker-style-buttons {
+  margin-top: 8px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mwc-line-picker-type-buttons {
+  margin-top: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mwc-line-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  cursor: pointer;
+  color: #fff;
+  transition: background-color 200ms ease;
+
+  &.active {
+    background-color: #575757;
+    cursor: default;
+  }
+
+  & + & {
+    border-inline-start: 1px solid #575757;
+  }
+}

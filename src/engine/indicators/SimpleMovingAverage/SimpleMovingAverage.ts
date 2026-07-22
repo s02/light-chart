@@ -1,14 +1,14 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
+import { getSourceSeries, ta } from 'oakscriptjs'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
 import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { SeriesLegend } from '@engine/series'
-import { getSourceSeries, ta } from 'oakscriptjs'
 
 const SMA_SCHEMA = {
   text: [],
@@ -17,12 +17,23 @@ const SMA_SCHEMA = {
     {
       type: 'select',
       key: 'sma-source',
-      values: ['close', 'open'],
+      values: ['close', 'open', 'high', 'low'],
       default: 'close'
     },
     { type: 'number', key: 'sma-offset', default: 0, min: 0, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'sma-color', default: 'rgb(41 98 255)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'sma-line',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 3,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type SMAParams = InferStudyValues<typeof SMA_SCHEMA.inputs> &
@@ -43,14 +54,18 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['sma-color'], priceLineVisible: false },
+      {
+        ...COMMON_SERIES_SETTINGS,
+        ...this.#params['sma-line'],
+        priceLineVisible: false
+      },
       this.paneIndex
     )
   }
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, SMA_SCHEMA.text, params)
-    this.#series.applyOptions({ color: this.#params['sma-color'] })
+    this.#series.applyOptions(this.#params['sma-line'])
   }
 
   getSchema() {
@@ -70,7 +85,7 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
     legend.data.push({ value: this.#params['sma-offset'].toString(), color: `rgb(140, 140, 140)` })
 
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['sma-color'] })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['sma-line'].color })
     }
 
     return legend

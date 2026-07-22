@@ -1,8 +1,22 @@
+import type { LineStyle, LineType, LineWidth } from 'lightweight-charts'
+
 type StudyParam = {
   key: string
   fastPanel?: boolean
   textEditPanel?: boolean
 }
+
+export type LineParamValue = {
+  color: string
+  lineWidth: LineWidth
+  lineStyle: LineStyle
+  lineType: LineType
+}
+
+type StudyLineParam = {
+  type: 'line'
+  default: LineParamValue
+} & StudyParam
 
 type StudyNumberParam = {
   type: 'number'
@@ -64,9 +78,9 @@ export type StudyParamDescriptor =
   | StudyFontSizeParam
   | StudyBoolParam
   | StudyLineColorParam
+  | StudyLineParam
 
-export type StudyParams = Record<string, number | string | boolean>
-export type StudyParamValue = StudyParams[string]
+export type StudyParams = Record<string, number | string | boolean | LineParamValue>
 export type SchemaKey = keyof StudySchema
 
 export type StudySchema = {

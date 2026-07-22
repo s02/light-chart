@@ -2,14 +2,13 @@
 import ChartMenuItem from '@chart/components/ChartMenuItem.vue'
 import CToggleButton from '@chart/components/Controls/CToggleButton.vue'
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
-import type { StudyParamValue } from '@engine/schema'
 
-const currentValue = defineModel<StudyParamValue>('current')
+const currentValue = defineModel<string>('current')
 const isOpened = defineModel<boolean>('isOpened', { default: false })
 
 defineProps<{ values: readonly string[] }>()
 
-const setValue = (val: StudyParamValue) => {
+const setValue = (val: string) => {
   currentValue.value = val
   isOpened.value = false
 }

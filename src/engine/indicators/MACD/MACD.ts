@@ -1,4 +1,4 @@
-import { HistogramSeries, LineSeries } from 'lightweight-charts'
+import { HistogramSeries, LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -15,11 +15,47 @@ const MACD_SCHEMA = {
   inputs: [
     { type: 'number', key: 'macd-fast', default: 12, min: 1, max: 9999 },
     { type: 'number', key: 'macd-slow', default: 26, min: 1, max: 9999 },
-    { type: 'number', key: 'macd-signal', default: 9, min: 1, max: 9999 }
+    {
+      type: 'select',
+      key: 'macd-source',
+      values: ['close', 'open', 'high', 'low'],
+      default: 'close'
+    },
+    { type: 'number', key: 'macd-signal', default: 9, min: 1, max: 9999 },
+    {
+      type: 'select',
+      key: 'macd-oscMaType',
+      values: ['SMA', 'EMA', 'WMA'],
+      default: 'EMA'
+    },
+    {
+      type: 'select',
+      key: 'macd-signalMaType',
+      values: ['SMA', 'EMA', 'WMA'],
+      default: 'EMA'
+    }
   ],
   style: [
-    { type: 'color', key: 'macd-macdLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'macd-signalLine', default: 'rgb(255 109 0)' },
+    {
+      type: 'line',
+      key: 'macd-macdLine',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'macd-signalLine',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'color', key: 'macd-hist-0', default: 'rgb(34, 171, 148)' },
     { type: 'color', key: 'macd-hist-1', default: 'rgb(172, 229, 220)' },
     { type: 'color', key: 'macd-hist-2', default: 'rgb(252, 203, 205)' },
@@ -56,12 +92,12 @@ export class MACD extends AbstractIndicator implements Indicator {
       ),
       macd: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['macd-macdLine'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['macd-macdLine'], priceLineVisible: false },
         this.paneIndex
       ),
       signal: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['macd-signalLine'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['macd-signalLine'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -77,8 +113,8 @@ export class MACD extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(MACD_SCHEMA.inputs, MACD_SCHEMA.style, MACD_SCHEMA.text, params)
-    this.#series.macd.applyOptions({ color: this.#params['macd-macdLine'] })
-    this.#series.signal.applyOptions({ color: this.#params['macd-signalLine'] })
+    this.#series.macd.applyOptions(this.#params['macd-macdLine'])
+    this.#series.signal.applyOptions(this.#params['macd-signalLine'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -89,7 +125,9 @@ export class MACD extends AbstractIndicator implements Indicator {
     legend.data.push(
       { value: this.#params['macd-fast'].toString(), color: 'rgb(140, 140, 140)' },
       { value: this.#params['macd-slow'].toString(), color: 'rgb(140, 140, 140)' },
-      { value: this.#params['macd-signal'].toString(), color: 'rgb(140, 140, 140)' }
+      { value: this.#params['macd-signal'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['macd-oscMaType'].toString(), color: 'rgb(140, 140, 140)' },
+      { value: this.#params['macd-signalMaType'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (macdData && signalData && histData) {
       const histValue = (histData as HistogramData<Time>).value
@@ -98,8 +136,8 @@ export class MACD extends AbstractIndicator implements Indicator {
           value: formatPrice(histValue),
           color: histValue >= 0 ? this.#params['macd-hist-0'] : this.#params['macd-hist-3']
         },
-        { value: formatPrice((macdData as LineData<Time>).value), color: this.#params['macd-macdLine'] },
-        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params['macd-signalLine'] }
+        { value: formatPrice((macdData as LineData<Time>).value), color: this.#params['macd-macdLine'].color },
+        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params['macd-signalLine'].color }
       )
     }
 
@@ -119,13 +157,23 @@ export class MACD extends AbstractIndicator implements Indicator {
     this.#chart.removeSeries(this.#series.hist)
   }
 
-  #calculate(bars: ChartBar[]) {
-    const source = getSourceSeries(bars, 'close')
+  #ma(source: ReturnType<typeof getSourceSeries>, length: number, type: MACDParams['macd-oscMaType']) {
+    if (type === 'SMA') {
+      return ta.sma(source, length)
+    }
+    if (type === 'WMA') {
+      return ta.wma(source, length)
+    }
+    return ta.ema(source, length)
+  }
 
-    const fastEMA = ta.ema(source, this.#params['macd-fast'])
-    const slowEMA = ta.ema(source, this.#params['macd-slow'])
-    const macdLine = fastEMA.sub(slowEMA)
-    const signalLine = ta.ema(macdLine, this.#params['macd-signal'])
+  #calculate(bars: ChartBar[]) {
+    const source = getSourceSeries(bars, this.#params['macd-source'])
+
+    const fastMA = this.#ma(source, this.#params['macd-fast'], this.#params['macd-oscMaType'])
+    const slowMA = this.#ma(source, this.#params['macd-slow'], this.#params['macd-oscMaType'])
+    const macdLine = fastMA.sub(slowMA)
+    const signalLine = this.#ma(macdLine, this.#params['macd-signal'], this.#params['macd-signalMaType'])
     const histogram = macdLine.sub(signalLine)
 
     const histArr = histogram.toArray()
