@@ -97,7 +97,8 @@ export class CCI extends AbstractIndicator implements Indicator {
           ...this.#params['cci-smoothingLine'],
           priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
           priceLineVisible: false,
-          lineVisible: false
+          lineVisible: false,
+          crosshairMarkerVisible: false
         },
         this.paneIndex
       ),
@@ -158,7 +159,8 @@ export class CCI extends AbstractIndicator implements Indicator {
     this.#series.cci.applyOptions(this.#params['cci-line'])
     this.#series.smoothing.applyOptions({
       ...this.#params['cci-smoothingLine'],
-      lineVisible: this.#params['cci-smoothingLineVisible']
+      lineVisible: this.#params['cci-smoothingLineVisible'],
+      crosshairMarkerVisible: this.#params['cci-smoothingLineVisible']
     })
     this.#series.fill.applyOptions({
       topFillColor1: this.#params['cci-fill-color'],
@@ -171,11 +173,14 @@ export class CCI extends AbstractIndicator implements Indicator {
     const legend: SeriesLegend = { key: 'CCI', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.cci)
     const smoothingData = seriesData.get(this.#series.smoothing)
+
     legend.data.push({ value: this.#params['cci-length'].toString(), color: 'rgb(140, 140, 140)' })
+
     if (data) {
       legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['cci-line'].color })
     }
-    if (smoothingData) {
+
+    if (smoothingData && this.#params['cci-smoothingLineVisible']) {
       legend.data.push({
         value: formatPrice((smoothingData as LineData<Time>).value),
         color: this.#params['cci-smoothingLine'].color
