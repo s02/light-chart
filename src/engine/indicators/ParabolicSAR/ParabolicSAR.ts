@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -17,7 +17,18 @@ const SAR_SCHEMA = {
     { type: 'number', key: 'sar-inc', default: 0.02, min: 0.001, step: 0.01, max: 9999 },
     { type: 'number', key: 'sar-max', default: 0.2, min: 0.01, step: 0.01, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'sar-color', default: 'rgb(255 255 255)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'sar-line',
+      default: {
+        color: 'rgb(255 255 255)',
+        lineWidth: 3,
+        lineStyle: LineStyle.SparseDotted,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type SARParams = InferStudyValues<typeof SAR_SCHEMA.inputs> &
@@ -39,7 +50,7 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, lineStyle: 3, priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, ...this.#params['sar-line'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -54,6 +65,7 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(SAR_SCHEMA.inputs, SAR_SCHEMA.style, SAR_SCHEMA.text, params)
+    this.#series.applyOptions(this.#params['sar-line'])
     if (this.#lastBars.length) {
       this.#series.setData(this.#calculate(this.#lastBars))
     }
@@ -68,7 +80,7 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
       { value: this.#params['sar-max'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (data) {
-      legend.data.push({ value: formatPrice(data.value), color: this.#params['sar-color'] })
+      legend.data.push({ value: formatPrice(data.value), color: this.#params['sar-line'].color })
     }
     return legend
   }
@@ -101,7 +113,7 @@ export class ParabolicSAR extends AbstractIndicator implements Indicator {
       return {
         time,
         value,
-        color: dirChanged ? 'transparent' : this.#params['sar-color']
+        color: dirChanged ? 'transparent' : this.#params['sar-line'].color
       }
     })
   }
