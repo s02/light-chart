@@ -26,10 +26,13 @@ const ST_SCHEMA = {
     { type: 'number', key: 'supertrend-factor', default: 3, min: 1, step: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'supertrend-bullish', default: 'rgb(0 128 0 / 65%)' },
-    { type: 'color', key: 'supertrend-bearish', default: 'rgb(128 0 0 / 65%)' },
-    { type: 'color', key: 'supertrend-up-arrow', default: 'rgb(0 255 0 / 65%)' },
-    { type: 'color', key: 'supertrend-down-arrow', default: 'rgb(255 0 0 / 65%)' }
+    { type: 'bool', key: 'supertrend-visible', default: true },
+    { type: 'color', key: 'supertrend-bullish-color', default: 'rgb(0 128 0 / 65%)' },
+    { type: 'color', key: 'supertrend-bearish-color', default: 'rgb(128 0 0 / 65%)' },
+    { type: 'bool', key: 'supertrend-up-arrow-visible', default: true },
+    { type: 'color', key: 'supertrend-up-arrow-color', default: 'rgb(0 255 0 / 65%)' },
+    { type: 'bool', key: 'supertrend-down-arrow-visible', default: true },
+    { type: 'color', key: 'supertrend-down-arrow-color', default: 'rgb(255 0 0 / 65%)' }
   ]
 } as const satisfies StudySchema
 
@@ -53,7 +56,12 @@ export class Supertrend extends AbstractIndicator implements Indicator {
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 3, priceLineVisible: false },
+      {
+        ...COMMON_SERIES_SETTINGS,
+        lineWidth: 3,
+        priceLineVisible: false,
+        lineVisible: this.#params['supertrend-visible']
+      },
       this.paneIndex
     )
 
@@ -69,7 +77,14 @@ export class Supertrend extends AbstractIndicator implements Indicator {
   }
 
   setParams(params: StudyParams) {
-    this.#params = resolveStudyParams(ST_SCHEMA.inputs, ST_SCHEMA.style, ST_SCHEMA.text, params)
+    const currentParams = resolveStudyParams(ST_SCHEMA.inputs, ST_SCHEMA.style, ST_SCHEMA.text, params)
+
+    if (currentParams['supertrend-visible'] !== this.#params['supertrend-visible']) {
+      this.#series.applyOptions({ lineVisible: currentParams['supertrend-visible'] })
+    }
+
+    this.#params = currentParams
+
     if (this.#lastBars.length) {
       const { lineData, markers } = this.#calculate(this.#lastBars)
       this.#series.setData(lineData)
@@ -87,7 +102,7 @@ export class Supertrend extends AbstractIndicator implements Indicator {
     )
 
     if (data) {
-      const color = data.color ?? this.#params['supertrend-bullish']
+      const color = data.color ?? this.#params['supertrend-bullish-color']
       legend.data.push({ value: formatPrice(data.value), color: helpers.parseColor(color).baseColor })
     }
 
@@ -129,30 +144,34 @@ export class Supertrend extends AbstractIndicator implements Indicator {
 
       if (prevDir !== undefined && dir !== prevDir) {
         if (dir === -1) {
-          markers.push({
-            time,
-            position: 'atPriceBottom',
-            shape: 'arrowUp',
-            color: this.#params['supertrend-up-arrow'],
-            price: bars[i].low,
-            size: 1
-          })
+          if (this.#params['supertrend-up-arrow-visible']) {
+            markers.push({
+              time,
+              position: 'atPriceBottom',
+              shape: 'arrowUp',
+              color: this.#params['supertrend-up-arrow-color'],
+              price: bars[i].low,
+              size: 1
+            })
+          }
         } else {
-          markers.push({
-            time,
-            position: 'atPriceTop',
-            shape: 'arrowDown',
-            color: this.#params['supertrend-down-arrow'],
-            price: bars[i].high,
-            size: 1
-          })
+          if (this.#params['supertrend-down-arrow-visible']) {
+            markers.push({
+              time,
+              position: 'atPriceTop',
+              shape: 'arrowDown',
+              color: this.#params['supertrend-down-arrow-color'],
+              price: bars[i].high,
+              size: 1
+            })
+          }
         }
       }
 
       return {
         time,
         value,
-        color: effectiveDir === -1 ? this.#params['supertrend-bullish'] : this.#params['supertrend-bearish']
+        color: effectiveDir === -1 ? this.#params['supertrend-bullish-color'] : this.#params['supertrend-bearish-color']
       }
     })
 
