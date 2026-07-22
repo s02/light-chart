@@ -1,4 +1,4 @@
-import { BaselineSeries, LineSeries, LineStyle } from 'lightweight-charts'
+import { BaselineSeries, LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -10,19 +10,59 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const STOCH_SCHEMA = {
   text: [],
   inputs: [
     { type: 'number', key: 'stochastic-lengthK', default: 14, min: 1, max: 9999 },
     { type: 'number', key: 'stochastic-smoothK', default: 1, min: 1, max: 9999 },
-    { type: 'number', key: 'stochastic-smoothD', default: 3, min: 1, max: 9999 },
-    { type: 'number', key: 'stochastic-upperLimit', default: 80, min: 1, max: 99 },
-    { type: 'number', key: 'stochastic-lowerLimit', default: 20, min: 1, max: 99 }
+    { type: 'number', key: 'stochastic-smoothD', default: 3, min: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'stochastic-kLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'stochastic-dLine', default: 'rgb(255 109 0)' },
-    { type: 'color', key: 'stochastic-fill-color', default: 'rgb(41 98 255 / 10%)' }
+    {
+      type: 'line',
+      key: 'stochastic-kLine',
+      default: {
+        color: 'rgb(41 98 255)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'stochastic-dLine',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'color', key: 'stochastic-fill-color', default: 'rgb(41 98 255 / 10%)' },
+    { type: 'number', key: 'stochastic-upperLimit', default: 80, min: 1, max: 99 },
+    {
+      type: 'line',
+      key: 'stochastic-upperLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'stochastic-lowerLimit', default: 20, min: 1, max: 99 },
+    {
+      type: 'line',
+      key: 'stochastic-lowerLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -52,20 +92,28 @@ export class Stochastic extends AbstractIndicator implements Indicator {
     this.#series = {
       k: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['stochastic-kLine'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['stochastic-kLine'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       d: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['stochastic-dLine'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['stochastic-dLine'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       upperLine: this.#chart.addSeries(
         LineSeries,
         {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
+          ...this.#params['stochastic-upperLimit-line'],
           crosshairMarkerVisible: false,
           lastValueVisible: false,
           priceLineVisible: false
@@ -75,9 +123,7 @@ export class Stochastic extends AbstractIndicator implements Indicator {
       lowerLine: this.#chart.addSeries(
         LineSeries,
         {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
+          ...this.#params['stochastic-lowerLimit-line'],
           crosshairMarkerVisible: false,
           lastValueVisible: false,
           priceLineVisible: false
@@ -114,8 +160,10 @@ export class Stochastic extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(STOCH_SCHEMA.inputs, STOCH_SCHEMA.style, STOCH_SCHEMA.text, params)
-    this.#series.k.applyOptions({ color: this.#params['stochastic-kLine'] })
-    this.#series.d.applyOptions({ color: this.#params['stochastic-dLine'] })
+    this.#series.k.applyOptions(this.#params['stochastic-kLine'])
+    this.#series.d.applyOptions(this.#params['stochastic-dLine'])
+    this.#series.upperLine.applyOptions(this.#params['stochastic-upperLimit-line'])
+    this.#series.lowerLine.applyOptions(this.#params['stochastic-lowerLimit-line'])
     this.#series.fill.applyOptions({
       topFillColor1: this.#params['stochastic-fill-color'],
       topFillColor2: this.#params['stochastic-fill-color'],
@@ -134,8 +182,8 @@ export class Stochastic extends AbstractIndicator implements Indicator {
     )
     if (kData && dData) {
       legend.data.push(
-        { value: formatPrice((kData as LineData<Time>).value), color: this.#params['stochastic-kLine'] },
-        { value: formatPrice((dData as LineData<Time>).value), color: this.#params['stochastic-dLine'] }
+        { value: formatPrice((kData as LineData<Time>).value), color: this.#params['stochastic-kLine'].color },
+        { value: formatPrice((dData as LineData<Time>).value), color: this.#params['stochastic-dLine'].color }
       )
     }
     return legend

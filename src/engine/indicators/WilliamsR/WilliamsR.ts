@@ -10,6 +10,8 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const WPR_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'wpr-length', default: 14, min: 1, max: 9999 }],
@@ -19,7 +21,7 @@ const WPR_SCHEMA = {
       key: 'wpr-line',
       default: {
         color: 'rgb(126 87 194)',
-        lineWidth: 3,
+        lineWidth: 2,
         lineStyle: LineStyle.Solid,
         lineType: LineType.Simple
       }
@@ -75,7 +77,12 @@ export class WilliamsR extends AbstractIndicator implements Indicator {
     this.#series = {
       wpr: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, ...this.#params['wpr-line'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['wpr-line'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       upperLine: this.#chart.addSeries(
