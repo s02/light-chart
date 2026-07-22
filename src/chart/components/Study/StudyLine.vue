@@ -31,6 +31,11 @@ const setType = (type: LineParamValue['lineType']) => {
   line.value.lineType = type
   isOpened.value = false
 }
+
+const setColor = (color: string) => {
+  line.value.color = color
+  isOpened.value = false
+}
 </script>
 
 <template>
@@ -42,7 +47,7 @@ const setType = (type: LineParamValue['lineType']) => {
       </button>
     </template>
     <div class="mwc-line-picker">
-      <ColorPicker :color="line.color" @select="line.color = $event" />
+      <ColorPicker :color="line.color" @select="setColor" />
 
       <div class="mwc-line-picker-container">
         <div class="mwc-line-picker-buttons mwc-line-picker-width-buttons">

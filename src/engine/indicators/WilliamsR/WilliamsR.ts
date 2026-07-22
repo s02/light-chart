@@ -1,4 +1,4 @@
-import { BaselineSeries, LineSeries, LineStyle } from 'lightweight-charts'
+import { BaselineSeries, LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -14,10 +14,39 @@ const WPR_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'wpr-length', default: 14, min: 1, max: 9999 }],
   style: [
-    { type: 'color', key: 'wpr-color', default: 'rgb(126 87 194)' },
+    {
+      type: 'line',
+      key: 'wpr-line',
+      default: {
+        color: 'rgb(126 87 194)',
+        lineWidth: 3,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'color', key: 'wpr-fill-color', default: 'rgb(41 98 255 / 10%)' },
     { type: 'number', key: 'wpr-upperLimit', default: -20, min: -99, max: 99 },
-    { type: 'number', key: 'wpr-lowerLimit', default: -80, min: -99, max: 99 }
+    {
+      type: 'line',
+      key: 'wpr-upperLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'wpr-lowerLimit', default: -80, min: -99, max: 99 },
+    {
+      type: 'line',
+      key: 'wpr-lowerLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -43,23 +72,32 @@ export class WilliamsR extends AbstractIndicator implements Indicator {
     this.#chart = chart
     this.#params = resolveStudyParams(WPR_SCHEMA.inputs, WPR_SCHEMA.style, WPR_SCHEMA.text, options?.params)
 
-    const refLineOptions = {
-      color: '#787B86',
-      lineWidth: 1 as const,
-      lineStyle: LineStyle.LargeDashed,
-      crosshairMarkerVisible: false,
-      lastValueVisible: false,
-      priceLineVisible: false
-    }
-
     this.#series = {
       wpr: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['wpr-color'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['wpr-line'], priceLineVisible: false },
         this.paneIndex
       ),
-      upperLine: this.#chart.addSeries(LineSeries, refLineOptions, this.paneIndex),
-      lowerLine: this.#chart.addSeries(LineSeries, refLineOptions, this.paneIndex),
+      upperLine: this.#chart.addSeries(
+        LineSeries,
+        {
+          ...this.#params['wpr-upperLimit-line'],
+          crosshairMarkerVisible: false,
+          lastValueVisible: false,
+          priceLineVisible: false
+        },
+        this.paneIndex
+      ),
+      lowerLine: this.#chart.addSeries(
+        LineSeries,
+        {
+          ...this.#params['wpr-lowerLimit-line'],
+          crosshairMarkerVisible: false,
+          lastValueVisible: false,
+          priceLineVisible: false
+        },
+        this.paneIndex
+      ),
       fill: this.#chart.addSeries(
         BaselineSeries,
         {
@@ -90,7 +128,9 @@ export class WilliamsR extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(WPR_SCHEMA.inputs, WPR_SCHEMA.style, WPR_SCHEMA.text, params)
-    this.#series.wpr.applyOptions({ color: this.#params['wpr-color'] })
+    this.#series.wpr.applyOptions(this.#params['wpr-line'])
+    this.#series.lowerLine.applyOptions(this.#params['wpr-lowerLimit-line'])
+    this.#series.upperLine.applyOptions(this.#params['wpr-upperLimit-line'])
     this.#series.fill.applyOptions({
       topFillColor1: this.#params['wpr-fill-color'],
       topFillColor2: this.#params['wpr-fill-color'],
@@ -103,7 +143,7 @@ export class WilliamsR extends AbstractIndicator implements Indicator {
     const data = seriesData.get(this.#series.wpr)
     legend.data.push({ value: this.#params['wpr-length'].toString(), color: 'rgb(140, 140, 140)' })
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['wpr-color'] })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['wpr-line'].color })
     }
     return legend
   }
