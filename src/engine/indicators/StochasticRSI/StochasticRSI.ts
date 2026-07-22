@@ -1,4 +1,4 @@
-import { BaselineSeries, LineSeries, LineStyle } from 'lightweight-charts'
+import { BaselineSeries, LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -10,20 +10,60 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const STOCHRSI_SCHEMA = {
   text: [],
   inputs: [
     { type: 'number', key: 'stochastic-rsi-rsiLength', default: 14, min: 1 },
     { type: 'number', key: 'stochastic-rsi-stochLength', default: 14, min: 1 },
     { type: 'number', key: 'stochastic-rsi-smoothK', default: 3, min: 1 },
-    { type: 'number', key: 'stochastic-rsi-smoothD', default: 3, min: 1 },
-    { type: 'number', key: 'stochastic-rsi-upperLimit', default: 80, min: 1, max: 99 },
-    { type: 'number', key: 'stochastic-rsi-lowerLimit', default: 20, min: 1, max: 99 }
+    { type: 'number', key: 'stochastic-rsi-smoothD', default: 3, min: 1 }
   ],
   style: [
-    { type: 'color', key: 'stochastic-rsi-kLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'stochastic-rsi-dLine', default: 'rgb(255 109 0)' },
-    { type: 'color', key: 'stochastic-rsi-fill-color', default: 'rgb(41 98 255 / 10%)' }
+    {
+      type: 'line',
+      key: 'stochastic-rsi-kLine',
+      default: {
+        color: 'rgb(41 98 255)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'stochastic-rsi-dLine',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'color', key: 'stochastic-rsi-fill-color', default: 'rgb(41 98 255 / 10%)' },
+    { type: 'number', key: 'stochastic-rsi-upperLimit', default: 80, min: 1, max: 99 },
+    {
+      type: 'line',
+      key: 'stochastic-rsi-upperLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'stochastic-rsi-lowerLimit', default: 20, min: 1, max: 99 },
+    {
+      type: 'line',
+      key: 'stochastic-rsi-lowerLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -60,8 +100,8 @@ export class StochasticRSI extends AbstractIndicator implements Indicator {
         LineSeries,
         {
           ...COMMON_SERIES_SETTINGS,
-          lineWidth: 1,
-          color: this.#params['stochastic-rsi-kLine'],
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['stochastic-rsi-kLine'],
           priceLineVisible: false
         },
         this.paneIndex
@@ -70,8 +110,8 @@ export class StochasticRSI extends AbstractIndicator implements Indicator {
         LineSeries,
         {
           ...COMMON_SERIES_SETTINGS,
-          lineWidth: 1,
-          color: this.#params['stochastic-rsi-dLine'],
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['stochastic-rsi-dLine'],
           priceLineVisible: false
         },
         this.paneIndex
@@ -79,9 +119,7 @@ export class StochasticRSI extends AbstractIndicator implements Indicator {
       upperLine: this.#chart.addSeries(
         LineSeries,
         {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
+          ...this.#params['stochastic-rsi-upperLimit-line'],
           crosshairMarkerVisible: false,
           lastValueVisible: false,
           priceLineVisible: false
@@ -91,9 +129,7 @@ export class StochasticRSI extends AbstractIndicator implements Indicator {
       lowerLine: this.#chart.addSeries(
         LineSeries,
         {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
+          ...this.#params['stochastic-rsi-lowerLimit-line'],
           crosshairMarkerVisible: false,
           lastValueVisible: false,
           priceLineVisible: false
@@ -130,8 +166,10 @@ export class StochasticRSI extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(STOCHRSI_SCHEMA.inputs, STOCHRSI_SCHEMA.style, STOCHRSI_SCHEMA.text, params)
-    this.#series.k.applyOptions({ color: this.#params['stochastic-rsi-kLine'] })
-    this.#series.d.applyOptions({ color: this.#params['stochastic-rsi-dLine'] })
+    this.#series.k.applyOptions(this.#params['stochastic-rsi-kLine'])
+    this.#series.d.applyOptions(this.#params['stochastic-rsi-dLine'])
+    this.#series.upperLine.applyOptions(this.#params['stochastic-rsi-upperLimit-line'])
+    this.#series.lowerLine.applyOptions(this.#params['stochastic-rsi-lowerLimit-line'])
 
     this.#series.fill.applyOptions({
       topFillColor1: this.#params['stochastic-rsi-fill-color'],
@@ -154,8 +192,8 @@ export class StochasticRSI extends AbstractIndicator implements Indicator {
 
     if (kData && dData) {
       legend.data.push(
-        { value: formatPrice((kData as LineData<Time>).value), color: this.#params['stochastic-rsi-kLine'] },
-        { value: formatPrice((dData as LineData<Time>).value), color: this.#params['stochastic-rsi-dLine'] }
+        { value: formatPrice((kData as LineData<Time>).value), color: this.#params['stochastic-rsi-kLine'].color },
+        { value: formatPrice((dData as LineData<Time>).value), color: this.#params['stochastic-rsi-dLine'].color }
       )
     }
 

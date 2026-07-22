@@ -1,4 +1,4 @@
-import { BaselineSeries, LineSeries, LineStyle } from 'lightweight-charts'
+import { BaselineSeries, LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -10,6 +10,8 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const BBB_SCHEMA = {
   text: [],
   inputs: [
@@ -17,25 +19,45 @@ const BBB_SCHEMA = {
     { type: 'number', key: 'bbb-mul', default: 2, min: 1, step: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'bbb-color', default: 'rgb(126 87 194)' },
+    {
+      type: 'line',
+      key: 'bbb-color',
+      default: {
+        color: 'rgb(126 87 194)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'color', key: 'bbb-fill-color', default: 'rgb(41 98 255 / 10%)' },
     { type: 'number', key: 'bbb-upperLimit', default: 1, min: -9999, max: 9999 },
+    {
+      type: 'line',
+      key: 'bbb-upperLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'number', key: 'bbb-lowerLimit', default: 0, min: -9999, max: 9999 },
-    { type: 'color', key: 'bbb-fill-color', default: 'rgb(41 98 255 / 10%)' }
+    {
+      type: 'line',
+      key: 'bbb-lowerLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
 type BBBParams = InferStudyValues<typeof BBB_SCHEMA.inputs> &
   InferStudyValues<typeof BBB_SCHEMA.style> &
   InferStudyValues<typeof BBB_SCHEMA.text>
-
-const REF_LINE_OPTIONS = {
-  color: '#787B86',
-  lineWidth: 1 as const,
-  lineStyle: LineStyle.LargeDashed,
-  crosshairMarkerVisible: false,
-  lastValueVisible: false,
-  priceLineVisible: false
-}
 
 export class BollingerBandsB extends AbstractIndicator implements Indicator {
   static readonly ikey = 'bbb' as const
@@ -58,11 +80,34 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
     this.#series = {
       b: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['bbb-color'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['bbb-color'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
-      upperLine: this.#chart.addSeries(LineSeries, REF_LINE_OPTIONS, this.paneIndex),
-      lowerLine: this.#chart.addSeries(LineSeries, REF_LINE_OPTIONS, this.paneIndex),
+      upperLine: this.#chart.addSeries(
+        LineSeries,
+        {
+          ...this.#params['bbb-upperLimit-line'],
+          crosshairMarkerVisible: false,
+          lastValueVisible: false,
+          priceLineVisible: false
+        },
+        this.paneIndex
+      ),
+      lowerLine: this.#chart.addSeries(
+        LineSeries,
+        {
+          ...this.#params['bbb-lowerLimit-line'],
+          crosshairMarkerVisible: false,
+          lastValueVisible: false,
+          priceLineVisible: false
+        },
+        this.paneIndex
+      ),
       fill: this.#chart.addSeries(
         BaselineSeries,
         {
@@ -93,7 +138,9 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(BBB_SCHEMA.inputs, BBB_SCHEMA.style, BBB_SCHEMA.text, params)
-    this.#series.b.applyOptions({ color: this.#params['bbb-color'] })
+    this.#series.b.applyOptions(this.#params['bbb-color'])
+    this.#series.upperLine.applyOptions(this.#params['bbb-upperLimit-line'])
+    this.#series.lowerLine.applyOptions(this.#params['bbb-lowerLimit-line'])
 
     this.#series.fill.applyOptions({
       topFillColor1: this.#params['bbb-fill-color'],
@@ -110,7 +157,7 @@ export class BollingerBandsB extends AbstractIndicator implements Indicator {
       { value: this.#params['bbb-length'].toString(), color: 'rgb(140, 140, 140)' },
       { value: this.#params['bbb-mul'].toString(), color: 'rgb(140, 140, 140)' }
     )
-    legend.data.push({ value, color: this.#params['bbb-color'] })
+    legend.data.push({ value, color: this.#params['bbb-color'].color })
     return legend
   }
 

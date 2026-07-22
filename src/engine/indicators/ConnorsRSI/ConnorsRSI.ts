@@ -1,4 +1,4 @@
-import { BaselineSeries, LineSeries, LineStyle } from 'lightweight-charts'
+import { BaselineSeries, LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -12,18 +12,49 @@ import type { SeriesLegend } from '@engine/series'
 
 // TODO: Перепроверить рассчеты
 
+const PRICE_PRECISION = 2
+
 const CRSI_SCHEMA = {
   text: [],
   inputs: [
     { type: 'number', key: 'crsi-lenrsi', default: 3, min: 1, max: 9999 },
     { type: 'number', key: 'crsi-lenupdown', default: 2, min: 1, max: 9999 },
-    { type: 'number', key: 'crsi-lenroc', default: 100, min: 1, max: 9999 },
-    { type: 'number', key: 'crsi-upperLimit', default: 70, min: 1, max: 99 },
-    { type: 'number', key: 'crsi-lowerLimit', default: 30, min: 1, max: 99 }
+    { type: 'number', key: 'crsi-lenroc', default: 100, min: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'crsi-color', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'crsi-fill-color', default: 'rgb(41 98 255 / 10%)' }
+    {
+      type: 'line',
+      key: 'crsi-color',
+      default: {
+        color: 'rgb(41 98 255)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'color', key: 'crsi-fill-color', default: 'rgb(41 98 255 / 10%)' },
+    { type: 'number', key: 'crsi-upperLimit', default: 70, min: 1, max: 99 },
+    {
+      type: 'line',
+      key: 'crsi-upperLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'crsi-lowerLimit', default: 30, min: 1, max: 99 },
+    {
+      type: 'line',
+      key: 'crsi-lowerLimit-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -52,15 +83,18 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
     this.#series = {
       crsi: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['crsi-color'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['crsi-color'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       upperLine: this.#chart.addSeries(
         LineSeries,
         {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
+          ...this.#params['crsi-upperLimit-line'],
           crosshairMarkerVisible: false,
           lastValueVisible: false,
           priceLineVisible: false
@@ -70,9 +104,7 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
       lowerLine: this.#chart.addSeries(
         LineSeries,
         {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
+          ...this.#params['crsi-lowerLimit-line'],
           crosshairMarkerVisible: false,
           lastValueVisible: false,
           priceLineVisible: false
@@ -109,7 +141,9 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(CRSI_SCHEMA.inputs, CRSI_SCHEMA.style, CRSI_SCHEMA.text, params)
-    this.#series.crsi.applyOptions({ color: this.#params['crsi-color'] })
+    this.#series.crsi.applyOptions(this.#params['crsi-color'])
+    this.#series.upperLine.applyOptions(this.#params['crsi-upperLimit-line'])
+    this.#series.lowerLine.applyOptions(this.#params['crsi-lowerLimit-line'])
     this.#series.fill.applyOptions({
       topFillColor1: this.#params['crsi-fill-color'],
       topFillColor2: this.#params['crsi-fill-color'],
@@ -126,7 +160,10 @@ export class ConnorsRSI extends AbstractIndicator implements Indicator {
       { value: this.#params['crsi-lenroc'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['crsi-color'] })
+      legend.data.push({
+        value: formatPrice((data as LineData<Time>).value),
+        color: this.#params['crsi-color'].color
+      })
     }
     return legend
   }
