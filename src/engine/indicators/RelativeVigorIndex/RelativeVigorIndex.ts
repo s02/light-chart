@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -10,12 +10,32 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const RVI_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'rvi-length', default: 10, min: 1, max: 9999 }],
   style: [
-    { type: 'color', key: 'rvi-rviColor', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'rvi-signalColor', default: 'rgb(255 109 0)' }
+    {
+      type: 'line',
+      key: 'rvi-rviLine',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'rvi-signalLine',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -42,12 +62,22 @@ export class RelativeVigorIndex extends AbstractIndicator implements Indicator {
     this.#series = {
       rvi: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['rvi-rviColor'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['rvi-rviLine'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       signal: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['rvi-signalColor'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['rvi-signalLine'],
+          priceLineVisible: false
+        },
         this.paneIndex
       )
     }
@@ -63,16 +93,16 @@ export class RelativeVigorIndex extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(RVI_SCHEMA.inputs, RVI_SCHEMA.style, RVI_SCHEMA.text, params)
-    this.#series.rvi.applyOptions({ color: this.#params['rvi-rviColor'] })
-    this.#series.signal.applyOptions({ color: this.#params['rvi-signalColor'] })
+    this.#series.rvi.applyOptions(this.#params['rvi-rviLine'])
+    this.#series.signal.applyOptions(this.#params['rvi-signalLine'])
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'RVI', paneIndex: this.paneIndex, data: [] }
     legend.data.push({ value: this.#params['rvi-length'].toString(), color: 'rgb(140, 140, 140)' })
     const entries = [
-      [this.#series.rvi, this.#params['rvi-rviColor']],
-      [this.#series.signal, this.#params['rvi-signalColor']]
+      [this.#series.rvi, this.#params['rvi-rviLine'].color],
+      [this.#series.signal, this.#params['rvi-signalLine'].color]
     ] as const
     for (const [series, color] of entries) {
       const data = seriesData.get(series)

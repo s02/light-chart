@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -9,10 +9,23 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const AD_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'advance-decline-length', default: 10, min: 1, max: 9999 }],
-  style: [{ type: 'color', key: 'advance-decline-color', default: 'rgb(33 150 243)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'advance-decline-line',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type ADParams = InferStudyValues<typeof AD_SCHEMA.inputs> &
@@ -39,8 +52,8 @@ export class AdvanceDecline extends AbstractIndicator implements Indicator {
         LineSeries,
         {
           ...COMMON_SERIES_SETTINGS,
-          lineWidth: 1,
-          color: this.#params['advance-decline-color'],
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['advance-decline-line'],
           priceLineVisible: false
         },
         this.paneIndex
@@ -58,7 +71,7 @@ export class AdvanceDecline extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(AD_SCHEMA.inputs, AD_SCHEMA.style, AD_SCHEMA.text, params)
-    this.#series.line.applyOptions({ color: this.#params['advance-decline-color'] })
+    this.#series.line.applyOptions(this.#params['advance-decline-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -66,7 +79,7 @@ export class AdvanceDecline extends AbstractIndicator implements Indicator {
     const data = seriesData.get(this.#series.line)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
     legend.data.push({ value: this.#params['advance-decline-length'].toString(), color: 'rgb(140, 140, 140)' })
-    legend.data.push({ value, color: this.#params['advance-decline-color'] })
+    legend.data.push({ value, color: this.#params['advance-decline-line'].color })
     return legend
   }
 

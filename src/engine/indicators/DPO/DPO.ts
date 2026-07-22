@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -10,6 +10,8 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const DPO_SCHEMA = {
   text: [],
   inputs: [
@@ -17,7 +19,16 @@ const DPO_SCHEMA = {
     { type: 'bool', key: 'dpo-mode', default: false }
   ],
   style: [
-    { type: 'color', key: 'dpo-color', default: 'rgb(126 87 194)' },
+    {
+      type: 'line',
+      key: 'dpo-line',
+      default: {
+        color: 'rgb(126 87 194)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'number', key: 'dpo-zero', default: 0, min: -9999, max: 9999 }
   ]
 } as const satisfies StudySchema
@@ -45,7 +56,12 @@ export class DPO extends AbstractIndicator implements Indicator {
     this.#series = {
       dpo: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['dpo-color'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['dpo-line'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       zero: this.#chart.addSeries(
@@ -73,7 +89,7 @@ export class DPO extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(DPO_SCHEMA.inputs, DPO_SCHEMA.style, DPO_SCHEMA.text, params)
-    this.#series.dpo.applyOptions({ color: this.#params['dpo-color'] })
+    this.#series.dpo.applyOptions(this.#params['dpo-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -86,7 +102,7 @@ export class DPO extends AbstractIndicator implements Indicator {
       { value: this.#params['dpo-mode'] ? 'centered' : 'not centered', color: 'rgb(140, 140, 140)' }
     )
 
-    legend.data.push({ value, color: this.#params['dpo-color'] })
+    legend.data.push({ value, color: this.#params['dpo-line'].color })
     return legend
   }
 

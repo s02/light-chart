@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -9,10 +9,23 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const BOP_SCHEMA = {
   text: [],
   inputs: [],
-  style: [{ type: 'color', key: 'bop-color', default: 'rgb(126 87 194)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'bop-line',
+      default: {
+        color: 'rgb(126 87 194)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type BOPParams = InferStudyValues<typeof BOP_SCHEMA.inputs> &
@@ -38,7 +51,12 @@ export class BalanceOfPower extends AbstractIndicator implements Indicator {
     this.#series = {
       bop: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['bop-color'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['bop-line'],
+          priceLineVisible: false
+        },
         this.paneIndex
       ),
       zeroLine: this.#chart.addSeries(
@@ -66,14 +84,14 @@ export class BalanceOfPower extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(BOP_SCHEMA.inputs, BOP_SCHEMA.style, BOP_SCHEMA.text, params)
-    this.#series.bop.applyOptions({ color: this.#params['bop-color'] })
+    this.#series.bop.applyOptions(this.#params['bop-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'BOP', paneIndex: this.paneIndex, data: [] }
     const data = seriesData.get(this.#series.bop)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
-    legend.data.push({ value, color: this.#params['bop-color'] })
+    legend.data.push({ value, color: this.#params['bop-line'].color })
     return legend
   }
 

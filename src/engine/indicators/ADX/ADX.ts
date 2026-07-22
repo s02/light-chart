@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -10,13 +10,26 @@ import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
 
+const PRICE_PRECISION = 2
+
 const ADX_SCHEMA = {
   text: [],
   inputs: [
     { type: 'number', key: 'adx-adxSmoothing', default: 14, min: 1 },
     { type: 'number', key: 'adx-diLength', default: 14, min: 1 }
   ],
-  style: [{ type: 'color', key: 'adx-adxColor', default: 'rgb(126 87 194)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'adx-adxLine',
+      default: {
+        color: 'rgb(126 87 194)',
+        lineWidth: 2,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type ADXParams = InferStudyValues<typeof ADX_SCHEMA.inputs> &
@@ -41,7 +54,12 @@ export class ADX extends AbstractIndicator implements Indicator {
     this.#series = {
       adx: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 2, color: this.#params['adx-adxColor'], priceLineVisible: false },
+        {
+          ...COMMON_SERIES_SETTINGS,
+          priceFormat: { ...COMMON_SERIES_SETTINGS.priceFormat, precision: PRICE_PRECISION },
+          ...this.#params['adx-adxLine'],
+          priceLineVisible: false
+        },
         this.paneIndex
       )
     }
@@ -57,7 +75,7 @@ export class ADX extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(ADX_SCHEMA.inputs, ADX_SCHEMA.style, ADX_SCHEMA.text, params)
-    this.#series.adx.applyOptions({ color: this.#params['adx-adxColor'] })
+    this.#series.adx.applyOptions(this.#params['adx-adxLine'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -66,7 +84,7 @@ export class ADX extends AbstractIndicator implements Indicator {
       { value: this.#params['adx-adxSmoothing'].toString(), color: 'rgb(140, 140, 140)' },
       { value: this.#params['adx-diLength'].toString(), color: 'rgb(140, 140, 140)' }
     )
-    const entries = [[this.#series.adx, 'ADX', this.#params['adx-adxColor']]] as const
+    const entries = [[this.#series.adx, 'ADX', this.#params['adx-adxLine'].color]] as const
     for (const [series, , color] of entries) {
       const data = seriesData.get(series)
       const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
