@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -17,7 +17,18 @@ const ALMA_SCHEMA = {
     { type: 'number', key: 'alma-offset', default: 0.85, min: 0, max: 1 },
     { type: 'number', key: 'alma-sigma', default: 6, min: 1, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'alma-color', default: 'rgb(255 109 0)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'alma-line',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type ALMAParams = InferStudyValues<typeof ALMA_SCHEMA.inputs> &
@@ -38,14 +49,14 @@ export class ArnaudLegouxMA extends AbstractIndicator implements Indicator {
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['alma-color'], priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, ...this.#params['alma-line'], priceLineVisible: false },
       this.paneIndex
     )
   }
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(ALMA_SCHEMA.inputs, ALMA_SCHEMA.style, ALMA_SCHEMA.text, params)
-    this.#series.applyOptions({ color: this.#params['alma-color'] })
+    this.#series.applyOptions(this.#params['alma-line'])
   }
 
   getSchema() {
@@ -65,7 +76,7 @@ export class ArnaudLegouxMA extends AbstractIndicator implements Indicator {
       { value: this.#params['alma-sigma'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['alma-color'] })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['alma-line'].color })
     }
     return legend
   }

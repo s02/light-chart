@@ -19,22 +19,18 @@ const line = defineModel<LineParamValue>({
 
 const setWidth = (width: LineParamValue['lineWidth']) => {
   line.value.lineWidth = width
-  isOpened.value = false
 }
 
 const setStyle = (style: LineParamValue['lineStyle']) => {
   line.value.lineStyle = style
-  isOpened.value = false
 }
 
 const setType = (type: LineParamValue['lineType']) => {
   line.value.lineType = type
-  isOpened.value = false
 }
 
 const setColor = (color: string) => {
   line.value.color = color
-  isOpened.value = false
 }
 </script>
 

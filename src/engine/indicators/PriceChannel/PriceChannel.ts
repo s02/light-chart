@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -18,9 +18,37 @@ const PC_SCHEMA = {
     { type: 'number', key: 'pricechannel-offset', default: 0, min: 0, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'pricechannel-upper', default: 'rgb(245 0 87)' },
-    { type: 'color', key: 'pricechannel-middle', default: 'rgb(33, 150, 243)' },
-    { type: 'color', key: 'pricechannel-lower', default: 'rgb(245 0 87)' },
+    {
+      type: 'line',
+      key: 'pricechannel-upper',
+      default: {
+        color: 'rgb(245 0 87)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'pricechannel-middle',
+      default: {
+        color: 'rgb(33, 150, 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'pricechannel-lower',
+      default: {
+        color: 'rgb(245 0 87)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+
     { type: 'color', key: 'pricechannel-fill-color', default: 'rgb(41 98 255 / 5%)' }
   ]
 } as const satisfies StudySchema
@@ -50,22 +78,21 @@ export class PriceChannel extends AbstractIndicator implements Indicator {
     this.#series = {
       upper: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['pricechannel-upper'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['pricechannel-upper'], priceLineVisible: false },
         this.paneIndex
       ),
       middle: this.#chart.addSeries(
         LineSeries,
         {
           ...COMMON_SERIES_SETTINGS,
-          lineWidth: 1,
-          color: this.#params['pricechannel-middle'],
+          ...this.#params['pricechannel-middle'],
           priceLineVisible: false
         },
         this.paneIndex
       ),
       lower: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['pricechannel-lower'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['pricechannel-lower'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -84,9 +111,9 @@ export class PriceChannel extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(PC_SCHEMA.inputs, PC_SCHEMA.style, PC_SCHEMA.text, params)
-    this.#series.upper.applyOptions({ color: this.#params['pricechannel-upper'] })
-    this.#series.middle.applyOptions({ color: this.#params['pricechannel-middle'] })
-    this.#series.lower.applyOptions({ color: this.#params['pricechannel-lower'] })
+    this.#series.upper.applyOptions(this.#params['pricechannel-upper'])
+    this.#series.middle.applyOptions(this.#params['pricechannel-middle'])
+    this.#series.lower.applyOptions(this.#params['pricechannel-lower'])
     this.#fill.setColor(this.#params['pricechannel-fill-color'])
   }
 
@@ -101,9 +128,9 @@ export class PriceChannel extends AbstractIndicator implements Indicator {
     )
     if (uData && mData && lData) {
       legend.data.push(
-        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['pricechannel-upper'] },
-        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['pricechannel-lower'] },
-        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['pricechannel-middle'] }
+        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['pricechannel-upper'].color },
+        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['pricechannel-lower'].color },
+        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['pricechannel-middle'].color }
       )
     }
     return legend

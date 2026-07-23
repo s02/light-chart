@@ -1,4 +1,6 @@
 import { line } from '@engine/primitives/line'
+import { lineStyleDash } from '@engine/primitives/line-style'
+import type { LineParamValue } from '@engine/schema'
 import type { CanvasRenderingTarget2D } from 'fancy-canvas'
 import type { IChartApi, IPrimitivePaneRenderer, ISeriesApi, SeriesType, Time } from 'lightweight-charts'
 
@@ -11,18 +13,19 @@ export class ZigZagRenderer implements IPrimitivePaneRenderer {
   #lines: ZigZagLine[]
   #chart: IChartApi
   #series: ISeriesApi<SeriesType>
-  #color: string
+  #lineParams: LineParamValue
 
-  constructor(lines: ZigZagLine[], chart: IChartApi, series: ISeriesApi<SeriesType>, color: string) {
+  constructor(lines: ZigZagLine[], chart: IChartApi, series: ISeriesApi<SeriesType>, lineParams: LineParamValue) {
     this.#lines = lines
     this.#chart = chart
     this.#series = series
-    this.#color = color
+    this.#lineParams = lineParams
   }
 
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
       const timeScale = this.#chart.timeScale()
+      const { color, lineWidth } = this.#lineParams
 
       for (const segment of this.#lines) {
         const x1 = timeScale.timeToCoordinate(segment.from.time)
@@ -32,7 +35,12 @@ export class ZigZagRenderer implements IPrimitivePaneRenderer {
 
         if (x1 === null || y1 === null || x2 === null || y2 === null) continue
 
-        line(scope, { x: x1, y: y1 }, { x: x2, y: y2 }, { color: this.#color, width: 2 })
+        line(
+          scope,
+          { x: x1, y: y1 },
+          { x: x2, y: y2 },
+          { color, width: lineWidth, ...lineStyleDash(this.#lineParams.lineStyle, lineWidth) }
+        )
       }
     })
   }

@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -13,8 +13,26 @@ const VI_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'vi-length', default: 14, min: 2, max: 9999 }],
   style: [
-    { type: 'color', key: 'vi-viPlus', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'vi-viMinus', default: 'rgb(239 83 80)' }
+    {
+      type: 'line',
+      key: 'vi-viPlus',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'vi-viMinus',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -42,12 +60,12 @@ export class VortexIndicator extends AbstractIndicator implements Indicator {
     this.#series = {
       viPlus: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['vi-viPlus'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['vi-viPlus'], priceLineVisible: false },
         this.paneIndex
       ),
       viMinus: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['vi-viMinus'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['vi-viMinus'], priceLineVisible: false },
         this.paneIndex
       ),
       midLine: this.#chart.addSeries(
@@ -75,16 +93,16 @@ export class VortexIndicator extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(VI_SCHEMA.inputs, VI_SCHEMA.style, VI_SCHEMA.text, params)
-    this.#series.viPlus.applyOptions({ color: this.#params['vi-viPlus'] })
-    this.#series.viMinus.applyOptions({ color: this.#params['vi-viMinus'] })
+    this.#series.viPlus.applyOptions(this.#params['vi-viPlus'])
+    this.#series.viMinus.applyOptions(this.#params['vi-viMinus'])
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'VI', paneIndex: this.paneIndex, data: [] }
     legend.data.push({ value: this.#params['vi-length'].toString(), color: 'rgb(140, 140, 140)' })
     const entries = [
-      [this.#series.viPlus, this.#params['vi-viPlus']],
-      [this.#series.viMinus, this.#params['vi-viMinus']]
+      [this.#series.viPlus, this.#params['vi-viPlus'].color],
+      [this.#series.viMinus, this.#params['vi-viMinus'].color]
     ] as const
     for (const [series, color] of entries) {
       const data = seriesData.get(series)

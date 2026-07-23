@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -18,9 +18,36 @@ const DC_SCHEMA = {
     { type: 'number', key: 'donchian-offset', default: 0, min: 0, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'donchian-upper', default: 'rgb(33 150 243)' },
-    { type: 'color', key: 'donchian-middle', default: 'rgb(255 109 0)' },
-    { type: 'color', key: 'donchian-lower', default: 'rgb(33 150 243)' },
+    {
+      type: 'line',
+      key: 'donchian-upper',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'donchian-middle',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'donchian-lower',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'color', key: 'donchian-fill-color', default: 'rgb(41 98 255 / 5%)' }
   ]
 } as const satisfies StudySchema
@@ -50,17 +77,17 @@ export class DonchianChannels extends AbstractIndicator implements Indicator {
     this.#series = {
       upper: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['donchian-upper'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['donchian-upper'], priceLineVisible: false },
         this.paneIndex
       ),
       middle: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['donchian-middle'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['donchian-middle'], priceLineVisible: false },
         this.paneIndex
       ),
       lower: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['donchian-lower'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['donchian-lower'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -79,9 +106,9 @@ export class DonchianChannels extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(DC_SCHEMA.inputs, DC_SCHEMA.style, DC_SCHEMA.text, params)
-    this.#series.upper.applyOptions({ color: this.#params['donchian-upper'] })
-    this.#series.middle.applyOptions({ color: this.#params['donchian-middle'] })
-    this.#series.lower.applyOptions({ color: this.#params['donchian-lower'] })
+    this.#series.upper.applyOptions(this.#params['donchian-upper'])
+    this.#series.middle.applyOptions(this.#params['donchian-middle'])
+    this.#series.lower.applyOptions(this.#params['donchian-lower'])
     this.#fill.setColor(this.#params['donchian-fill-color'])
   }
 
@@ -98,9 +125,9 @@ export class DonchianChannels extends AbstractIndicator implements Indicator {
 
     if (uData && mData && lData) {
       legend.data.push(
-        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['donchian-lower'] },
-        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['donchian-upper'] },
-        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['donchian-middle'] }
+        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['donchian-lower'].color },
+        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['donchian-upper'].color },
+        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['donchian-middle'].color }
       )
     }
 

@@ -10,10 +10,10 @@ export class ZigZagPaneView implements IPrimitivePaneView {
   }
 
   renderer() {
-    const { chart, series, lines, color } = this.#primitive
+    const { chart, series, lines, lineParams } = this.#primitive
     if (!chart || !series) {
       return null
     }
-    return new ZigZagRenderer(lines, chart, series, color)
+    return new ZigZagRenderer(lines, chart, series, lineParams)
   }
 }

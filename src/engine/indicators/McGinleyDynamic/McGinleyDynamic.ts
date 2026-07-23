@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -13,7 +13,18 @@ import { getSourceSeries, ta } from 'oakscriptjs'
 const MD_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'md-length', default: 14, min: 1, max: 9999 }],
-  style: [{ type: 'color', key: 'md-color', default: 'rgb(255 109 0)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'md-line',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type MDParams = InferStudyValues<typeof MD_SCHEMA.inputs> &
@@ -34,7 +45,7 @@ export class McGinleyDynamic extends AbstractIndicator implements Indicator {
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['md-color'], priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, ...this.#params['md-line'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -49,7 +60,7 @@ export class McGinleyDynamic extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(MD_SCHEMA.inputs, MD_SCHEMA.style, MD_SCHEMA.text, params)
-    this.#series.applyOptions({ color: this.#params['md-color'] })
+    this.#series.applyOptions(this.#params['md-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -57,7 +68,7 @@ export class McGinleyDynamic extends AbstractIndicator implements Indicator {
     const data = seriesData.get(this.#series)
     legend.data.push({ value: this.#params['md-length'].toString(), color: 'rgb(140, 140, 140)' })
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['md-color'] })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['md-line'].color })
     }
     return legend
   }

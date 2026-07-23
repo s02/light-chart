@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -16,7 +16,18 @@ const LSMA_SCHEMA = {
     { type: 'number', key: 'lsma-length', default: 25, min: 1, max: 9999 },
     { type: 'number', key: 'lsma-offset', default: 0, min: 0, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'lsma-color', default: 'rgb(255 109 0)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'lsma-line',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type LSMAParams = InferStudyValues<typeof LSMA_SCHEMA.inputs> &
@@ -37,7 +48,7 @@ export class LeastSquaresMA extends AbstractIndicator implements Indicator {
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['lsma-color'], priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, ...this.#params['lsma-line'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -52,7 +63,7 @@ export class LeastSquaresMA extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(LSMA_SCHEMA.inputs, LSMA_SCHEMA.style, LSMA_SCHEMA.text, params)
-    this.#series.applyOptions({ color: this.#params['lsma-color'] })
+    this.#series.applyOptions(this.#params['lsma-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -63,7 +74,7 @@ export class LeastSquaresMA extends AbstractIndicator implements Indicator {
       { value: this.#params['lsma-offset'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['lsma-color'] })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['lsma-line'].color })
     }
     return legend
   }

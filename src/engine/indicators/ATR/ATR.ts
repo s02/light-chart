@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -13,7 +13,18 @@ import type { SeriesLegend } from '@engine/series'
 const ATR_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'atr-length', default: 14, min: 1, max: 9999 }],
-  style: [{ type: 'color', key: 'atr-color', default: 'rgb(255 109 0)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'atr-line',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type ATRParams = InferStudyValues<typeof ATR_SCHEMA.inputs> &
@@ -34,7 +45,7 @@ export class ATR extends AbstractIndicator implements Indicator {
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['atr-color'], priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, ...this.#params['atr-line'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -49,7 +60,7 @@ export class ATR extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(ATR_SCHEMA.inputs, ATR_SCHEMA.style, ATR_SCHEMA.text, params)
-    this.#series.applyOptions({ color: this.#params['atr-color'] })
+    this.#series.applyOptions(this.#params['atr-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -57,7 +68,7 @@ export class ATR extends AbstractIndicator implements Indicator {
     const data = seriesData.get(this.#series)
     legend.data.push({ value: this.#params['atr-length'].toString(), color: 'rgb(140, 140, 140)' })
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['atr-color'] })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['atr-line'].color })
     }
     return legend
   }

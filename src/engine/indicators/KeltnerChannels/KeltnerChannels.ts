@@ -1,6 +1,6 @@
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { KeltnerChannelsFill } from '@engine/indicators/KeltnerChannels/KeltnerChannelsFill'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -19,9 +19,36 @@ const KC_SCHEMA = {
     { type: 'number', key: 'kc-mul', default: 1, min: 0.1, step: 0.1 }
   ],
   style: [
-    { type: 'color', key: 'kc-upper', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'kc-middle', default: 'rgb(255 171 64)' },
-    { type: 'color', key: 'kc-lower', default: 'rgb(41 98 255)' },
+    {
+      type: 'line',
+      key: 'kc-upper',
+      default: {
+        color: 'rgb(41 98 255)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'kc-middle',
+      default: {
+        color: 'rgb(255 171 64)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'kc-lower',
+      default: {
+        color: 'rgb(41 98 255)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'color', key: 'kc-fill', default: 'rgb(41 98 255 / 10%)' }
   ]
 } as const satisfies StudySchema
@@ -51,17 +78,17 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
     this.#series = {
       upper: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['kc-upper'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['kc-upper'], priceLineVisible: false },
         this.paneIndex
       ),
       middle: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['kc-middle'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['kc-middle'], priceLineVisible: false },
         this.paneIndex
       ),
       lower: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['kc-lower'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['kc-lower'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -80,9 +107,9 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(KC_SCHEMA.inputs, KC_SCHEMA.style, KC_SCHEMA.text, params)
 
-    this.#series.upper.applyOptions({ color: this.#params['kc-upper'] })
-    this.#series.middle.applyOptions({ color: this.#params['kc-middle'] })
-    this.#series.lower.applyOptions({ color: this.#params['kc-lower'] })
+    this.#series.upper.applyOptions(this.#params['kc-upper'])
+    this.#series.middle.applyOptions(this.#params['kc-middle'])
+    this.#series.lower.applyOptions(this.#params['kc-lower'])
     this.#fill.fill = this.#params['kc-fill']
   }
 
@@ -99,9 +126,9 @@ export class KeltnerChannels extends AbstractIndicator implements Indicator {
 
     if (uData && mData && lData) {
       legend.data.push(
-        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['kc-middle'] },
-        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['kc-upper'] },
-        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['kc-lower'] }
+        { value: formatPrice((mData as LineData<Time>).value), color: this.#params['kc-middle'].color },
+        { value: formatPrice((uData as LineData<Time>).value), color: this.#params['kc-upper'].color },
+        { value: formatPrice((lData as LineData<Time>).value), color: this.#params['kc-lower'].color }
       )
     }
     return legend

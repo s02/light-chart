@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -17,12 +17,23 @@ const WMA_SCHEMA = {
     {
       type: 'select',
       key: 'wma-source',
-      values: ['close', 'open'],
+      values: ['close', 'open', 'high', 'low'],
       default: 'close'
     },
     { type: 'number', key: 'wma-offset', default: 0, min: 0, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'wma-color', default: 'rgb(255 109 0)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'wma-line',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type WMAParams = InferStudyValues<typeof WMA_SCHEMA.inputs> &
@@ -43,7 +54,7 @@ export class WeightedMovingAverage extends AbstractIndicator implements Indicato
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['wma-color'], priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, ...this.#params['wma-line'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -58,7 +69,7 @@ export class WeightedMovingAverage extends AbstractIndicator implements Indicato
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(WMA_SCHEMA.inputs, WMA_SCHEMA.style, WMA_SCHEMA.text, params)
-    this.#series.applyOptions({ color: this.#params['wma-color'] })
+    this.#series.applyOptions(this.#params['wma-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -70,7 +81,7 @@ export class WeightedMovingAverage extends AbstractIndicator implements Indicato
       { value: this.#params['wma-offset'].toString(), color: 'rgb(140, 140, 140)' }
     )
     if (data) {
-      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['wma-color'] })
+      legend.data.push({ value: formatPrice((data as LineData<Time>).value), color: this.#params['wma-line'].color })
     }
     return legend
   }

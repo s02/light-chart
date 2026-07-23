@@ -1,5 +1,6 @@
 import { ZigZagPaneView } from './ZigZagPaneView'
 import type { ZigZagLine } from './ZigZagRenderer'
+import type { LineParamValue } from '@engine/schema'
 import type {
   IChartApi,
   ISeriesApi,
@@ -13,16 +14,16 @@ export class ZigZagPrimitive implements ISeriesPrimitive<Time> {
   chart: IChartApi | null = null
   series: ISeriesApi<SeriesType> | null = null
   lines: ZigZagLine[] = []
-  color: string
+  lineParams: LineParamValue
 
-  constructor(color: string) {
-    this.color = color
+  constructor(lineParams: LineParamValue) {
+    this.lineParams = { ...lineParams }
   }
 
   #view = new ZigZagPaneView(this)
 
-  setColor(color: string) {
-    this.color = color
+  setLine(lineParams: LineParamValue) {
+    this.lineParams = { ...lineParams }
   }
 
   setLines(lines: ZigZagLine[]) {

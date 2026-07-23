@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -14,7 +14,18 @@ const VZT_SCHEMA = {
     { type: 'number', key: 'vzt-period', default: 10, min: 1, max: 9999 },
     { type: 'number', key: 'vzt-daysPerYear', default: 252, min: 1, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'vzt-color', default: 'rgb(255 109 0)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'vzt-line',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type VZTParams = InferStudyValues<typeof VZT_SCHEMA.inputs> &
@@ -35,7 +46,7 @@ export class VolatilityZeroTrend extends AbstractIndicator implements Indicator 
 
     this.#series = this.#chart.addSeries(
       LineSeries,
-      { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['vzt-color'], priceLineVisible: false },
+      { ...COMMON_SERIES_SETTINGS, ...this.#params['vzt-line'], priceLineVisible: false },
       this.paneIndex
     )
   }
@@ -50,7 +61,7 @@ export class VolatilityZeroTrend extends AbstractIndicator implements Indicator 
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(VZT_SCHEMA.inputs, VZT_SCHEMA.style, VZT_SCHEMA.text, params)
-    this.#series.applyOptions({ color: this.#params['vzt-color'] })
+    this.#series.applyOptions(this.#params['vzt-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -61,7 +72,7 @@ export class VolatilityZeroTrend extends AbstractIndicator implements Indicator 
       { value: this.#params['vzt-period'].toString(), color: 'rgb(140, 140, 140)' },
       { value: this.#params['vzt-daysPerYear'].toString(), color: 'rgb(140, 140, 140)' }
     )
-    legend.data.push({ value, color: this.#params['vzt-color'] })
+    legend.data.push({ value, color: this.#params['vzt-line'].color })
     return legend
   }
 

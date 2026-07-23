@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -18,7 +18,18 @@ const ZZ_SCHEMA = {
     { type: 'number', key: 'zigzag-deviation', default: 0.001, min: 0, max: 9999 },
     { type: 'number', key: 'zigzag-depth', default: 10, min: 1, max: 9999 }
   ],
-  style: [{ type: 'color', key: 'zigzag-color', default: 'rgb(33 150 243)' }]
+  style: [
+    {
+      type: 'line',
+      key: 'zigzag-line',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type ZZParams = InferStudyValues<typeof ZZ_SCHEMA.inputs> &
@@ -37,7 +48,7 @@ export class ZigZag extends AbstractIndicator implements Indicator {
     super(datafeed, options.paneIndex)
     this.#chart = chart
     this.#params = resolveStudyParams(ZZ_SCHEMA.inputs, ZZ_SCHEMA.style, ZZ_SCHEMA.text, options?.params)
-    this.#primitive = new ZigZagPrimitive(this.#params['zigzag-color'])
+    this.#primitive = new ZigZagPrimitive(this.#params['zigzag-line'])
 
     this.#series = this.#chart.addSeries(
       LineSeries,
@@ -64,7 +75,7 @@ export class ZigZag extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(ZZ_SCHEMA.inputs, ZZ_SCHEMA.style, ZZ_SCHEMA.text, params)
-    this.#primitive.setColor(this.#params['zigzag-color'])
+    this.#primitive.setLine(this.#params['zigzag-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -81,9 +92,9 @@ export class ZigZag extends AbstractIndicator implements Indicator {
     )
 
     if (data) {
-      legend.data.push({ value: formatPrice(data.value), color: this.#params['zigzag-color'] })
+      legend.data.push({ value: formatPrice(data.value), color: this.#params['zigzag-line'].color })
     } else {
-      legend.data.push({ value: '∅', color: this.#params['zigzag-color'] })
+      legend.data.push({ value: '∅', color: this.#params['zigzag-line'].color })
     }
 
     return legend

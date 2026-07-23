@@ -1,4 +1,4 @@
-import { LineSeries } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
@@ -18,8 +18,26 @@ const CKS_SCHEMA = {
     { type: 'number', key: 'cks-q', default: 9, min: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'cks-stopShort', default: 'rgb(242 54 69)' },
-    { type: 'color', key: 'cks-stopLong', default: 'rgb(76 175 80)' }
+    {
+      type: 'line',
+      key: 'cks-stopShort',
+      default: {
+        color: 'rgb(242 54 69)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'cks-stopLong',
+      default: {
+        color: 'rgb(76 175 80)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -46,12 +64,12 @@ export class ChandeKrollStop extends AbstractIndicator implements Indicator {
     this.#series = {
       stopShort: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['cks-stopShort'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['cks-stopShort'], priceLineVisible: false },
         this.paneIndex
       ),
       stopLong: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['cks-stopLong'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['cks-stopLong'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -67,8 +85,8 @@ export class ChandeKrollStop extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(CKS_SCHEMA.inputs, CKS_SCHEMA.style, CKS_SCHEMA.text, params)
-    this.#series.stopShort.applyOptions({ color: this.#params['cks-stopShort'] })
-    this.#series.stopLong.applyOptions({ color: this.#params['cks-stopLong'] })
+    this.#series.stopShort.applyOptions(this.#params['cks-stopShort'])
+    this.#series.stopLong.applyOptions(this.#params['cks-stopLong'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -82,8 +100,8 @@ export class ChandeKrollStop extends AbstractIndicator implements Indicator {
     )
     if (shortData && longData) {
       legend.data.push(
-        { value: formatPrice((longData as LineData<Time>).value), color: this.#params['cks-stopLong'] },
-        { value: formatPrice((shortData as LineData<Time>).value), color: this.#params['cks-stopShort'] }
+        { value: formatPrice((longData as LineData<Time>).value), color: this.#params['cks-stopLong'].color },
+        { value: formatPrice((shortData as LineData<Time>).value), color: this.#params['cks-stopShort'].color }
       )
     }
     return legend

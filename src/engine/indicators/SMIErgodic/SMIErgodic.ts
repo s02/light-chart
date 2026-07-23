@@ -1,4 +1,4 @@
-import { HistogramSeries, LineSeries } from 'lightweight-charts'
+import { HistogramSeries, LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -18,8 +18,26 @@ const SMI_SCHEMA = {
     { type: 'number', key: 'smiio-signal', default: 5, min: 1, max: 9999 }
   ],
   style: [
-    { type: 'color', key: 'smiio-ergodicLine', default: 'rgb(41 98 255)' },
-    { type: 'color', key: 'smiio-signalLine', default: 'rgb(255 109 0)' },
+    {
+      type: 'line',
+      key: 'smiio-ergodicLine',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'smiio-signalLine',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
     { type: 'color', key: 'smiio-hist', default: 'rgb(255 82 82)' }
   ]
 } as const satisfies StudySchema
@@ -53,12 +71,12 @@ export class SMIErgodic extends AbstractIndicator implements Indicator {
       ),
       ergodic: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['smiio-ergodicLine'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['smiio-ergodicLine'], priceLineVisible: false },
         this.paneIndex
       ),
       signal: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['smiio-signalLine'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['smiio-signalLine'], priceLineVisible: false },
         this.paneIndex
       )
     }
@@ -74,8 +92,8 @@ export class SMIErgodic extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(SMI_SCHEMA.inputs, SMI_SCHEMA.style, SMI_SCHEMA.text, params)
-    this.#series.ergodic.applyOptions({ color: this.#params['smiio-ergodicLine'] })
-    this.#series.signal.applyOptions({ color: this.#params['smiio-signalLine'] })
+    this.#series.ergodic.applyOptions(this.#params['smiio-ergodicLine'])
+    this.#series.signal.applyOptions(this.#params['smiio-signalLine'])
     this.#series.hist.applyOptions({ color: this.#params['smiio-hist'] })
   }
 
@@ -92,8 +110,8 @@ export class SMIErgodic extends AbstractIndicator implements Indicator {
     if (histData && ergodicData && signalData) {
       const histValue = (histData as HistogramData<Time>).value
       legend.data.push(
-        { value: formatPrice((ergodicData as LineData<Time>).value), color: this.#params['smiio-ergodicLine'] },
-        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params['smiio-signalLine'] },
+        { value: formatPrice((ergodicData as LineData<Time>).value), color: this.#params['smiio-ergodicLine'].color },
+        { value: formatPrice((signalData as LineData<Time>).value), color: this.#params['smiio-signalLine'].color },
         { value: formatPrice(histValue), color: this.#params['smiio-hist'] }
       )
     }
