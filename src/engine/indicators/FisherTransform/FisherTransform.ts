@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -14,8 +14,81 @@ const FISHER_SCHEMA = {
   text: [],
   inputs: [{ type: 'number', key: 'fisher-transform-length', default: 9, min: 1, max: 9999 }],
   style: [
-    { type: 'color', key: 'fisher-transform-fisherColor', default: 'rgb(33 150 243)' },
-    { type: 'color', key: 'fisher-transform-triggerColor', default: 'rgb(255 109 0)' }
+    {
+      type: 'line',
+      key: 'fisher-transform-fisherLine',
+      default: {
+        color: 'rgb(33 150 243)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    {
+      type: 'line',
+      key: 'fisher-transform-triggerLine',
+      default: {
+        color: 'rgb(255 109 0)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'fisher-transform-level0', default: 1.5, min: -9999, max: 9999 },
+    {
+      type: 'line',
+      key: 'fisher-transform-level0Line',
+      default: {
+        color: '#E91E63',
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'fisher-transform-level1', default: 0.75, min: -9999, max: 9999 },
+    {
+      type: 'line',
+      key: 'fisher-transform-level1Line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'fisher-transform-level2', default: 0, min: -9999, max: 9999 },
+    {
+      type: 'line',
+      key: 'fisher-transform-level2Line',
+      default: {
+        color: '#E91E63',
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'fisher-transform-level3', default: -0.75, min: -9999, max: 9999 },
+    {
+      type: 'line',
+      key: 'fisher-transform-level3Line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'fisher-transform-level4', default: -1.5, min: -9999, max: 9999 },
+    {
+      type: 'line',
+      key: 'fisher-transform-level4Line',
+      default: {
+        color: '#E91E63',
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        lineType: LineType.Simple
+      }
+    }
   ]
 } as const satisfies StudySchema
 
@@ -40,22 +113,12 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
     this.#chart = chart
     this.#params = resolveStudyParams(FISHER_SCHEMA.inputs, FISHER_SCHEMA.style, FISHER_SCHEMA.text, options?.params)
 
-    const levelOpts = (color: string) => ({
-      color,
-      lineWidth: 1 as const,
-      lineStyle: LineStyle.Dashed,
-      crosshairMarkerVisible: false,
-      lastValueVisible: false,
-      priceLineVisible: false
-    })
-
     this.#series = {
       fisher: this.#chart.addSeries(
         LineSeries,
         {
           ...COMMON_SERIES_SETTINGS,
-          lineWidth: 1,
-          color: this.#params['fisher-transform-fisherColor'],
+          ...this.#params['fisher-transform-fisherLine'],
           priceLineVisible: false
         },
         this.paneIndex
@@ -64,19 +127,29 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
         LineSeries,
         {
           ...COMMON_SERIES_SETTINGS,
-          lineWidth: 1,
-          color: this.#params['fisher-transform-triggerColor'],
+          ...this.#params['fisher-transform-triggerLine'],
           priceLineVisible: false
         },
         this.paneIndex
       ),
       levels: [
-        [1.5, '#E91E63'],
-        [0.75, '#787B86'],
-        [0, '#E91E63'],
-        [-0.75, '#787B86'],
-        [-1.5, '#E91E63']
-      ].map(([, color]) => this.#chart.addSeries(LineSeries, levelOpts(color as string), this.paneIndex))
+        this.#params['fisher-transform-level0Line'],
+        this.#params['fisher-transform-level1Line'],
+        this.#params['fisher-transform-level2Line'],
+        this.#params['fisher-transform-level3Line'],
+        this.#params['fisher-transform-level4Line']
+      ].map((opts) =>
+        this.#chart.addSeries(
+          LineSeries,
+          {
+            ...opts,
+            crosshairMarkerVisible: false,
+            lastValueVisible: false,
+            priceLineVisible: false
+          },
+          this.paneIndex
+        )
+      )
     }
   }
 
@@ -90,16 +163,21 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(FISHER_SCHEMA.inputs, FISHER_SCHEMA.style, FISHER_SCHEMA.text, params)
-    this.#series.fisher.applyOptions({ color: this.#params['fisher-transform-fisherColor'] })
-    this.#series.trigger.applyOptions({ color: this.#params['fisher-transform-triggerColor'] })
+    this.#series.fisher.applyOptions(this.#params['fisher-transform-fisherLine'])
+    this.#series.trigger.applyOptions(this.#params['fisher-transform-triggerLine'])
+    this.#series.levels[0].applyOptions(this.#params['fisher-transform-level0Line'])
+    this.#series.levels[1].applyOptions(this.#params['fisher-transform-level1Line'])
+    this.#series.levels[2].applyOptions(this.#params['fisher-transform-level2Line'])
+    this.#series.levels[3].applyOptions(this.#params['fisher-transform-level3Line'])
+    this.#series.levels[4].applyOptions(this.#params['fisher-transform-level4Line'])
   }
 
   getLegend(seriesData: SeriesMap) {
     const legend: SeriesLegend = { key: 'Fisher Transform', paneIndex: this.paneIndex, data: [] }
     legend.data.push({ value: this.#params['fisher-transform-length'].toString(), color: 'rgb(140, 140, 140)' })
     const entries = [
-      [this.#series.fisher, this.#params['fisher-transform-fisherColor']],
-      [this.#series.trigger, this.#params['fisher-transform-triggerColor']]
+      [this.#series.fisher, this.#params['fisher-transform-fisherLine'].color],
+      [this.#series.trigger, this.#params['fisher-transform-triggerLine'].color]
     ] as const
     for (const [series, color] of entries) {
       const data = seriesData.get(series)
@@ -114,7 +192,15 @@ export class FisherTransform extends AbstractIndicator implements Indicator {
     const firstTime = data[0].time
     const lastTime = data[data.length - 1].time
 
-    for (const [i, level] of ([1.5, 0.75, 0, -0.75, -1.5] as const).entries()) {
+    const levels = [
+      this.#params['fisher-transform-level0'],
+      this.#params['fisher-transform-level1'],
+      this.#params['fisher-transform-level2'],
+      this.#params['fisher-transform-level3'],
+      this.#params['fisher-transform-level4']
+    ]
+
+    for (const [i, level] of levels.entries()) {
       this.#series.levels[i].setData([
         { time: firstTime, value: level },
         { time: lastTime, value: level }
