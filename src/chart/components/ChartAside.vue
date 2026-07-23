@@ -159,7 +159,7 @@ const removeStudies = () => {
   <FloatingDropdown :open="openedMenu?.el === 'remove'" placement="right-start" @update:open="openedMenu = undefined">
     <template #trigger="{ triggerRef }">
       <div :ref="triggerRef" class="mwc-ca-btn">
-        <div class="mwc-ca-btn-icon">
+        <div class="mwc-ca-btn-icon" @click="openedMenu = { type: 'action', el: 'remove' }">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
             <path
               fill="currentColor"
