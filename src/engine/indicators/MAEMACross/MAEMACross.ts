@@ -1,21 +1,15 @@
-import { LineSeries, createSeriesMarkers } from 'lightweight-charts'
+import { LineSeries } from 'lightweight-charts'
 import { formatPrice } from '@engine/helpers'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
+import { CrossMarker } from '@engine/primitives/CrossMarker/CrossMarker'
 import type { StudySchema, InferStudyValues, StudyParams } from '@engine/schema'
-import type {
-  IChartApi,
-  ISeriesApi,
-  ISeriesMarkersPluginApi,
-  LineData,
-  SeriesMarker,
-  SeriesType,
-  Time
-} from 'lightweight-charts'
+import type { IChartApi, ISeriesApi, LineData, SeriesType, Time } from 'lightweight-charts'
 import type { Indicator, IndicatorOptions, SeriesMap } from '@engine/indicators/types'
 import type { ChartBar, Datafeed } from '@engine/types'
 import type { SeriesLegend } from '@engine/series'
+import type { CrossPoint } from '@engine/primitives/CrossMarker/CrossMarkerRenderer'
 import { getSourceSeries, ta } from 'oakscriptjs'
 
 const MAEMA_SCHEMA = {
@@ -46,7 +40,7 @@ export class MAEMACross extends AbstractIndicator implements Indicator {
     ema: ISeriesApi<SeriesType>
   }
 
-  #markers: ISeriesMarkersPluginApi<Time>
+  #cross = new CrossMarker()
 
   constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
     super(datafeed, options.paneIndex)
@@ -66,7 +60,7 @@ export class MAEMACross extends AbstractIndicator implements Indicator {
       )
     }
 
-    this.#markers = createSeriesMarkers(this.#series.ma)
+    this.#series.ma.attachPrimitive(this.#cross)
   }
 
   getSchema() {
@@ -104,11 +98,10 @@ export class MAEMACross extends AbstractIndicator implements Indicator {
     const pp = this.#calculate(data)
     this.#series.ma.setData(pp.ma)
     this.#series.ema.setData(pp.ema)
-    this.#markers.setMarkers(pp.markers)
+    this.#cross.setPoints(pp.crosses)
   }
 
   protected removeSeries() {
-    this.#markers.detach()
     this.#chart.removeSeries(this.#series.ma)
     this.#chart.removeSeries(this.#series.ema)
   }
@@ -126,26 +119,23 @@ export class MAEMACross extends AbstractIndicator implements Indicator {
       value: value ?? NaN
     })
 
-    const markers: SeriesMarker<Time>[] = []
+    const crosses: CrossPoint[] = []
 
     for (let i = 0; i < bars.length; i++) {
       if (!crossArr[i]) continue
       const ma = maArr[i]
       if (ma == null) continue
-      markers.push({
+      crosses.push({
         time: bars[i].time,
-        position: 'atPriceMiddle',
-        shape: 'square',
-        color: this.#params['maema-cross'],
         price: ma,
-        size: 0.6
+        color: this.#params['maema-cross']
       })
     }
 
     return {
       ma: this.filter(maArr.map(toBar)),
       ema: this.filter(emaArr.map(toBar)),
-      markers
+      crosses
     }
   }
 }
