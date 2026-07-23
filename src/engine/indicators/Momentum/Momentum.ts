@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle } from 'lightweight-charts'
+import { LineSeries, LineStyle, LineType } from 'lightweight-charts'
 import { COMMON_SERIES_SETTINGS } from '@engine/series/constants'
 import { resolveStudyParams } from '@engine/schema'
 import { AbstractIndicator } from '@engine/indicators/AbstractIndicator'
@@ -11,8 +11,38 @@ import type { SeriesLegend } from '@engine/series'
 
 const MOM_SCHEMA = {
   text: [],
-  inputs: [{ type: 'number', key: 'mom-length', default: 10, min: 1, max: 9999 }],
-  style: [{ type: 'color', key: 'mom-color', default: 'rgb(126 87 194)' }]
+  inputs: [
+    { type: 'number', key: 'mom-length', default: 10, min: 1, max: 9999 },
+    {
+      type: 'select',
+      key: 'mom-source',
+      values: ['close', 'open', 'high', 'low'],
+      default: 'close'
+    }
+  ],
+  style: [
+    {
+      type: 'line',
+      key: 'mom-line',
+      default: {
+        color: 'rgb(126 87 194)',
+        lineWidth: 1,
+        lineStyle: LineStyle.Solid,
+        lineType: LineType.Simple
+      }
+    },
+    { type: 'number', key: 'mom-zero', default: 0, min: 0, max: 9999 },
+    {
+      type: 'line',
+      key: 'mom-zero-line',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
+    }
+  ]
 } as const satisfies StudySchema
 
 type MOMParams = InferStudyValues<typeof MOM_SCHEMA.inputs> &
@@ -38,15 +68,13 @@ export class Momentum extends AbstractIndicator implements Indicator {
     this.#series = {
       mom: this.#chart.addSeries(
         LineSeries,
-        { ...COMMON_SERIES_SETTINGS, lineWidth: 1, color: this.#params['mom-color'], priceLineVisible: false },
+        { ...COMMON_SERIES_SETTINGS, ...this.#params['mom-line'], priceLineVisible: false },
         this.paneIndex
       ),
       zeroLine: this.#chart.addSeries(
         LineSeries,
         {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
+          ...this.#params['mom-zero-line'],
           crosshairMarkerVisible: false,
           lastValueVisible: false,
           priceLineVisible: false
@@ -66,7 +94,8 @@ export class Momentum extends AbstractIndicator implements Indicator {
 
   setParams(params: StudyParams) {
     this.#params = resolveStudyParams(MOM_SCHEMA.inputs, MOM_SCHEMA.style, MOM_SCHEMA.text, params)
-    this.#series.mom.applyOptions({ color: this.#params['mom-color'] })
+    this.#series.mom.applyOptions(this.#params['mom-line'])
+    this.#series.zeroLine.applyOptions(this.#params['mom-zero-line'])
   }
 
   getLegend(seriesData: SeriesMap) {
@@ -74,8 +103,8 @@ export class Momentum extends AbstractIndicator implements Indicator {
     const data = seriesData.get(this.#series.mom)
     const value = data ? formatPrice((data as LineData<Time>).value) : '∅'
     legend.data.push({ value: this.#params['mom-length'].toString(), color: 'rgb(140, 140, 140)' })
-    legend.data.push({ value: 'close', color: 'rgb(140, 140, 140)' })
-    legend.data.push({ value, color: this.#params['mom-color'] })
+    legend.data.push({ value: this.#params['mom-source'], color: 'rgb(140, 140, 140)' })
+    legend.data.push({ value, color: this.#params['mom-line'].color })
     return legend
   }
 
@@ -85,8 +114,8 @@ export class Momentum extends AbstractIndicator implements Indicator {
     const lastTime = data[data.length - 1].time
 
     this.#series.zeroLine.setData([
-      { time: firstTime, value: 0 },
-      { time: lastTime, value: 0 }
+      { time: firstTime, value: this.#params['mom-zero'] },
+      { time: lastTime, value: this.#params['mom-zero'] }
     ])
     this.#series.mom.setData(momData)
   }
@@ -100,7 +129,7 @@ export class Momentum extends AbstractIndicator implements Indicator {
     const length = this.#params['mom-length']
     const mapped = bars.map((b, i) => ({
       time: b.time,
-      value: i < length ? NaN : b.close - bars[i - length].close
+      value: i < length ? NaN : b[this.#params['mom-source']] - bars[i - length][this.#params['mom-source']]
     }))
 
     return this.filter(mapped)
