@@ -17,6 +17,10 @@ const line = defineModel<LineParamValue>({
   }
 })
 
+const widths = [1, 2, 3, 4] as const
+const types = [0, 1, 2] as const
+const styles = [0, 1, 2, 3, 4] as const
+
 const setWidth = (width: LineParamValue['lineWidth']) => {
   line.value.lineWidth = width
 }
@@ -48,7 +52,7 @@ const setColor = (color: string) => {
       <div class="mwc-line-picker-container">
         <div class="mwc-line-picker-buttons mwc-line-picker-width-buttons">
           <div
-            v-for="i in [1, 2, 3, 4]"
+            v-for="i in widths"
             :key="i"
             class="mwc-line-btn"
             :class="{ active: line.lineWidth === i }"
@@ -58,7 +62,7 @@ const setColor = (color: string) => {
         </div>
         <div class="mwc-line-picker-buttons mwc-line-picker-style-buttons">
           <div
-            v-for="i in [0, 1, 2, 3, 4]"
+            v-for="i in styles"
             :key="i"
             class="mwc-line-btn"
             :class="{ active: line.lineStyle === i }"
@@ -69,7 +73,7 @@ const setColor = (color: string) => {
 
         <div class="mwc-line-picker-buttons mwc-line-picker-type-buttons">
           <div
-            v-for="i in [0, 1, 2]"
+            v-for="i in types"
             :key="i"
             class="mwc-line-btn"
             :class="{ active: line.lineType === i }"
