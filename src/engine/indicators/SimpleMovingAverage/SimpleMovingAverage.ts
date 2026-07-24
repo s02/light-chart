@@ -47,8 +47,8 @@ export class SimpleMovingAverage extends AbstractIndicator implements Indicator 
   #series: ISeriesApi<SeriesType>
   #params: SMAParams
 
-  constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
-    super(datafeed, options?.paneIndex)
+  constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
+    super(datafeed, options.paneIndex)
     this.#chart = chart
     this.#params = resolveStudyParams(SMA_SCHEMA.inputs, SMA_SCHEMA.style, SMA_SCHEMA.text, options?.params)
 

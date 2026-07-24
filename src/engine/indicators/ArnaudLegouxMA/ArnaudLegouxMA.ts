@@ -42,8 +42,8 @@ export class ArnaudLegouxMA extends AbstractIndicator implements Indicator {
   #series: ISeriesApi<SeriesType>
   #params: ALMAParams
 
-  constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
-    super(datafeed, options?.paneIndex)
+  constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
+    super(datafeed, options.paneIndex)
     this.#chart = chart
     this.#params = resolveStudyParams(ALMA_SCHEMA.inputs, ALMA_SCHEMA.style, ALMA_SCHEMA.text, options?.params)
 

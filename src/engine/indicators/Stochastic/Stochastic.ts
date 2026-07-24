@@ -217,6 +217,9 @@ export class Stochastic extends AbstractIndicator implements Indicator {
   protected removeSeries() {
     this.#chart.removeSeries(this.#series.k)
     this.#chart.removeSeries(this.#series.d)
+    this.#chart.removeSeries(this.#series.lowerLine)
+    this.#chart.removeSeries(this.#series.upperLine)
+    this.#chart.removeSeries(this.#series.fill)
   }
 
   #calculate(bars: ChartBar[]) {

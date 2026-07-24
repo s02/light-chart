@@ -1,15 +1,56 @@
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
 import type { IndicatorName } from '@engine/indicators'
 import type { Indicator, SeriesMap } from './types'
-import type { Datafeed, IndicatorOnPane, ChartSeriesLegend } from '@engine/types'
+import type { Datafeed, ChartSeriesLegend } from '@engine/types'
 import type { IChartApi } from 'lightweight-charts'
 import type { StudyParams } from '@engine/schema'
 
+type IndicatorPaneAPI = { getHTMLElement(): HTMLElement | null; paneIndex(): number }
 type IndicatorId = number
+export type IndicatorOnPane = { id: IndicatorId; indicator: Indicator; pane?: IndicatorPane }
+
+class IndicatorPane {
+  #pane: IndicatorPaneAPI
+  #container: HTMLElement
+
+  constructor(pane: IndicatorPaneAPI, container: HTMLElement) {
+    this.#pane = pane
+    this.#container = container
+  }
+
+  getHTMLElement(): Promise<HTMLElement> {
+    return new Promise((resolve, reject) => {
+      let iv: NodeJS.Timeout | null = null
+
+      const observer = new MutationObserver(() => {
+        const el = this.#pane.getHTMLElement()
+        const div = el ? el.querySelector('div') : null
+        if (div) {
+          observer.disconnect()
+          resolve(div)
+          if (iv) {
+            clearTimeout(iv)
+          }
+        }
+      })
+
+      observer.observe(this.#container, { childList: true, subtree: true })
+
+      iv = setTimeout(() => {
+        observer.disconnect()
+        reject(new Error('Pane element not found'))
+      }, 3000)
+    })
+  }
+
+  paneIndex() {
+    return this.#pane.paneIndex()
+  }
+}
 export class IndicatorsManager {
   #chart: IChartApi
   #datafeed: Datafeed
-  #indicators: { id: IndicatorId; indicator: Indicator }[] = []
+  #indicators: IndicatorOnPane[] = []
   #id = 10
 
   constructor(chart: IChartApi, datafeed: Datafeed) {
@@ -48,51 +89,36 @@ export class IndicatorsManager {
     return legends
   }
 
-  add(key: IndicatorName, params?: StudyParams): Promise<IndicatorOnPane> {
+  add(key: IndicatorName, params?: StudyParams): IndicatorOnPane {
     const script = this.#findScript(key)
 
     const pane = script.separatePane ? this.#chart.addPane() : this.#chart.panes()[0]
     const id = this.#id++
-
     const indicator = new script.indicator(this.#chart, this.#datafeed, { paneIndex: pane.paneIndex(), params })
+    const iop = script.separatePane
+      ? {
+          id,
+          indicator,
+          pane: new IndicatorPane(pane, this.#chart.chartElement())
+        }
+      : {
+          id,
+          indicator
+        }
 
-    this.#indicators.push({
-      id,
-      indicator
-    })
+    this.#indicators.push(iop)
 
     indicator.apply()
-
-    return new Promise((resolve, reject) => {
-      if (!script.separatePane) {
-        resolve({ id })
-      }
-      let iv: NodeJS.Timeout | null = null
-
-      const observer = new MutationObserver(() => {
-        const el = pane.getHTMLElement()
-        const div = el ? el.querySelector('div') : null
-        if (div) {
-          observer.disconnect()
-          resolve({ id, paneIndex: pane.paneIndex(), el: div })
-          if (iv) {
-            clearTimeout(iv)
-          }
-        }
-      })
-
-      observer.observe(this.#chart.chartElement(), { childList: true, subtree: true })
-
-      iv = setTimeout(() => {
-        observer.disconnect()
-        reject(new Error('Pane element not found'))
-      }, 3000)
-    })
+    return iop
   }
 
   getSchema(id: number) {
     const el = this.#findIndicator(id)
     return el.indicator.getSchema()
+  }
+
+  getAllIndicators() {
+    return this.#indicators
   }
 
   updateParams(id: number, params: StudyParams) {

@@ -5,21 +5,15 @@ import { seriesOverlayFactory } from '@engine/series'
 import { PluginManager } from '@engine/plugins'
 import { WhitespaceSeries } from './series/WhitespaceSeries'
 import { LegendsManager } from '@engine/legends/LegendsManager'
+import { DrawingsManager } from '@engine/drawings'
 import type { IChartApi, LogicalRange } from 'lightweight-charts'
-import type {
-  ChartExpiration,
-  ChartOption,
-  Datafeed,
-  IndicatorOnPane,
-  ChartSeriesLegend,
-  ResolutionId
-} from '@engine/types'
+import type { ChartExpiration, ChartOption, Datafeed, ChartSeriesLegend, ResolutionId } from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
 import type { IndicatorName } from '@engine/indicators'
-import { DrawingsManager } from '@engine/drawings'
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
 import type { StudyParams } from '@engine/schema'
 import type { Anchor } from '@engine/points'
+import type { IndicatorOnPane } from '@engine/indicators/IndicatorsManager'
 
 type Params = {
   datafeed: Datafeed
@@ -138,6 +132,10 @@ export class PlotEngine {
     const iop = await this.#indicatorsManager.add(key, params)
     this.#seriesOverlay.moveToTop()
     return iop
+  }
+
+  getAllIndicators() {
+    return this.#indicatorsManager.getAllIndicators()
   }
 
   removeIndicator(id: number) {

@@ -8,7 +8,7 @@ export type SeriesMap = Map<ISeriesApi<SeriesType, Time>, SeriesOverlayData>
 
 export type IndicatorOptions = {
   params?: StudyParams
-  paneIndex?: number
+  paneIndex: number
 }
 
 export type Indicator = {

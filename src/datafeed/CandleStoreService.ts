@@ -56,7 +56,7 @@ export class CandleStoreService {
     candleHelpers.updateWithQuote(lastCandle, quote)
     result.push(lastCandle)
 
-    if (ts !== lastCandle.time) {
+    if (ts > lastCandle.time) {
       const candle = candleHelpers.createFromQuote(quote)
       this.#data.push(candle)
       result.push(candle)

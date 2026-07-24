@@ -1,6 +1,5 @@
 import type { Datafeed, DatafeedDataCallbackFn } from '@engine/types'
 import type { LineData, Time, WhitespaceData } from 'lightweight-charts'
-
 export abstract class AbstractIndicator {
   #subscriptionId?: string
   #datafeed: Datafeed
@@ -9,7 +8,7 @@ export abstract class AbstractIndicator {
   }
   protected readonly paneIndex: number
 
-  constructor(datafeed: Datafeed, paneIndex = 0) {
+  constructor(datafeed: Datafeed, paneIndex: number) {
     this.#datafeed = datafeed
     this.paneIndex = paneIndex
   }

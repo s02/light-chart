@@ -4,11 +4,11 @@ import type { PlotEngine } from '@engine/PlotEngine'
 import type { ChartSeriesLegend } from '@engine/types'
 import { onUnmounted, ref } from 'vue'
 
-const props = defineProps<{ paneIndex: number; subscribeToLegends: PlotEngine['subscribeToLegends'] }>()
+const props = defineProps<{ indicatorId: number; subscribeToLegends: PlotEngine['subscribeToLegends'] }>()
 
 const paneLegends = ref<ChartSeriesLegend[]>([])
 const unsub = props.subscribeToLegends((legends) => {
-  paneLegends.value = legends.filter((legend) => legend.paneIndex === props.paneIndex)
+  paneLegends.value = legends.filter((legend) => legend.id === props.indicatorId)
 })
 
 onUnmounted(() => {

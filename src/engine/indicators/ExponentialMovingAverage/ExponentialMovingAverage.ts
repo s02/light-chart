@@ -73,8 +73,8 @@ export class ExponentialMovingAverage extends AbstractIndicator implements Indic
   }
   #params: EMAParams
 
-  constructor(chart: IChartApi, datafeed: Datafeed, options?: IndicatorOptions) {
-    super(datafeed, options?.paneIndex)
+  constructor(chart: IChartApi, datafeed: Datafeed, options: IndicatorOptions) {
+    super(datafeed, options.paneIndex)
     this.#chart = chart
     this.#params = resolveStudyParams(EMA_SCHEMA.inputs, EMA_SCHEMA.style, EMA_SCHEMA.text, options?.params)
 

@@ -50,6 +50,7 @@ import type { IChartApi, ISeriesApi, SeriesType, Time } from 'lightweight-charts
 import type { Datafeed } from '@engine/types'
 import type { StudyParams, StudySchema } from '@engine/schema'
 import type { SeriesLegend, SeriesOverlayData } from '@engine/series'
+import type { IndicatorOptions } from '@engine/indicators/types'
 
 type SeriesMap = Map<ISeriesApi<SeriesType, Time>, SeriesOverlayData>
 
@@ -64,11 +65,6 @@ type Indicator = {
     schema: StudySchema
     params: StudyParams
   }
-}
-
-type IndicatorOptions = {
-  params?: StudyParams
-  paneIndex?: number
 }
 
 export const INDICATOR_SCRIPTS = [
