@@ -4,6 +4,8 @@ import { geometry } from '../geometry'
 import { ArrowPaneView } from './ArrowPaneView'
 import type { IChartApi, Point } from 'lightweight-charts'
 import type { DrawingOptions } from '@engine/drawings/types'
+import { AxisHighlighterPaneView } from '@engine/drawings/AxisHighlighter/AxisHighlighterPaneView'
+import { AxisHighlighterLabelView } from '@engine/drawings/AxisHighlighter/AxisHighlighterLabelView'
 
 const ARROW_SCHEMA = {
   text: [],
@@ -24,6 +26,56 @@ export class Arrow extends BaseDrawing {
   constructor(chart: IChartApi, options?: DrawingOptions) {
     super(chart)
     this.#params = resolveStudyParams(ARROW_SCHEMA.inputs, ARROW_SCHEMA.style, ARROW_SCHEMA.text, options?.params)
+  }
+
+  priceAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: true })]
+    }
+
+    return []
+  }
+
+  timeAxisPaneViews() {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (viewport) {
+      return [new AxisHighlighterPaneView(viewport, this.anchors, { vertical: false })]
+    }
+
+    return []
+  }
+
+  priceAxisViews() {
+    return this.#axisLabelViews(true)
+  }
+
+  timeAxisViews() {
+    return this.#axisLabelViews(false)
+  }
+
+  #axisLabelViews(vertical: boolean) {
+    if (!this.anchorsVisible) {
+      return []
+    }
+
+    const viewport = this.getViewport()
+    if (!viewport || this.anchors.length < 2) {
+      return []
+    }
+
+    return [
+      new AxisHighlighterLabelView(viewport, this.anchors[0], { vertical }),
+      new AxisHighlighterLabelView(viewport, this.anchors[1], { vertical })
+    ]
   }
 
   override setParams(params: StudyParams) {
