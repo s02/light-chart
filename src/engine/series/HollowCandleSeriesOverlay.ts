@@ -63,7 +63,7 @@ export class HollowCandleSeriesOverlay extends AbstractSeriesOverlay {
 
   getLegend(bar: BarData<Time>) {
     const color = getBarColor(bar)
-
+    console.log(bar)
     return {
       key: 'candlestick-series',
       paneIndex: 0,

@@ -89,7 +89,7 @@ export class CandleStoreService {
       time: helpers.toZonedDate(candle.time, this.#timeZone)
     }))
 
-    if (this.#mergeStrategyName === 'continuous') {
+    if (this.#mergeStrategy() === 'continuous') {
       candleHelpers.smoothify(zonedCandles)
     }
 

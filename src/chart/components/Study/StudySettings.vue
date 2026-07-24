@@ -3,7 +3,6 @@ import { i18n } from '@chart/i18n'
 import CloseIcon from '@chart/components/CloseIcon.vue'
 import ChartTabs from '@chart/components/ChartTabs.vue'
 import { ref } from 'vue'
-import type { LineParamValue, SchemaKey, StudyParams, StudySchema } from '@engine/schema'
 import StudyColor from './StudyColor.vue'
 import StudyLineWidth from './StudyLineWidth.vue'
 import StudyLineStyle from './StudyLineStyle.vue'
@@ -13,6 +12,8 @@ import CCheckbox from '@chart/components/Controls/CCheckbox.vue'
 import CSelect from '@chart/components/Controls/CSelect.vue'
 import CButton from '@chart/components/Controls/CButton.vue'
 import StudyLine from '@chart/components/Study/StudyLine.vue'
+import type { LineParamValue, SchemaKey, StudyParams, StudySchema } from '@engine/schema'
+import { onKeyStroke } from '@vueuse/core'
 
 const emit = defineEmits<{
   (e: 'close', result?: StudyParams): void
@@ -42,10 +43,20 @@ const tab = ref(tabs[0])
 const setTab = (v: string) => {
   tab.value = v.replace('tab-', '') as SchemaKey
 }
+
+const inputRef = ref<HTMLInputElement | null>(null)
+
+onKeyStroke(
+  ['Backspace', 'Delete'],
+  (e) => {
+    e.stopPropagation()
+  },
+  { target: inputRef }
+)
 </script>
 
 <template>
-  <div class="mwc-studysett">
+  <div ref="inputRef" class="mwc-studysett">
     <div class="mwc-studysett-container">
       <div class="mwc-studysett-header">
         <p class="mwc-studysett-title">{{ i18n.translate(`study-${ikey}`) }}</p>
