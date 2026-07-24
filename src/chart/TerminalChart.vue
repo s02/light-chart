@@ -88,7 +88,7 @@ onUnmounted(() => {
     </div>
     <div class="mwc-chart-wrapper">
       <div class="mwc-chart-legends">
-        <ChartLegend :legends="mainPaneLegends" />
+        <ChartLegend :legends="mainPaneLegends" :prefix="assetSymbol.name" />
       </div>
       <StudyPanel class="mwc-chart-drawings" />
       <div ref="chartRef" class="mwc-chart-plot"></div>

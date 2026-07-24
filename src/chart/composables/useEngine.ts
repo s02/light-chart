@@ -48,8 +48,6 @@ function assertEngine(engine: PlotEngine | null): asserts engine {
 }
 
 let pe: PlotEngine | null = null
-let plotEl: HTMLElement
-let plotOptions: EngineOptions
 const rootEl = ref<string | null>(null)
 const unwatch: Array<() => void> = []
 const legendEls: HTMLElement[] = []
@@ -64,7 +62,6 @@ export const useEngineApi = () => {
 
   const register = (el: HTMLElement, options: EngineOptions) => {
     rootEl.value = options.rootEl
-    plotEl = el
 
     if (!options.resolutionId.value || !options.seriesId.value) {
       throw 'Resolution Id and Series Id are required for engine initialization'
