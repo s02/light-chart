@@ -25,7 +25,6 @@ export class ExpirationLinesPlugin implements ISeriesPrimitive<Time> {
   #lockLineView: LockLineView | null = null
   #closeLineView: CloseLineView | null = null
   #offsetLineView: OffsetLineView | null = null
-  #timeZone: string
 
   constructor(
     chart: IChartApi,
@@ -40,11 +39,11 @@ export class ExpirationLinesPlugin implements ISeriesPrimitive<Time> {
     this.#offset = offset
 
     if (this.#expiration && LOCK_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
-      this.#lockLineView = new LockLineView(this, this.#expiration.lock)
+      this.#lockLineView = new LockLineView(this, this.#expiration.lock, timeZone)
     }
 
     if (this.#expiration && CLOSE_ALLOWED_RESOLUTIONS.includes(resolutionId)) {
-      this.#closeLineView = new CloseLineView(this, this.#expiration.close)
+      this.#closeLineView = new CloseLineView(this, this.#expiration.close, timeZone)
     }
 
     if (typeof this.#offset !== 'undefined' && OFFSET_ALLOWED_RESOLUTIONS.includes(resolutionId)) {

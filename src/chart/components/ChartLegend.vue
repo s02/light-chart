@@ -5,7 +5,7 @@ import IndicatorLegendMenu from '@chart/components/IndicatorLegendMenu.vue'
 import { useEngineApi } from '@chart/composables/useEngine'
 import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 
-defineProps<{ legends: ChartSeriesLegend[]; prefix: string }>()
+defineProps<{ legends: ChartSeriesLegend[]; prefix?: string }>()
 
 const { removeIndicator, editIndicator } = useEngineApi()
 
@@ -38,7 +38,7 @@ const handleMenuAction = (name: string) => {
       @update:open="id = null">
       <template #trigger="{ triggerRef }">
         <div class="mwc-chart-legend" :class="legend.category">
-          <div v-if="legend.category === 'main'" class="mwc-legend-line">{{ prefix }}</div>
+          <div v-if="legend.category === 'main' && prefix" class="mwc-legend-line">{{ prefix }}</div>
           <div v-else class="mwc-chart-legend-line">
             <span class="mwc-chart-legend-label">{{ legend.key }}</span>
             <div :ref="triggerRef" class="mwc-chart-legend-menu" @click="id = legend.id">
