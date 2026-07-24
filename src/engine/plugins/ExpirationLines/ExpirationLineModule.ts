@@ -7,10 +7,12 @@ export class ExpirationLineModule extends BasePluginModule {
   #chart: IChartApi
   #expiration?: ChartExpiration
   #offset?: number
+  #timeZone: string
 
-  constructor(chart: IChartApi, resolutionId: ResolutionId) {
+  constructor(chart: IChartApi, resolutionId: ResolutionId, timeZone: string) {
     super(resolutionId)
     this.#chart = chart
+    this.#timeZone = timeZone
   }
 
   setExpiration(expiration?: ChartExpiration) {
@@ -30,6 +32,6 @@ export class ExpirationLineModule extends BasePluginModule {
   }
 
   createPlugins() {
-    return [new ExpirationLinesPlugin(this.#chart, this.#expiration, this.#offset, this.resolutionId)]
+    return [new ExpirationLinesPlugin(this.#chart, this.#expiration, this.#offset, this.resolutionId, this.#timeZone)]
   }
 }

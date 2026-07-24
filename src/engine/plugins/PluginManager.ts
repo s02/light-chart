@@ -7,15 +7,17 @@ import { ExpirationLineModule } from '@engine/plugins/ExpirationLines/Expiration
 
 export class PluginManager extends BasePluginModule {
   #chart: IChartApi
+  #timeZone: string
   readonly option: OptionModule
   readonly exp: ExpirationLineModule
 
-  constructor(chart: IChartApi, resolutionId: ResolutionId) {
+  constructor(chart: IChartApi, resolutionId: ResolutionId, timeZone: string) {
     super(resolutionId)
     this.#chart = chart
+    this.#timeZone = timeZone
 
     this.option = new OptionModule(this.#chart, this.resolutionId)
-    this.exp = new ExpirationLineModule(this.#chart, this.resolutionId)
+    this.exp = new ExpirationLineModule(this.#chart, this.resolutionId, this.#timeZone)
   }
 
   override attach(series: ISeriesApi<SeriesType>) {
@@ -37,6 +39,6 @@ export class PluginManager extends BasePluginModule {
   }
 
   createPlugins() {
-    return [new CloseBarCountdownPlugin(this.resolutionId)]
+    return [new CloseBarCountdownPlugin(this.resolutionId, this.#timeZone)]
   }
 }

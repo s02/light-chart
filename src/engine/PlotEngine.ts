@@ -18,6 +18,7 @@ import type { IndicatorOnPane } from '@engine/indicators/IndicatorsManager'
 type Params = {
   datafeed: Datafeed
   seriesId?: SeriesId
+  timeZone: string
 }
 
 type PlotEvent =
@@ -35,6 +36,7 @@ export class PlotEngine {
   #datafeed: Datafeed
   #seriesId: SeriesId
   #pluginManager: PluginManager
+  #timeZone: string
   #seriesOverlay: SeriesOverlay
   #indicatorsManager: IndicatorsManager
   #drawingsManager: DrawingsManager
@@ -46,13 +48,13 @@ export class PlotEngine {
     this.#chart = createChart(el, CHART_PARAMS)
     this.#datafeed = params.datafeed
     this.#seriesId = params.seriesId || 'candlestick'
+    this.#timeZone = params.timeZone
 
     this.#seriesOverlay = seriesOverlayFactory(this.#seriesId, this.#chart, this.#datafeed)
     this.#indicatorsManager = new IndicatorsManager(this.#chart, this.#datafeed)
     this.#drawingsManager = new DrawingsManager(this.#chart, this.#seriesOverlay.getSeries())
     this.#legendsManager = new LegendsManager(this.#chart, this.#seriesOverlay, this.#indicatorsManager)
-    this.#pluginManager = new PluginManager(this.#chart, this.#datafeed.getResolutionId())
-    this.#pluginManager.attach(this.#seriesOverlay.getSeries())
+    this.#pluginManager = this.#createPluginManager()
     this.#whitespace = new WhitespaceSeries(this.#chart, this.#datafeed)
 
     this.#chart.timeScale().subscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
@@ -92,6 +94,12 @@ export class PlotEngine {
     this.#subscribers.forEach((sub) => {
       sub({ type: 'seriesChanged', data: seriesId })
     })
+  }
+
+  setTimeZone(timeZone: string) {
+    this.#timeZone = timeZone
+    this.#pluginManager.detach()
+    this.#pluginManager = this.#createPluginManager()
   }
 
   async setDatafeed(datafeed: Datafeed) {
@@ -203,5 +211,11 @@ export class PlotEngine {
     const candlesCount = Math.round(diff / resolution.seconds)
 
     this.#datafeed.loadHistory({ minCandles: candlesCount })
+  }
+
+  #createPluginManager() {
+    const pm = new PluginManager(this.#chart, this.#datafeed.getResolutionId(), this.#timeZone)
+    pm.attach(this.#seriesOverlay.getSeries())
+    return pm
   }
 }

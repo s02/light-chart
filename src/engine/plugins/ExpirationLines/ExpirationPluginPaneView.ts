@@ -1,4 +1,4 @@
-import { getBarLogical } from '@engine/helpers'
+import { getBarLogical, toZonedDate } from '@engine/helpers'
 import { CloseLineRenderer, LockLineRenderer } from './ExpirationPluginRenderer'
 import type { ExpirationLinesPlugin } from './ExpirationLinesPlugin'
 import type { Coordinate, IPrimitivePaneRenderer, IPrimitivePaneView, UTCTimestamp } from 'lightweight-charts'
@@ -11,10 +11,12 @@ export class CloseLineView implements IPrimitivePaneView, PaneView {
   protected time: UTCTimestamp
   protected source: ExpirationLinesPlugin
   protected x: Coordinate | null = null
+  protected timeZone: string
 
-  constructor(source: ExpirationLinesPlugin, time: UTCTimestamp) {
+  constructor(source: ExpirationLinesPlugin, time: UTCTimestamp, timeZone: string) {
     this.source = source
     this.time = time
+    this.timeZone = timeZone
   }
 
   update() {
@@ -43,7 +45,7 @@ export class LockLineView extends CloseLineView {
   #timer: { diff: number; label: string } | null = null
 
   updateTimer() {
-    const now = Math.floor(Date.now() / 1000)
+    const now = toZonedDate(Date.now() / 1000, this.timeZone)
     const diff = Math.max(0, this.time - now)
     const m = Math.floor(diff / 60)
     const s = diff % 60

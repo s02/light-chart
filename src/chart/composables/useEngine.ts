@@ -48,6 +48,8 @@ function assertEngine(engine: PlotEngine | null): asserts engine {
 }
 
 let pe: PlotEngine | null = null
+let plotEl: HTMLElement
+let plotOptions: EngineOptions
 const rootEl = ref<string | null>(null)
 const unwatch: Array<() => void> = []
 const legendEls: HTMLElement[] = []
@@ -62,6 +64,7 @@ export const useEngineApi = () => {
 
   const register = (el: HTMLElement, options: EngineOptions) => {
     rootEl.value = options.rootEl
+    plotEl = el
 
     if (!options.resolutionId.value || !options.seriesId.value) {
       throw 'Resolution Id and Series Id are required for engine initialization'
@@ -73,7 +76,8 @@ export const useEngineApi = () => {
         options.resolutionId.value,
         options.timeZone.value
       ),
-      seriesId: options.seriesId.value
+      seriesId: options.seriesId.value,
+      timeZone: options.timeZone.value
     })
 
     if (options.options.value) {
@@ -101,6 +105,13 @@ export const useEngineApi = () => {
     )
 
     pe.subscribeToSelectDrawing(selectDrawing)
+
+    unwatch.push(
+      watch(options.timeZone, (next) => {
+        assertEngine(pe)
+        pe.setTimeZone(next)
+      })
+    )
 
     unwatch.push(
       watch(options.expiration, (next) => {

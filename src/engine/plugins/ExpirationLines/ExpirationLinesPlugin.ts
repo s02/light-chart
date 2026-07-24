@@ -25,12 +25,14 @@ export class ExpirationLinesPlugin implements ISeriesPrimitive<Time> {
   #lockLineView: LockLineView | null = null
   #closeLineView: CloseLineView | null = null
   #offsetLineView: OffsetLineView | null = null
+  #timeZone: string
 
   constructor(
     chart: IChartApi,
     expiration: ChartExpiration | undefined,
     offset: number | undefined,
-    resolutionId: ResolutionId
+    resolutionId: ResolutionId,
+    timeZone: string
   ) {
     this.#chart = chart
     this.#expiration = expiration

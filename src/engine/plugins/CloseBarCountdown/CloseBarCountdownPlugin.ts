@@ -9,14 +9,13 @@ import type {
   Time
 } from 'lightweight-charts'
 import type { ResolutionId } from '@engine/types'
-import { getBarColor, getBarPrice, getBarTime } from '@engine/helpers'
+import { getBarColor, getBarPrice, getBarTime, toZonedDate } from '@engine/helpers'
 
 const formatSeconds = (seconds: number) => {
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
   const s = seconds % 60
   const time = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
-
   return h > 0 ? `${h}:${time}` : time
 }
 
@@ -104,10 +103,12 @@ export class CloseBarCountdownPlugin implements ISeriesPrimitive<Time> {
   #timerInterval: NodeJS.Timeout | null = null
   #label = ''
   #axisView: CountdownAxisView
+  #timeZone: string
 
-  constructor(resolutionId: ResolutionId) {
+  constructor(resolutionId: ResolutionId, timeZone: string) {
     this.#resolutionId = resolutionId
     this.#axisView = new CountdownAxisView(this)
+    this.#timeZone = timeZone
   }
 
   attached({ series, requestUpdate }: SeriesAttachedParameter<Time>) {
@@ -143,7 +144,7 @@ export class CloseBarCountdownPlugin implements ISeriesPrimitive<Time> {
   }
 
   #updateTimer() {
-    if (!this.#series) {
+    if (!this.#series || RESOLUTION_SETTINGS[this.#resolutionId].seconds === 1) {
       return
     }
 
@@ -154,7 +155,7 @@ export class CloseBarCountdownPlugin implements ISeriesPrimitive<Time> {
     }
 
     const nextBarTime = lastBarTime + RESOLUTION_SETTINGS[this.#resolutionId].seconds
-    const now = Math.floor(Date.now() / 1000)
+    const now = toZonedDate(Date.now() / 1000, this.#timeZone)
     const diff = Math.max(0, nextBarTime - now)
     this.#label = formatSeconds(diff)
   }
