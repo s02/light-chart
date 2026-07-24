@@ -56,10 +56,6 @@
   }
 }
 
-.mwc-study-item-del {
-  display: none;
-}
-
 .mwc-study-item-name {
   font-size: 14px;
   line-height: 21px;
@@ -75,5 +71,6 @@
 }
 
 .mwc-study-list-empty {
-  padding: 6px 20px;
+  padding: 10px 20px 2px;
+  font-size: 14px;
 }
