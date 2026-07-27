@@ -31,12 +31,23 @@ export class HollowCandleSeriesOverlay extends AbstractSeriesOverlay {
     if (result.type === 'set') {
       const data = this.#model.setData(result.data).map((hwbar) => this.getColored(hwbar))
       this.series.setData(data)
+      this.#updatePriceLineColor(data.at(-1)?.borderColor)
     } else {
       result.data.forEach((bar) => {
         const hwbar = this.#model.update(bar)
-        this.series.update(this.getColored(hwbar))
+        const colored = this.getColored(hwbar)
+        this.series.update(colored)
+        this.#updatePriceLineColor(colored.borderColor)
       })
     }
+  }
+
+  #updatePriceLineColor(borderColor: string | undefined) {
+    if (!borderColor) {
+      return
+    }
+
+    this.series.applyOptions({ priceLineColor: borderColor })
   }
 
   private getColored(bar: HollowBar) {
@@ -62,8 +73,7 @@ export class HollowCandleSeriesOverlay extends AbstractSeriesOverlay {
   }
 
   getLegend(bar: BarData<Time>) {
-    const color = getBarColor(bar)
-    console.log(bar)
+    const color = getBarColor({ ...bar, color: undefined })
     return {
       key: 'candlestick-series',
       paneIndex: 0,

@@ -61,7 +61,8 @@ class CountdownAxisView implements ISeriesPrimitiveAxisView {
       this.#color = opts.color
     } else if (lastBar && 'open' in lastBar && 'close' in lastBar) {
       if ('color' in lastBar && lastBar.color) {
-        this.#color = lastBar.color === 'transparent' ? 'black' : lastBar.color
+        const color = getBarColor({ ...lastBar, color: undefined })
+        this.#color = lastBar.color === 'transparent' ? color : lastBar.color
       } else if ('upColor' in opts && 'downColor' in opts) {
         const color = getBarColor(lastBar as BarData<Time>)
         this.#color = color === CANDLE_COLORS.up ? opts.upColor : opts.downColor
