@@ -8,45 +8,56 @@ import ExpirationMenu from '@app/components/ExpirationMenu.vue'
 import { DatafeedFactory } from '@datafeed/DatafeedFactory'
 import { Transport } from '@app/transport'
 import TimezonesMenu from '@app/components/TimezonesMenu.vue'
-import { useState } from '@app/composables/useState'
 import type { Language } from '@chart/types'
+import { useChart, type ChartState } from '@app/composables/useChartState'
 
-const { state, setSeries, setResolution, setTimeZone, setLanguage } = useState()
-const { buyOption, options } = useTrading(toRef(() => state.value.assetSymbol.id))
+const props = defineProps<{ chartId: ChartState['id'] }>()
+
+const { chart, setResolution, setSeries, setLanguage, setTimeZone } = useChart(toRef(props, 'chartId'))
+
+const assetSymbolId = computed(() => chart.value.assetSymbol.id)
+
+const { buyOption } = useTrading(toRef(props, 'chartId'), assetSymbolId)
+
 const datafeedFactory = new DatafeedFactory(Transport.get().http, Transport.get().ws)
 
-useQuoteHandler(toRef(() => state.value.assetSymbol.id))
+useQuoteHandler(assetSymbolId)
 
-const chartOptions = computed(() =>
-  options.value.map((option) => ({
+const chartOptions = computed(() => {
+  const options = chart.value.options[assetSymbolId.value] || []
+
+  return options.map((option) => ({
     ...option,
-    createdAt: helpers.toZonedDate(option.createdAt, state.value.timeZone),
-    expirationDate: helpers.toZonedDate(option.expirationDate, state.value.timeZone),
+    createdAt: helpers.toZonedDate(option.createdAt, chart.value.timeZone),
+    expirationDate: helpers.toZonedDate(option.expirationDate, chart.value.timeZone),
     getSum() {
       return this.sum + '$'
     }
   }))
-)
+})
 
 const buy = (direction: 'up' | 'down') => {
-  const currentExp = state.value.currentExpiration
+  const currentExp = chart.value.currentExpiration
+
   if (!currentExp) {
     throw `Expiration is required when buying`
   }
-  buyOption(direction, currentExp.expiration)
+
+  buyOption(direction, currentExp)
 }
 
 const chartRoot = ref<HTMLElement | null>(null)
+
 const chartApp = createApp(() =>
   h(TerminalChart, {
     rootEl: '#teleport',
-    language: state.value.language,
+    language: chart.value.language,
     options: chartOptions.value,
-    expiration: state.value.currentExpiration?.chartExpiration,
-    assetSymbol: state.value.assetSymbol,
-    resolutionId: state.value.resolutionId,
-    seriesId: state.value.seriesId,
-    timeZone: state.value.timeZone,
+    expiration: chart.value.zonedCurrentExpiration,
+    assetSymbol: chart.value.assetSymbol,
+    resolutionId: chart.value.resolutionId,
+    seriesId: chart.value.seriesId,
+    timeZone: chart.value.timeZone,
     datafeedFactory,
     onSeriesChanged: setSeries,
     onResolutionChanged: setResolution
@@ -67,9 +78,9 @@ onUnmounted(() => {
     <div ref="chartRoot" class="terminal-chart"></div>
     <div class="terminal-aside">
       <div class="terminal-menus">
-        <ExpirationMenu />
-        <TimezonesMenu :model-value="state.timeZone" @update:model-value="setTimeZone($event!)" />
-        <select :value="state.language" @change="setLanguage(($event.target as HTMLSelectElement).value as Language)">
+        <ExpirationMenu :chart-id="chartId" />
+        <TimezonesMenu :model-value="chart.timeZone" @update:model-value="setTimeZone($event!)" />
+        <select :value="chart.language" @change="setLanguage(($event.target as HTMLSelectElement).value as Language)">
           <option value="ru">Русский</option>
           <option value="en">English</option>
         </select>

@@ -1,10 +1,10 @@
-import { computed, onUnmounted, reactive, toValue, watch } from 'vue'
+import { onUnmounted, reactive, toValue, watch } from 'vue'
 import { dateHelpers } from '@app/services/dateHelpers'
 import { Transport } from '@app/transport'
-import { useState } from '@app/composables/useState'
 import type { Ref } from 'vue'
 import type { Asset, OptionKind, Expiration } from '@app/types'
 import type { Quote } from '@datafeed/types'
+import { useChartState, type ChartState } from '@app/composables/useChartState'
 
 let id = 1
 
@@ -43,8 +43,8 @@ export const useQuoteHandler = (assetIdRef: Ref<Asset['id']>) => {
   )
 }
 
-export const useTrading = (assetIdRef: Ref<string>) => {
-  const { addOption, state } = useState()
+export const useTrading = (chartId: Ref<ChartState['id']>, assetIdRef: Ref<string>) => {
+  const { addOption } = useChartState()
 
   const buyOption = (kind: OptionKind, expiration: Expiration) => {
     const asset = toValue(assetIdRef)
@@ -53,7 +53,7 @@ export const useTrading = (assetIdRef: Ref<string>) => {
       return
     }
 
-    addOption({
+    addOption(chartId.value, {
       id: id++,
       asset,
       sum: 10,
@@ -65,34 +65,29 @@ export const useTrading = (assetIdRef: Ref<string>) => {
   }
 
   return {
-    buyOption,
-    options: computed(() => state.value.options[toValue(assetIdRef)] || [])
+    buyOption
   }
 }
 
 export const runOptionsWatcher = () => {
-  const { state } = useState()
+  const { charts } = useChartState()
 
   return watch(lastQuotes, (next) => {
     for (const [assetId, lastQuote] of Object.entries(next)) {
       const currentExpirationDate = dateHelpers.secondsToIso8601(lastQuote.timestamp)
-      if (!state.value.options[assetId]) {
-        continue
-      }
+      charts.value.forEach((chart) => {
+        if (chart.options[assetId]) {
+          const hasExpiredOptions = !!chart.options[assetId].find((opt) => opt.expirationDate <= currentExpirationDate)
 
-      const hasExpiredOptions = !!state.value.options[assetId].find(
-        (opt) => opt.expirationDate <= currentExpirationDate
-      )
+          if (hasExpiredOptions) {
+            chart.options[assetId] = chart.options[assetId].filter((opt) => opt.expirationDate > currentExpirationDate)
 
-      if (hasExpiredOptions) {
-        state.value.options[assetId] = state.value.options[assetId].filter(
-          (opt) => opt.expirationDate > currentExpirationDate
-        )
-
-        if (!state.value.options[assetId].length) {
-          delete state.value.options[assetId]
+            if (!chart.options[assetId].length) {
+              delete chart.options[assetId]
+            }
+          }
         }
-      }
+      })
     }
   })
 }

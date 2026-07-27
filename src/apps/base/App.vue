@@ -1,30 +1,15 @@
 <script setup lang="ts">
 import AppTerminal from '@app/components/AppTerminal.vue'
 import AssetButton from '@app/components/AssetButton.vue'
-import { ASSETS, PROFITABILITY } from '@app/constants'
 import { useExpirations } from '@app/composables/useExpirations'
-import { runStateWatcher, useState } from '@app/composables/useState'
+import { runStateWatcher } from '@app/composables/useChartState'
 import { runOptionsWatcher } from '@app/composables/useTrading'
+import { useChartState } from '@app/composables/useChartState'
 
 const { schedule: scheduleExpirationsUpdate } = useExpirations()
-const { state, setChart } = useState()
+const { charts, setChartActive } = useChartState()
+
 scheduleExpirationsUpdate()
-
-const assetMenu = [
-  {
-    asset: ASSETS[0],
-    profitability: PROFITABILITY.TURBO
-  },
-  {
-    asset: ASSETS[1],
-    profitability: PROFITABILITY.BINARY
-  }
-]
-
-const openChart = (el: (typeof assetMenu)[0]) => {
-  setChart(el.asset, el.profitability)
-}
-
 runOptionsWatcher()
 runStateWatcher()
 </script>
@@ -33,15 +18,15 @@ runStateWatcher()
   <div class="app">
     <div class="app-asset-menu">
       <AssetButton
-        v-for="el of assetMenu"
-        :key="el.asset.id"
-        :name="el.asset.name"
-        :active="el.asset.id === state.assetSymbol.id"
-        :profitability="el.profitability"
-        @click="openChart(el)" />
+        v-for="chart of charts"
+        :key="chart.id"
+        :name="chart.assetSymbol.name"
+        :active="chart.active"
+        :profitability="chart.profitability"
+        @click="setChartActive(chart.id)" />
     </div>
     <div class="app-terminal">
-      <AppTerminal />
+      <AppTerminal v-for="chart of charts" :key="chart.id" :chart-id="chart.id" />
     </div>
   </div>
 </template>
@@ -88,6 +73,8 @@ body {
 .app-terminal {
   flex-grow: 1;
   overflow: hidden;
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
 .app-asset-menu {

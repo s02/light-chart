@@ -1,7 +1,7 @@
 import { ASSETS, PROFITABILITY } from '@app/constants'
 import type { AssetSymbol, Language, ResolutionId, SeriesId } from '@chart/types'
 import type { Asset, ProfitabilityType, Option, Expiration } from '@app/types'
-import { computed, reactive } from 'vue'
+import { computed, reactive, toValue, watch, type MaybeRef } from 'vue'
 import { getActualExpiration, useExpirations } from '@app/composables/useExpirations'
 import { helpers } from '@chart/helpers'
 
@@ -18,32 +18,29 @@ export type ChartState = {
   expiration?: Expiration
 }
 
-const charts = reactive<ChartState[]>([
-  {
-    id: 'ch-1',
-    assetSymbol: ASSETS[0],
-    profitability: PROFITABILITY.TURBO,
-    active: true,
-    resolutionId: '5S',
-    seriesId: 'candlestick',
-    timeZone: 'Europe/Riga',
-    options: {},
-    language: 'en',
-    expiration: undefined
+const storage = {
+  save: (state: unknown) => {
+    localStorage.setItem('mwcx-state', JSON.stringify(state))
   },
-  {
-    id: 'ch-2',
-    assetSymbol: ASSETS[1],
-    profitability: PROFITABILITY.BINARY,
-    active: false,
-    resolutionId: '30',
-    seriesId: 'candlestick',
-    timeZone: 'Europe/London',
-    options: {},
-    language: 'en',
-    expiration: undefined
+  load: () => {
+    const item = localStorage.getItem('mwcx-state')
+    const saved = item ? JSON.parse(item) : [{}]
+    let id = 0
+    return saved.map((s: ChartState) => ({
+      id: s.id || `ch-${id++}`,
+      resolutionId: s.resolutionId || '5S',
+      seriesId: s.seriesId || 'candlestick',
+      assetSymbol: s.assetSymbol || ASSETS[0],
+      profitability: s.profitability || PROFITABILITY.TURBO,
+      timeZone: s.timeZone || 'Etc/Utc',
+      language: s.language || 'en',
+      options: s.options || {},
+      active: true
+    }))
   }
-])
+}
+
+const charts = reactive<ChartState[]>(storage.load())
 
 export const useChartState = () => {
   const { data: expirationList } = useExpirations()
@@ -79,6 +76,15 @@ export const useChartState = () => {
     chart!.expiration = expiration
   }
 
+  const addOption = (id: ChartState['id'], option: Option) => {
+    const chart = charts.find((chart) => chart.id === id)
+    if (!chart!.options[option.asset]) {
+      chart!.options[option.asset] = []
+    }
+
+    chart!.options[option.asset] = [...chart!.options[option.asset], option]
+  }
+
   return {
     setExpiration,
     setSeries,
@@ -86,6 +92,7 @@ export const useChartState = () => {
     setChartActive,
     setTimeZone,
     setLanguage,
+    addOption,
     charts: computed(() =>
       charts.map((chart) => {
         const expirations = expirationList.value.filter((exp) => exp.type === chart.profitability)
@@ -107,3 +114,28 @@ export const useChartState = () => {
     )
   }
 }
+
+export const useChart = (chartId: MaybeRef<ChartState['id']>) => {
+  const { charts, setSeries, setResolution, setLanguage, setTimeZone, setExpiration } = useChartState()
+
+  const chart = computed(() => {
+    const c = charts.value.find((ch) => ch.id === toValue(chartId))
+
+    if (!c) {
+      throw new Error(`Chart with id ${chartId} not found`)
+    }
+
+    return c
+  })
+
+  return {
+    chart,
+    setSeries: (seriesId: SeriesId) => setSeries(toValue(chartId), seriesId),
+    setResolution: (resolutionId: ResolutionId) => setResolution(toValue(chartId), resolutionId),
+    setLanguage: (language: Language) => setLanguage(toValue(chartId), language),
+    setTimeZone: (tz: string) => setTimeZone(toValue(chartId), tz),
+    setExpiration: (exp: Expiration) => setExpiration(toValue(chartId), exp)
+  }
+}
+
+export const runStateWatcher = () => watch(charts, storage.save)

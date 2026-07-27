@@ -5,7 +5,7 @@ import ChartAside from '@chart/components/ChartAside.vue'
 import ModalContainer from '@chart/ModalContainer.vue'
 import ChartLegend from '@chart/components/ChartLegend.vue'
 import StudyPanel from '@chart/components/StudyPanel/StudyPanel.vue'
-import { useEngineApi } from '@chart/composables/useEngine'
+import { provideEngineApi } from '@chart/composables/useEngine'
 import type { AssetSymbol, ChartExpiration, ChartOption, ResolutionId, SeriesId } from '@engine/types'
 import type { DatafeedFactory, Language } from '@chart/types'
 import HintsContainer from '@chart/HintsContainer.vue'
@@ -39,7 +39,7 @@ watch(
 
 const chartRef = ref<HTMLElement | null>(null)
 const mainPaneLegends = computed(() => legends.value.filter((legend) => legend.paneIndex === 0))
-const { register, unregister, legends } = useEngineApi()
+const { register, unregister, legends } = provideEngineApi()
 
 onMounted(async () => {
   if (!chartRef.value) {

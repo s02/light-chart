@@ -1,4 +1,4 @@
-import { shallowRef, type Component } from 'vue'
+import { inject, provide, shallowRef, type Component, type InjectionKey, type ShallowRef } from 'vue'
 
 type ComponentProps = Record<string, unknown>
 
@@ -14,30 +14,33 @@ type ModalState = {
   props?: ComponentProps
 }
 
-const queue: ModalState[] = []
-const current = shallowRef<ModalState | null>(null)
-
-export const useModalState = () => {
-  return {
-    current
-  }
+type ModalStore = {
+  queue: ModalState[]
+  current: ShallowRef<ModalState | null>
 }
 
-export const useModal = () => {
+const ModalStoreKey: InjectionKey<ModalStore> = Symbol('modal-store')
+
+const createModalStore = (): ModalStore => ({
+  queue: [],
+  current: shallowRef(null)
+})
+
+const createModalApi = (store: ModalStore) => {
   const next = () => {
-    if (!current.value) {
-      current.value = queue.shift() ?? null
+    if (!store.current.value) {
+      store.current.value = store.queue.shift() ?? null
     }
   }
 
   const close = () => {
-    current.value = null
+    store.current.value = null
     next()
   }
 
   const open = <T extends undefined extends T ? unknown : never>(component: Component, options?: ModalOptions) => {
     return new Promise<T>((resolve) => {
-      queue.push({
+      store.queue.push({
         component,
         props: options?.props,
         result: {
@@ -52,4 +55,25 @@ export const useModal = () => {
     open,
     close
   }
+}
+
+const useModalStore = (): ModalStore => {
+  const store = inject(ModalStoreKey, null)
+  if (!store) {
+    throw new Error('useModal/useModalState must be used within a TerminalChart instance')
+  }
+  return store
+}
+
+export const provideModal = () => {
+  const store = createModalStore()
+  provide(ModalStoreKey, store)
+  return createModalApi(store)
+}
+
+export const useModal = () => createModalApi(useModalStore())
+
+export const useModalState = () => {
+  const { current } = useModalStore()
+  return { current }
 }

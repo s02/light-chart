@@ -1,19 +1,29 @@
-import { ref } from 'vue'
+import { inject, provide, ref, type InjectionKey, type Ref } from 'vue'
 
-const current = ref<string | undefined>()
+const HintsStateKey: InjectionKey<Ref<string | undefined>> = Symbol('hints-state')
 
-export const useHints = () => {
-  const show = (text: string) => {
+const createHintsApi = (current: Ref<string | undefined>) => ({
+  show: (text: string) => {
     current.value = text
-  }
-
-  const hide = () => {
+  },
+  hide: () => {
     current.value = undefined
-  }
+  },
+  current
+})
 
-  return {
-    show,
-    hide,
-    current
+const useHintsState = (): Ref<string | undefined> => {
+  const current = inject(HintsStateKey, null)
+  if (!current) {
+    throw new Error('useHints must be used within a TerminalChart instance')
   }
+  return current
 }
+
+export const provideHints = () => {
+  const current = ref<string | undefined>()
+  provide(HintsStateKey, current)
+  return createHintsApi(current)
+}
+
+export const useHints = () => createHintsApi(useHintsState())

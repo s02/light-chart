@@ -1,27 +1,34 @@
 <script setup lang="ts">
-import { useExpirations } from '@app/composables/useExpirations'
-import { useState } from '@app/composables/useState'
+import { useChart, type ChartState } from '@app/composables/useChartState'
 import type { Expiration } from '@app/types'
+import { toRef } from 'vue'
 
-const { format: formatExp } = useExpirations()
-const { state, setExpiration } = useState()
+const props = defineProps<{ chartId: ChartState['id'] }>()
+const { chart, setExpiration } = useChart(toRef(props, 'chartId'))
 
 const compare = (exp1: Expiration, exp2: Expiration) => {
   return exp1.type === exp2.type && exp1.close === exp2.close && exp1.lock === exp2.lock
 }
 
 const step = (v: number) => {
-  const currentExpiration = state.value.currentExpiration
-  const expirations = state.value.expirations
+  const currentExpiration = chart.value.currentExpiration
+  const expirations = chart.value.expirations
   if (!currentExpiration) {
     return
   }
-  const ind = expirations.findIndex((exp) => compare(exp, currentExpiration.expiration))
+  const ind = expirations.findIndex((exp) => compare(exp, currentExpiration))
   if (ind + v < 0 || ind + v >= expirations.length) {
     return
   }
 
   setExpiration(expirations[ind + v])
+}
+
+const format = (time: number) => {
+  const date = new Date(time)
+  const h = date.getUTCHours().toString().padStart(2, '0')
+  const m = date.getUTCMinutes().toString().padStart(2, '0')
+  return `${h}:${m}`
 }
 </script>
 
@@ -41,7 +48,7 @@ const step = (v: number) => {
             </g>
           </svg>
         </div>
-        <span v-if="state.currentExpiration">{{ formatExp(state.currentExpiration.expiration.close) }}</span>
+        <span v-if="chart.zonedCurrentExpiration">{{ format(chart.zonedCurrentExpiration.close * 1000) }}</span>
         <span v-else>...</span>
       </div>
     </div>
