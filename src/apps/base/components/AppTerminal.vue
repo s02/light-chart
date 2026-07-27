@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue'
+import { computed, createApp, h, onMounted, onUnmounted, ref, toRef } from 'vue'
 import TerminalChart from '@chart/TerminalChart.vue'
 import { useQuoteHandler, useTrading } from '@app/composables/useTrading'
 import { helpers } from '@chart/helpers'
@@ -35,26 +35,36 @@ const buy = (direction: 'up' | 'down') => {
   }
   buyOption(direction, currentExp.expiration)
 }
+
+const chartRoot = ref<HTMLElement | null>(null)
+const chartApp = createApp(() =>
+  h(TerminalChart, {
+    rootEl: '#teleport',
+    language: state.value.language,
+    options: chartOptions.value,
+    expiration: state.value.currentExpiration?.chartExpiration,
+    assetSymbol: state.value.assetSymbol,
+    resolutionId: state.value.resolutionId,
+    seriesId: state.value.seriesId,
+    timeZone: state.value.timeZone,
+    datafeedFactory,
+    onSeriesChanged: setSeries,
+    onResolutionChanged: setResolution
+  })
+)
+
+onMounted(() => {
+  chartApp.mount(chartRoot.value!)
+})
+
+onUnmounted(() => {
+  chartApp.unmount()
+})
 </script>
 
 <template>
   <div class="terminal">
-    <div class="terminal-chart">
-      <TerminalChart
-        root-el="#teleport"
-        :language="state.language"
-        :options="chartOptions"
-        :expiration="state.currentExpiration?.chartExpiration"
-        :asset-symbol="state.assetSymbol"
-        :default-config="{
-          resolutionId: state.resolutionId,
-          seriesId: state.seriesId
-        }"
-        :time-zone="state.timeZone"
-        :datafeed-factory="datafeedFactory"
-        @series-changed="setSeries"
-        @resolution-changed="setResolution" />
-    </div>
+    <div ref="chartRoot" class="terminal-chart"></div>
     <div class="terminal-aside">
       <div class="terminal-menus">
         <ExpirationMenu />

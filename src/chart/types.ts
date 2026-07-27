@@ -1,12 +1,7 @@
-import type { AssetSymbol, Datafeed, ResolutionId, SeriesId } from '@engine/types'
+import type { AssetSymbol, Datafeed, ResolutionId } from '@engine/types'
 
 export type DatafeedFactory = {
   create: (assetSymbol: AssetSymbol, resolutionId: ResolutionId, timeZone: string) => Datafeed
-}
-
-export type TerminalChartConfig = {
-  resolutionId: ResolutionId
-  seriesId: SeriesId
 }
 
 export type Language = 'ru' | 'en'

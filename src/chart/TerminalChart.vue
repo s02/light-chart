@@ -5,17 +5,18 @@ import ChartAside from '@chart/components/ChartAside.vue'
 import ModalContainer from '@chart/ModalContainer.vue'
 import ChartLegend from '@chart/components/ChartLegend.vue'
 import StudyPanel from '@chart/components/StudyPanel/StudyPanel.vue'
-import { useChart } from '@chart/useChart'
 import { useEngineApi } from '@chart/composables/useEngine'
 import type { AssetSymbol, ChartExpiration, ChartOption, ResolutionId, SeriesId } from '@engine/types'
-import type { DatafeedFactory, Language, TerminalChartConfig } from '@chart/types'
+import type { DatafeedFactory, Language } from '@chart/types'
 import HintsContainer from '@chart/HintsContainer.vue'
+import { i18n } from '@chart/i18n'
 
 const props = defineProps<{
   assetSymbol: AssetSymbol
   timeZone: string
   datafeedFactory: DatafeedFactory
-  defaultConfig: TerminalChartConfig
+  seriesId: SeriesId
+  resolutionId: ResolutionId
   options?: ChartOption[]
   expiration?: ChartExpiration
   expirationOffset?: number
@@ -28,16 +29,11 @@ const emit = defineEmits<{
   (e: 'seriesChanged', seriesId: SeriesId): void
 }>()
 
-const { state } = useChart()
 const isReady = ref(false)
 
-state.resolutionId = props.defaultConfig.resolutionId
-state.seriesId = props.defaultConfig.seriesId
 watch(
   () => props.language,
-  (language) => {
-    state.language = language
-  },
+  (language) => i18n.setLanguage(language),
   { immediate: true }
 )
 
@@ -51,8 +47,8 @@ onMounted(async () => {
   }
 
   await register(chartRef.value, {
-    seriesId: toRef(state, 'seriesId'),
-    resolutionId: toRef(state, 'resolutionId'),
+    seriesId: toRef(props, 'seriesId'),
+    resolutionId: toRef(props, 'resolutionId'),
     timeZone: toRef(props, 'timeZone'),
     options: toRef(props, 'options'),
     expiration: toRef(props, 'expiration'),
@@ -81,7 +77,11 @@ onUnmounted(() => {
   <div class="mwc-chart">
     <div v-if="!isReady" class="mwc-chart-loader"></div>
     <div class="mwc-chart-header">
-      <ChartHeader />
+      <ChartHeader
+        :resolution-id="resolutionId"
+        :series-id="seriesId"
+        @resolution-changed="emit('resolutionChanged', $event)"
+        @series-changed="emit('seriesChanged', $event)" />
     </div>
     <div class="mwc-chart-aside">
       <ChartAside />

@@ -7,7 +7,7 @@ import { WhitespaceSeries } from './series/WhitespaceSeries'
 import { LegendsManager } from '@engine/legends/LegendsManager'
 import { DrawingsManager } from '@engine/drawings'
 import type { IChartApi, LogicalRange } from 'lightweight-charts'
-import type { ChartExpiration, ChartOption, Datafeed, ChartSeriesLegend, ResolutionId } from '@engine/types'
+import type { ChartExpiration, ChartOption, Datafeed, ChartSeriesLegend } from '@engine/types'
 import type { SeriesId, SeriesOverlay } from '@engine/series'
 import type { IndicatorName } from '@engine/indicators'
 import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawings/types'
@@ -21,16 +21,6 @@ type Params = {
   timeZone: string
 }
 
-type PlotEvent =
-  | {
-      type: 'resolutionChanged'
-      data: ResolutionId
-    }
-  | {
-      type: 'seriesChanged'
-      data: SeriesId
-    }
-
 export class PlotEngine {
   #chart: IChartApi
   #datafeed: Datafeed
@@ -42,7 +32,6 @@ export class PlotEngine {
   #drawingsManager: DrawingsManager
   #legendsManager: LegendsManager
   #whitespace: WhitespaceSeries
-  #subscribers: Array<(event: PlotEvent) => void> = []
 
   constructor(el: HTMLElement, params: Params) {
     this.#chart = createChart(el, CHART_PARAMS)
@@ -59,14 +48,6 @@ export class PlotEngine {
 
     this.#chart.timeScale().subscribeVisibleLogicalRangeChange(this.#rangeChangeHandler)
     console.log(`%c[Plot Engine: started]`, 'background: #90ac12; color:#fff')
-  }
-
-  subscribe(cb: (event: PlotEvent) => void) {
-    this.#subscribers.push(cb)
-  }
-
-  unsubscribe(cb: (event: PlotEvent) => void) {
-    this.#subscribers = this.#subscribers.filter((sub) => sub !== cb)
   }
 
   get ready() {
@@ -90,10 +71,6 @@ export class PlotEngine {
     this.#pluginManager.setSeries(series.getSeries())
     this.#drawingsManager.setSeries(series.getSeries())
     this.#legendsManager.setSeriesOverlay(series)
-
-    this.#subscribers.forEach((sub) => {
-      sub({ type: 'seriesChanged', data: seriesId })
-    })
   }
 
   setTimeZone(timeZone: string) {
@@ -110,10 +87,6 @@ export class PlotEngine {
     this.#indicatorsManager.setDatafeed(datafeed)
     this.#pluginManager.setResolution(datafeed.getResolutionId())
     this.#whitespace.setDatafeed(datafeed)
-
-    this.#subscribers.forEach((sub) => {
-      sub({ type: 'resolutionChanged', data: datafeed.getResolutionId() })
-    })
   }
 
   setOptions(options: ChartOption[]) {

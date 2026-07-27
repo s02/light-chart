@@ -84,17 +84,6 @@ export const useEngineApi = () => {
     pe.setExpiration(options.expiration.value)
     pe.setExpirationOffset(options.expirationOffset.value)
 
-    const plotEventsHandler = (ev: Parameters<Parameters<PlotEngine['subscribe']>[0]>[0]) => {
-      if (ev.type === 'resolutionChanged') {
-        options.onResolutionChanged(ev.data)
-      } else if (ev.type === 'seriesChanged') {
-        options.onSeriesChanged(ev.data)
-      }
-    }
-
-    pe.subscribe(plotEventsHandler)
-    unwatch.push(() => pe?.unsubscribe(plotEventsHandler))
-
     unwatch.push(
       pe.subscribeToLegends((l) => {
         legends.value = l

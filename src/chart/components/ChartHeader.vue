@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useChart } from '@chart/useChart'
 import { RESOLUTION_SETTINGS } from '@engine/constants'
 import { ref } from 'vue'
 import ResolutionMenu from '@chart/components/ResolutionMenu.vue'
@@ -11,19 +10,25 @@ import FloatingDropdown from '@chart/components/FloatingDropdown.vue'
 import type { ResolutionId, SeriesId } from '@engine/types'
 import { i18n } from '@chart/i18n'
 
-const { state } = useChart()
+const emit = defineEmits<{
+  (e: 'resolutionChanged', resolution: ResolutionId): void
+  (e: 'seriesChanged', seriesId: SeriesId): void
+}>()
+
+defineProps<{ resolutionId: ResolutionId; seriesId: SeriesId }>()
+
 const { openScriptList } = useIndicators()
 
 const isResolutionMenuOpened = ref(false)
 const isSeriesMenuOpened = ref(false)
 
 const setResolutionId = (resolutionId: ResolutionId) => {
-  state.resolutionId = resolutionId
+  emit('resolutionChanged', resolutionId)
   isResolutionMenuOpened.value = false
 }
 
 const setSeriesId = (seriesId: SeriesId) => {
-  state.seriesId = seriesId
+  emit('seriesChanged', seriesId)
   isSeriesMenuOpened.value = false
 }
 </script>
@@ -34,29 +39,25 @@ const setSeriesId = (seriesId: SeriesId) => {
       <FloatingDropdown :open="isResolutionMenuOpened" @update:open="isResolutionMenuOpened = false">
         <template #trigger="{ triggerRef }">
           <button
-            v-if="state.resolutionId"
+            v-if="resolutionId"
             :ref="triggerRef"
             class="mwc-chart-header-btn"
             @click="isResolutionMenuOpened = true">
-            {{ RESOLUTION_SETTINGS[state.resolutionId].name }}
+            {{ RESOLUTION_SETTINGS[resolutionId].name }}
           </button>
         </template>
-        <ResolutionMenu v-if="state.resolutionId" :active="state.resolutionId" @selected="setResolutionId" />
+        <ResolutionMenu v-if="resolutionId" :active="resolutionId" @selected="setResolutionId" />
       </FloatingDropdown>
 
       <div class="mwc-chart-header-separator"></div>
 
       <FloatingDropdown :open="isSeriesMenuOpened" @update:open="isSeriesMenuOpened = false">
         <template #trigger="{ triggerRef }">
-          <button
-            v-if="state.seriesId"
-            :ref="triggerRef"
-            class="mwc-chart-header-btn"
-            @click="isSeriesMenuOpened = true">
-            <SeriesIcon :series-id="state.seriesId" />
+          <button v-if="seriesId" :ref="triggerRef" class="mwc-chart-header-btn" @click="isSeriesMenuOpened = true">
+            <SeriesIcon :series-id="seriesId" />
           </button>
         </template>
-        <SeriesMenu v-if="state.seriesId" :active="state.seriesId" @selected="setSeriesId" />
+        <SeriesMenu v-if="seriesId" :active="seriesId" @selected="setSeriesId" />
       </FloatingDropdown>
 
       <div class="mwc-chart-header-separator"></div>

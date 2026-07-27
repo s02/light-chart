@@ -1,18 +1,20 @@
-import { useChart } from '@chart/useChart'
 import en from './locales/locale-en.json'
 import ru from './locales/locale-ru.json'
 import { computed } from 'vue'
+import { ref } from 'vue'
+import type { Language } from '@chart/types'
 
 const dicts = {
   en,
   ru
 }
 
+const language = ref<Language>('en')
+
 const translate = (key: string) => {
-  const { state } = useChart()
   const prefixedKey = `$mwc@${key}`
 
-  const dict = dicts[state.language] as Record<string, string>
+  const dict = dicts[language.value] as Record<string, string>
 
   return computed(() => {
     if (dict[prefixedKey]) {
@@ -23,6 +25,11 @@ const translate = (key: string) => {
   })
 }
 
+const setLanguage = (lang: Language) => {
+  language.value = lang
+}
+
 export const i18n = {
+  setLanguage,
   translate
 }
