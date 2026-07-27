@@ -54,15 +54,8 @@ onMounted(async () => {
     expiration: toRef(props, 'expiration'),
     expirationOffset: toRef(props, 'expirationOffset'),
     assetSymbol: toRef(props, 'assetSymbol'),
-
     datafeedFactory: props.datafeedFactory,
-    rootEl: props.rootEl,
-    onResolutionChanged: (resolution: ResolutionId) => {
-      emit('resolutionChanged', resolution)
-    },
-    onSeriesChanged: (seriesId: SeriesId) => {
-      emit('seriesChanged', seriesId)
-    }
+    rootEl: props.rootEl
   })
 
   isReady.value = true

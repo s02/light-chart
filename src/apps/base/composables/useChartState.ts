@@ -18,25 +18,38 @@ export type ChartState = {
   expiration?: Expiration
 }
 
+const defaults: ChartState[] = [
+  {
+    id: 'ch-1',
+    resolutionId: '5S',
+    seriesId: 'candlestick',
+    assetSymbol: ASSETS[0],
+    profitability: PROFITABILITY.TURBO,
+    timeZone: 'Etc/UTC',
+    language: 'en',
+    options: {},
+    active: true
+  },
+  {
+    id: 'ch-2',
+    resolutionId: '5S',
+    seriesId: 'candlestick',
+    assetSymbol: ASSETS[0],
+    profitability: PROFITABILITY.BINARY,
+    timeZone: 'Europe/London',
+    language: 'en',
+    options: {},
+    active: false
+  }
+]
+
 const storage = {
   save: (state: unknown) => {
     localStorage.setItem('mwcx-state', JSON.stringify(state))
   },
   load: () => {
     const item = localStorage.getItem('mwcx-state')
-    const saved = item ? JSON.parse(item) : [{}]
-    let id = 0
-    return saved.map((s: ChartState) => ({
-      id: s.id || `ch-${id++}`,
-      resolutionId: s.resolutionId || '5S',
-      seriesId: s.seriesId || 'candlestick',
-      assetSymbol: s.assetSymbol || ASSETS[0],
-      profitability: s.profitability || PROFITABILITY.TURBO,
-      timeZone: s.timeZone || 'Etc/Utc',
-      language: s.language || 'en',
-      options: s.options || {},
-      active: true
-    }))
+    return item ? JSON.parse(item) : defaults
   }
 }
 

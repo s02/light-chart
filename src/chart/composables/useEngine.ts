@@ -31,8 +31,6 @@ type EngineOptions = {
   timeZone: Ref<string>
   datafeedFactory: DatafeedFactory
   rootEl: string
-  onResolutionChanged(resolutionId: ResolutionId): void
-  onSeriesChanged(seriesId: SeriesId): void
 }
 
 type EngineState = {
