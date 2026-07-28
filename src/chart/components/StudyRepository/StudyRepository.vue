@@ -45,7 +45,7 @@ const openLayoutList = () => {
 <template>
   <div class="mwc-study-r">
     <CButton type="transparent" @click="openLayoutName">{{ i18n.translate('menu-save-layout') }}</CButton>
-    <FloatingDropdown :open="isOpened" @update:open="isOpened = false">
+    <FloatingDropdown :open="isOpened" placement="bottom-end" @update:open="isOpened = false">
       <template #trigger="{ triggerRef }">
         <CToggleButton :ref="triggerRef" :is-opened="isOpened" class="mwc-study-r-toggle" @click="isOpened = true" />
       </template>
