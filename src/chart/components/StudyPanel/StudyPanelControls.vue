@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onClickOutside, onKeyStroke, useDraggable } from '@vueuse/core'
-import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { onClickOutside, onKeyStroke } from '@vueuse/core'
+import { computed, onUnmounted, ref, useTemplateRef } from 'vue'
 import PropLineColor from '@chart/components/StudyPanel/PropLineColor.vue'
 import PropFontSize from '@chart/components/StudyPanel/PropFontSize.vue'
 import PropLineWidth from '@chart/components/StudyPanel/PropLineWidth.vue'
@@ -45,31 +45,13 @@ const hasSettings =
 const dwsRef = useTemplateRef<HTMLDivElement>('dws')
 const dragHandleRef = useTemplateRef<HTMLDivElement>('dragHandle')
 
+defineExpose({ dragHandleRef })
+
 onClickOutside(dwsRef, () => {
   if (!isSettingsOpened.value && !isPanelMenuOpened.value) {
     editSettings.value = null
     selectDrawing(null)
   }
-})
-
-const {
-  x: dragX,
-  y: dragY,
-  style: dragStyle
-} = useDraggable(dwsRef, {
-  handle: dragHandleRef,
-  containerElement: () => dwsRef.value?.parentElement,
-  restrictInView: true
-})
-
-onMounted(() => {
-  const parent = dwsRef.value?.parentElement
-  if (!parent || !dwsRef.value) {
-    return
-  }
-
-  dragX.value = parent.getBoundingClientRect().width - dwsRef.value.getBoundingClientRect().width
-  dragY.value = 0
 })
 
 const editSettings = ref<{ el: StudyParamDescriptor; type: MenuType } | null>(null)
@@ -141,7 +123,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="dws" :style="dragStyle">
+  <div ref="dws">
     <div class="mwc-study-panel" :class="{ hidden: isSettingsOpened }">
       <div class="mwc-drawing-settings">
         <div ref="dragHandle" class="mwc-drawing-settings-handle">
