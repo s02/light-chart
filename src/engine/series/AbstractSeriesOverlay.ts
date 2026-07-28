@@ -9,7 +9,7 @@ type SeriesSettings = {
 
 export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implements SeriesOverlay<TData> {
   protected series: ISeriesApi<SeriesType>
-  #datafeed: Datafeed
+  protected datafeed: Datafeed
   #chart: IChartApi
   #datafeedSubscriptionId?: string
   #destroyed = false
@@ -18,7 +18,7 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
 
   constructor(chart: IChartApi, datafeed: Datafeed, settings: SeriesSettings) {
     this.#chart = chart
-    this.#datafeed = datafeed
+    this.datafeed = datafeed
     this.series = this.#chart.addSeries(settings.series, settings.options)
     this.ready = new Promise((resolve) => {
       this.#ready = resolve
@@ -36,15 +36,15 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
       return
     }
 
-    this.#datafeed.unsubscribe(this.#datafeedSubscriptionId)
+    this.datafeed.unsubscribe(this.#datafeedSubscriptionId)
   }
 
   setDatafeed(datafeed: Datafeed) {
     if (this.#datafeedSubscriptionId) {
-      this.#datafeed.unsubscribe(this.#datafeedSubscriptionId)
+      this.datafeed.unsubscribe(this.#datafeedSubscriptionId)
     }
 
-    this.#datafeed = datafeed
+    this.datafeed = datafeed
     queueMicrotask(() => this.#init())
   }
 
@@ -60,7 +60,18 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
     if (result.type === 'set') {
       this.series.setData(result.data)
     } else {
-      result.data.forEach((bar) => this.series.update(bar))
+      result.data.forEach((bar) => {
+        try {
+          this.series.update(bar)
+        } catch (e) {
+          const error = {
+            e,
+            lastData: this.series.data().slice(-10),
+            bar
+          }
+          console.error('Error update data', error)
+        }
+      })
     }
   }
 
@@ -69,7 +80,7 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
       return
     }
 
-    this.#datafeedSubscriptionId = await this.#datafeed.subscribe((ev) => {
+    this.#datafeedSubscriptionId = await this.datafeed.subscribe((ev) => {
       this.transformData(ev)
       if (this.#ready) {
         this.#ready()
@@ -77,7 +88,7 @@ export abstract class AbstractSeriesOverlay<TData = SeriesOverlayData> implement
     })
 
     if (this.#destroyed) {
-      this.#datafeed.unsubscribe(this.#datafeedSubscriptionId)
+      this.datafeed.unsubscribe(this.#datafeedSubscriptionId)
     }
   }
 }

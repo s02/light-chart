@@ -22,9 +22,9 @@ export class CandleStoreService {
   }
 
   #mergeStrategy(): CANDLE_MERGE_STRATEGY {
-    if (this.#resolutionId === '1S') {
+    /* if (this.#resolutionId === '1S') {
       return 'gap'
-    }
+    } */
 
     return this.#mergeStrategyName
   }
