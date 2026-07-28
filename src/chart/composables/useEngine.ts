@@ -1,7 +1,20 @@
 import { PlotEngine } from '@engine/PlotEngine'
 import StudySettings from '@chart/components/Study/StudySettings.vue'
 import PaneLegend from '@chart/components/PaneLegend.vue'
-import { computed, h, inject, provide, ref, render, watch, type InjectionKey, type Ref } from 'vue'
+import { provideHints, useHints } from '@chart/composables/useHints'
+import {
+  computed,
+  getCurrentInstance,
+  h,
+  inject,
+  provide,
+  ref,
+  render,
+  watch,
+  type AppContext,
+  type InjectionKey,
+  type Ref
+} from 'vue'
 import { provideModal, useModal } from '@chart/composables/useModal'
 import type {
   AssetSymbol,
@@ -16,7 +29,6 @@ import type { DatafeedFactory } from '@chart/types'
 import type { StudyParams } from '@engine/schema'
 import type { LayoutConfig } from '@engine/indicators/types'
 import type { IndicatorName } from '@engine/indicators'
-import { provideHints, useHints } from '@chart/composables/useHints'
 import type { IndicatorOnPane } from '@engine/indicators/IndicatorsManager'
 
 type DrawingElement = Parameters<DrawingSelectFn>[0]
@@ -39,6 +51,7 @@ type EngineState = {
   unwatch: Array<() => void>
   legendEls: HTMLElement[]
   selectedDrawingElement: Ref<DrawingElement | null>
+  appContext: AppContext | null
 }
 
 type ModalApi = ReturnType<typeof useModal>
@@ -63,7 +76,8 @@ const createEngineState = (): EngineState => ({
   rootEl: ref<string | null>(null),
   unwatch: [],
   legendEls: [],
-  selectedDrawingElement: ref<DrawingElement | null>(null)
+  selectedDrawingElement: ref<DrawingElement | null>(null),
+  appContext: null
 })
 
 const useEngineState = (): EngineState => {
@@ -239,10 +253,12 @@ const createEngineApi = (state: EngineState, modal: ModalApi, hints: HintsApi) =
       if (el) {
         setTimeout(() => {
           assertEngine(state.pe)
-          render(
-            h(PaneLegend, { indicatorId: iop.id, subscribeToLegends: state.pe.subscribeToLegends.bind(state.pe) }),
-            el
-          )
+          const vnode = h(PaneLegend, {
+            indicatorId: iop.id,
+            subscribeToLegends: state.pe.subscribeToLegends.bind(state.pe)
+          })
+          vnode.appContext = state.appContext
+          render(vnode, el)
           state.legendEls.push(el)
         }, delay)
       }
@@ -328,6 +344,18 @@ export const provideEngineApi = () => {
   const hints = provideHints()
   const state = createEngineState()
   provide(EngineStateKey, state)
+
+  const instance = getCurrentInstance() as
+    | (ReturnType<typeof getCurrentInstance> & { provides: Record<string | symbol, unknown> })
+    | null
+
+  if (instance) {
+    // Detached vnodes rendered via render() outside the component tree have no
+    // parent instance, so inject() can't see provide()s from this component.
+    // Cloning the appContext with this instance's own `provides` (which already
+    // chains up through app-level provides) lets injects resolve correctly.
+    state.appContext = { ...instance.appContext, provides: instance.provides }
+  }
 
   return createEngineApi(state, modal, hints)
 }
