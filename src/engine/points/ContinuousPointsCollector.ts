@@ -21,23 +21,24 @@ export class ContinuousPointsCollector {
     }
 
     this.#handler = handler
-    this.#el.addEventListener('mousedown', this.#mousedownHandler)
-    this.#el.addEventListener('mousemove', this.#mousemoveHandler)
-    this.#el.addEventListener('mouseup', this.#mouseupHandler)
+    this.#el.addEventListener('pointerdown', this.#pointerdownHandler)
+    this.#el.addEventListener('pointermove', this.#pointermoveHandler)
+    this.#el.addEventListener('pointerup', this.#pointerupHandler)
   }
 
-  #mousedownHandler = (e: MouseEvent) => {
+  #pointerdownHandler = (e: PointerEvent) => {
     e.preventDefault()
     if (!this.#handler) return
     const p = this.#resolvePoint(e)
     if (!p) return
     this.#recording = true
+    this.#el.setPointerCapture(e.pointerId)
     this.#chart.applyOptions({ handleScroll: false })
     this.#points = [p]
     this.#handler({ status: 'pending', points: [p] })
   }
 
-  #mousemoveHandler = (e: MouseEvent) => {
+  #pointermoveHandler = (e: PointerEvent) => {
     e.preventDefault()
     if (!this.#recording || !this.#handler) return
     const p = this.#resolvePoint(e)
@@ -46,7 +47,7 @@ export class ContinuousPointsCollector {
     this.#handler({ status: 'pending', points: this.#filterPoints(this.#points) })
   }
 
-  #mouseupHandler = (e: MouseEvent) => {
+  #pointerupHandler = (e: PointerEvent) => {
     e.preventDefault()
     if (!this.#recording || !this.#handler) return
     this.#recording = false
@@ -55,7 +56,7 @@ export class ContinuousPointsCollector {
     this.destroy()
   }
 
-  #resolvePoint(e: MouseEvent): (Anchor & Point) | null {
+  #resolvePoint(e: PointerEvent): (Anchor & Point) | null {
     const rect = this.#el.getBoundingClientRect()
     const { width, height } = this.#chart.paneSize()
 
@@ -89,9 +90,9 @@ export class ContinuousPointsCollector {
       this.#chart.applyOptions({ handleScroll: true })
       this.#recording = false
     }
-    this.#el.removeEventListener('mousedown', this.#mousedownHandler)
-    this.#el.removeEventListener('mousemove', this.#mousemoveHandler)
-    this.#el.removeEventListener('mouseup', this.#mouseupHandler)
+    this.#el.removeEventListener('pointerdown', this.#pointerdownHandler)
+    this.#el.removeEventListener('pointermove', this.#pointermoveHandler)
+    this.#el.removeEventListener('pointerup', this.#pointerupHandler)
     this.#handler = null
   }
 }

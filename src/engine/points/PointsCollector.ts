@@ -23,12 +23,12 @@ export class PointsCollector implements PointsManager {
     }
 
     this.#handler = handler
-    this.#el.addEventListener('mousemove', this.#mousemoveHandler)
+    this.#el.addEventListener('pointermove', this.#pointermoveHandler)
     this.#el.addEventListener('click', this.#clickHandler)
     this.#el.addEventListener('dblclick', this.#dblClickHandler)
   }
 
-  #mousemoveHandler = (e: MouseEvent) => {
+  #pointermoveHandler = (e: PointerEvent) => {
     const rect = this.#el.getBoundingClientRect()
     const { width, height } = this.#chart.paneSize()
 
@@ -109,7 +109,7 @@ export class PointsCollector implements PointsManager {
   }
 
   destroy() {
-    this.#el.removeEventListener('mousemove', this.#mousemoveHandler)
+    this.#el.removeEventListener('pointermove', this.#pointermoveHandler)
     this.#el.removeEventListener('click', this.#clickHandler)
     this.#el.removeEventListener('dblclick', this.#dblClickHandler)
     this.#handler = null

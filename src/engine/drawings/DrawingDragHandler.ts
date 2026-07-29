@@ -13,17 +13,17 @@ export class DrawingDragHandler {
     this.#chart = chart
     this.#getDrawings = getDrawings
     this.#isAvailable = isAvailable
-    this.#el.addEventListener('mousedown', this.#mousedownHandler, { capture: true })
+    this.#el.addEventListener('pointerdown', this.#pointerdownHandler, { capture: true })
   }
 
   #start(drawing: BaseDrawing, initialPoint: Point, anchorIndex: number | null) {
     drawing.startDrag()
     this.#dragging = { drawing, initialPoint, anchorIndex }
-    window.addEventListener('mousemove', this.#mousemoveHandler)
-    window.addEventListener('mouseup', this.#mouseupHandler)
+    window.addEventListener('pointermove', this.#pointermoveHandler)
+    window.addEventListener('pointerup', this.#pointerupHandler)
   }
 
-  #mousemoveHandler = (e: MouseEvent) => {
+  #pointermoveHandler = (e: PointerEvent) => {
     if (!this.#dragging || !this.#isAvailable()) {
       return
     }
@@ -44,18 +44,20 @@ export class DrawingDragHandler {
     this.#dragging.drawing.drag(dx, dy, this.#dragging.anchorIndex)
   }
 
-  #mouseupHandler = () => {
+  #pointerupHandler = () => {
     if (this.#dragging) {
       this.#dragging.drawing.stopDrag()
       this.#dragging = null
     }
 
-    window.removeEventListener('mousemove', this.#mousemoveHandler)
-    window.removeEventListener('mouseup', this.#mouseupHandler)
+    window.removeEventListener('pointermove', this.#pointermoveHandler)
+    window.removeEventListener('pointerup', this.#pointerupHandler)
   }
 
-  #mousedownHandler = (e: MouseEvent) => {
-    const { layerX: x, layerY: y } = e
+  #pointerdownHandler = (e: PointerEvent) => {
+    const rect = this.#el.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
 
     const point = { x, y } as Point
 
@@ -71,8 +73,8 @@ export class DrawingDragHandler {
   }
 
   destroy() {
-    this.#el.removeEventListener('mousedown', this.#mousedownHandler, { capture: true })
-    window.removeEventListener('mousemove', this.#mousemoveHandler)
-    window.removeEventListener('mouseup', this.#mouseupHandler)
+    this.#el.removeEventListener('pointerdown', this.#pointerdownHandler, { capture: true })
+    window.removeEventListener('pointermove', this.#pointermoveHandler)
+    window.removeEventListener('pointerup', this.#pointerupHandler)
   }
 }

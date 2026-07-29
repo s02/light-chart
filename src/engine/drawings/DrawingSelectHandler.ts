@@ -18,11 +18,12 @@ export class DrawingSelectHandler {
     this.#onSelect = onSelect
     this.#isAvailable = isAvailable
     this.#el.addEventListener('click', this.#clickHandler)
-    this.#el.addEventListener('mousemove', this.#mousemoveHandler)
+    this.#el.addEventListener('pointermove', this.#pointermoveHandler)
   }
 
   destroy() {
     this.#el.removeEventListener('click', this.#clickHandler)
+    this.#el.removeEventListener('pointermove', this.#pointermoveHandler)
   }
 
   deselect(el: DrawingElement) {
@@ -34,7 +35,7 @@ export class DrawingSelectHandler {
     this.#onSelect({ id: el.id, ds: el.drawing.getSchema() })
   }
 
-  #mousemoveHandler = (e: MouseEvent) => {
+  #pointermoveHandler = (e: PointerEvent) => {
     if (!this.#isAvailable()) {
       return
     }
