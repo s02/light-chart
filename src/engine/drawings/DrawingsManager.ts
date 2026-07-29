@@ -154,6 +154,10 @@ export class DrawingsManager {
 
   subscribe(cb: DrawingSelectFn) {
     this.#subscribers.push(cb)
+
+    return () => {
+      this.#subscribers = this.#subscribers.filter((s) => s !== cb)
+    }
   }
 
   destroy() {
@@ -163,6 +167,7 @@ export class DrawingsManager {
     })
     this.#selectHandler.destroy()
     this.#dragHandler.destroy()
+    this.#subscribers = []
   }
 
   #onSelect = (res: Parameters<DrawingSelectFn>[0]) => {

@@ -69,7 +69,11 @@ function assertEngine(engine: PlotEngine | null): asserts engine {
   }
 }
 
-const EngineStateKey: InjectionKey<EngineState> = Symbol('engine-state')
+// Symbol.for (not Symbol()) so the key survives Vite HMR: when this module is
+// re-evaluated as a dependency of an edited file, a plain Symbol() would mint a
+// new identity, breaking inject() in components that re-run setup() with the
+// fresh module while the provider (TerminalChart) hasn't remounted.
+const EngineStateKey: InjectionKey<EngineState> = Symbol.for('light-chart/engine-state')
 
 const createEngineState = (): EngineState => ({
   pe: null,
@@ -124,7 +128,7 @@ const createEngineApi = (state: EngineState, modal: ModalApi, hints: HintsApi) =
       })
     )
 
-    state.pe.subscribeToSelectDrawing(selectDrawing)
+    state.unwatch.push(state.pe.subscribeToSelectDrawing(selectDrawing))
 
     state.unwatch.push(
       watch(options.timeZone, (next) => {
@@ -186,16 +190,20 @@ const createEngineApi = (state: EngineState, modal: ModalApi, hints: HintsApi) =
   }
 
   const unregister = () => {
-    if (state.pe) {
-      state.pe.destroy()
-      state.pe = null
-    }
-
+    // Unsubscribe (incl. subscribeToLegends) before destroying the engine: destroying
+    // the chart/series synchronously fires crosshair/data-changed events, and a
+    // legends callback still attached at that point would update `legends` on a
+    // component tree that's already being unmounted.
     state.unwatch.forEach((fn) => fn())
     state.unwatch.splice(0, state.unwatch.length)
 
     state.legendEls.forEach((el) => render(null, el))
     state.legendEls.splice(0, state.legendEls.length)
+
+    if (state.pe) {
+      state.pe.destroy()
+      state.pe = null
+    }
   }
 
   const getLayoutConfig = () => {

@@ -21,7 +21,8 @@ type ModalStore = {
   current: ShallowRef<ModalState | null>
 }
 
-const ModalStoreKey: InjectionKey<ModalStore> = Symbol('modal-store')
+// Symbol.for keeps this key stable across Vite HMR re-evaluation, see useEngine.ts
+const ModalStoreKey: InjectionKey<ModalStore> = Symbol.for('light-chart/modal-store')
 
 const createModalStore = (): ModalStore => ({
   queue: [],

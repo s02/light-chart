@@ -1,6 +1,7 @@
 import { inject, provide, ref, type InjectionKey, type Ref } from 'vue'
 
-const HintsStateKey: InjectionKey<Ref<string | undefined>> = Symbol('hints-state')
+// Symbol.for keeps this key stable across Vite HMR re-evaluation, see useEngine.ts
+const HintsStateKey: InjectionKey<Ref<string | undefined>> = Symbol.for('light-chart/hints-state')
 
 const createHintsApi = (current: Ref<string | undefined>) => ({
   show: (text: string) => {

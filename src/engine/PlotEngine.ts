@@ -59,7 +59,7 @@ export class PlotEngine {
   }
 
   subscribeToSelectDrawing(cb: DrawingSelectFn) {
-    this.#drawingsManager.subscribe(cb)
+    return this.#drawingsManager.subscribe(cb)
   }
 
   setSeriesId(seriesId: SeriesId) {
