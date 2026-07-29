@@ -67,176 +67,224 @@ type Indicator = {
   }
 }
 
-export const INDICATOR_SCRIPTS = [
+const INDICATOR_SCRIPTS = [
   {
-    indicator: BollingerBands
+    indicator: BollingerBands,
+    keywords: 'bollinger bands'
   },
   {
-    indicator: SimpleMovingAverage
+    indicator: SimpleMovingAverage,
+    keywords: 'sma simple moving average'
   },
   {
     indicator: MACD,
-    separatePane: true
+    separatePane: true,
+    keywords: 'macd moving average convergence divergence'
   },
   {
-    indicator: Supertrend
+    indicator: Supertrend,
+    keywords: 'supertrend'
   },
   {
-    indicator: ParabolicSAR
+    indicator: ParabolicSAR,
+    keywords: 'sar parabolic stop reverse'
   },
   {
     indicator: Stochastic,
-    separatePane: true
+    separatePane: true,
+    keywords: 'stochastic oscillator'
   },
   {
     indicator: RSI,
-    separatePane: true
+    separatePane: true,
+    keywords: 'rsi relative strength index'
   },
   {
     indicator: StochasticRSI,
-    separatePane: true
+    separatePane: true,
+    keywords: 'stochastic rsi relative strength index'
   },
   {
-    indicator: WilliamsAlligator
+    indicator: WilliamsAlligator,
+    keywords: 'willliams alligator'
   },
   {
-    indicator: EMACross
+    indicator: EMACross,
+    keywords: 'ema exponential moving average cross'
   },
   {
-    indicator: PriceChannel
+    indicator: PriceChannel,
+    keywords: 'price channel'
   },
   {
-    indicator: DonchianChannels
+    indicator: DonchianChannels,
+    keywords: 'donchian channels'
   },
   {
-    indicator: ExponentialMovingAverage
+    indicator: ExponentialMovingAverage,
+    keywords: 'ema exponential moving average'
   },
   {
-    indicator: ZigZag
+    indicator: ZigZag,
+    keywords: 'zig zag'
   },
   {
-    indicator: WilliamsFractal
+    indicator: WilliamsFractal,
+    keywords: 'williams fractal'
   },
   {
     indicator: ConnorsRSI,
-    separatePane: true
+    separatePane: true,
+    keywords: 'rsi connors relative strength index'
   },
   {
     indicator: AwesomeOscillator,
-    separatePane: true
+    separatePane: true,
+    keywords: 'awesome oscillator'
   },
   {
     indicator: KnowSureThing,
-    separatePane: true
+    separatePane: true,
+    keywords: 'kst know sure things'
   },
   {
     indicator: WilliamsR,
-    separatePane: true
+    separatePane: true,
+    keywords: 'williams'
   },
   {
-    indicator: KeltnerChannels
+    indicator: KeltnerChannels,
+    keywords: 'keltner channels'
   },
   {
-    indicator: LeastSquaresMA
+    indicator: LeastSquaresMA,
+    keywords: 'ma least squares moving average'
   },
   {
-    indicator: ChandeKrollStop
+    indicator: ChandeKrollStop,
+    keywords: 'chande kroll stop'
   },
   {
-    indicator: WeightedMovingAverage
+    indicator: WeightedMovingAverage,
+    keywords: 'wma weighted moving average'
   },
   {
-    indicator: SmoothedMovingAverage
+    indicator: SmoothedMovingAverage,
+    keywords: 'ssma smoothed moving average'
   },
   {
-    indicator: McGinleyDynamic
+    indicator: McGinleyDynamic,
+    keywords: 'mcginley dynamic'
   },
   {
-    indicator: IchimokuCloud
+    indicator: IchimokuCloud,
+    keywords: 'ichimoku cloud'
   },
   {
     indicator: AcceleratorOscillator,
-    separatePane: true
+    separatePane: true,
+    keywords: 'accelerator oscillator'
   },
   {
     indicator: CCI,
-    separatePane: true
+    separatePane: true,
+    keywords: 'cci commodity channel index'
   },
   {
     indicator: TrueStrengthIndex,
-    separatePane: true
+    separatePane: true,
+    keywords: 'tsi true strength index'
   },
   {
     indicator: ATR,
-    separatePane: true
+    separatePane: true,
+    keywords: 'atr average true range'
   },
   {
     indicator: VortexIndicator,
-    separatePane: true
+    separatePane: true,
+    keywords: 'vortex indicator'
   },
   {
     indicator: SMIErgodic,
-    separatePane: true
+    separatePane: true,
+    keywords: 'smi stochastic momentum index ergodic'
   },
   {
     indicator: BalanceOfPower,
-    separatePane: true
+    separatePane: true,
+    keywords: 'balance of power'
   },
   {
     indicator: Momentum,
-    separatePane: true
+    separatePane: true,
+    keywords: 'momentum'
   },
   {
     indicator: BollingerBandsB,
-    separatePane: true
+    separatePane: true,
+    keywords: 'bollinger bands'
   },
   {
     indicator: DPO,
-    separatePane: true
+    separatePane: true,
+    keywords: 'dpo detrended price oscillator'
   },
   {
     indicator: RelativeVigorIndex,
-    separatePane: true
+    separatePane: true,
+    keywords: 'relative vigor index'
   },
   {
     indicator: TrendStrengthIndex,
-    separatePane: true
+    separatePane: true,
+    keywords: 'trend strength index'
   },
   {
     indicator: ADX,
-    separatePane: true
+    separatePane: true,
+    keywords: 'adx average directional index'
   },
   {
     indicator: DMI,
-    separatePane: true
+    separatePane: true,
+    keywords: 'dmi directional movement index'
   },
   {
     indicator: FisherTransform,
-    separatePane: true
+    separatePane: true,
+    keywords: 'fisher transform'
   },
   {
     indicator: AdvanceDecline,
-    separatePane: true
+    separatePane: true,
+    keywords: 'advance decline'
   },
   {
-    indicator: MACross
+    indicator: MACross,
+    keywords: 'ma moving average cross'
   },
   {
-    indicator: ArnaudLegouxMA
+    indicator: ArnaudLegouxMA,
+    keywords: 'arnaud legoux moving average'
   },
   {
     indicator: VolatilityZeroTrend,
-    separatePane: true
+    separatePane: true,
+    keywords: 'volatility zero trend'
   },
   {
     indicator: StandardError,
-    separatePane: true
+    separatePane: true,
+    keywords: 'standard error'
   },
   {
-    indicator: MovingAverageDouble
+    indicator: MovingAverageDouble,
+    keywords: 'moving average double'
   },
   {
-    indicator: MAEMACross
+    indicator: MAEMACross,
+    keywords: 'maema exponential moving average cross'
   }
 ] satisfies {
   indicator: {
@@ -244,8 +292,10 @@ export const INDICATOR_SCRIPTS = [
     readonly ikey: string
   }
   separatePane?: boolean
+  keywords: string
 }[]
 
+export { INDICATOR_SCRIPTS }
 export { IndicatorsManager } from './IndicatorsManager'
 export type IndicatorName = (typeof INDICATOR_SCRIPTS)[number]['indicator']['ikey']
 export type IndicatorScript = (typeof INDICATOR_SCRIPTS)[number]
