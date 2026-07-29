@@ -44,6 +44,16 @@ const KST_SCHEMA = {
         lineStyle: LineStyle.Solid,
         lineType: LineType.Simple
       }
+    },
+    {
+      type: 'line',
+      key: 'kst-zeroLine',
+      default: {
+        color: '#787B86',
+        lineWidth: 1,
+        lineStyle: LineStyle.LargeDashed,
+        lineType: LineType.Simple
+      }
     }
   ]
 } as const satisfies StudySchema
@@ -78,9 +88,7 @@ export class KnowSureThing extends AbstractIndicator implements Indicator {
       zero: this.#chart.addSeries(
         LineSeries,
         {
-          color: '#787B86',
-          lineWidth: 1,
-          lineStyle: LineStyle.LargeDashed,
+          ...this.#params['kst-zeroLine'],
           crosshairMarkerVisible: false,
           lastValueVisible: false,
           priceLineVisible: false
@@ -107,6 +115,7 @@ export class KnowSureThing extends AbstractIndicator implements Indicator {
     this.#params = resolveStudyParams(KST_SCHEMA.inputs, KST_SCHEMA.style, KST_SCHEMA.text, params)
     this.#series.kst.applyOptions(this.#params['kst-kstLine'])
     this.#series.signal.applyOptions(this.#params['kst-signalLine'])
+    this.#series.zero.applyOptions(this.#params['kst-zeroLine'])
   }
 
   getLegend(seriesData: SeriesMap) {
