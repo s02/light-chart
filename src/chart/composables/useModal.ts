@@ -3,7 +3,8 @@ import { inject, provide, shallowRef, type Component, type InjectionKey, type Sh
 type ComponentProps = Record<string, unknown>
 
 type ModalOptions = {
-  props: ComponentProps
+  props?: ComponentProps
+  position?: 'center' | 'top'
 }
 
 type ModalState = {
@@ -11,6 +12,7 @@ type ModalState = {
   result: {
     resolve: (value: unknown) => void
   }
+  position: ModalOptions['position']
   props?: ComponentProps
 }
 
@@ -42,6 +44,7 @@ const createModalApi = (store: ModalStore) => {
     return new Promise<T>((resolve) => {
       store.queue.push({
         component,
+        position: options?.position || 'center',
         props: options?.props,
         result: {
           resolve: resolve as (value: unknown) => void

@@ -25,7 +25,7 @@ runStateWatcher()
         :profitability="chart.profitability"
         @click="setChartActive(chart.id)" />
     </div>
-    <div class="app-terminal">
+    <div class="app-terminal" :class="{ split: charts.length > 1 }">
       <AppTerminal v-for="chart of charts" :key="chart.id" :chart-id="chart.id" />
     </div>
   </div>
@@ -73,8 +73,11 @@ body {
 .app-terminal {
   flex-grow: 1;
   overflow: hidden;
-  display: grid;
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+
+  &.split {
+    display: grid;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .app-asset-menu {

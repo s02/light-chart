@@ -8,7 +8,7 @@ export const useIndicators = () => {
   const { addIndicator } = useEngineApi()
 
   const openScriptList = () => {
-    open<IndicatorScript | undefined>(ModalIndicatorsList).then((result) => {
+    open<IndicatorScript | undefined>(ModalIndicatorsList, { position: 'top' }).then((result) => {
       if (result) {
         addIndicator(result.indicator.ikey)
       }

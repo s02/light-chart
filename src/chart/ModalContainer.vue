@@ -22,7 +22,7 @@ onKeyStroke('Escape', () => {
 </script>
 
 <template>
-  <div v-if="current" class="mwc-modal" @click="closeModal()">
+  <div v-if="current" class="mwc-modal" :class="current.position" @click="closeModal()">
     <component :is="current.component" v-bind="current.props" @click.stop @close="closeModal($event)" />
   </div>
 </template>
@@ -36,7 +36,15 @@ onKeyStroke('Escape', () => {
   left: 0;
   z-index: 2;
   display: flex;
-  align-items: center;
-  justify-content: center;
+
+  &.center {
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.top {
+    align-items: start;
+    justify-content: center;
+  }
 }
 </style>

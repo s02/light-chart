@@ -3,11 +3,17 @@ import CloseIcon from '@chart/components/CloseIcon.vue'
 import { i18n } from '@chart/i18n'
 import { INDICATOR_SCRIPTS } from '@engine/indicators'
 import type { IndicatorScript } from '@engine/types'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const emit = defineEmits<{
   (e: 'close', result?: IndicatorScript): void
 }>()
+
+const searchInputRef = ref<HTMLInputElement | null>(null)
+
+onMounted(() => {
+  searchInputRef.value?.focus()
+})
 
 INDICATOR_SCRIPTS.sort((i1, i2) => {
   const name1 = i18n.translate(`study-${i1.indicator.ikey}`).value
@@ -40,7 +46,7 @@ const list = computed(() => {
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="none">
         <path stroke="currentColor" d="M17.4 17.5a7 7 0 1 0-4.9 2c1.9 0 3.64-.76 4.9-2zm0 0l5.1 5"></path>
       </svg>
-      <input v-model="searchInput" type="text" />
+      <input ref="searchInputRef" v-model="searchInput" type="text" />
     </div>
     <div class="mwc-ind-list-body ch-scroll">
       <div class="mwc-ind-list-group">Script Name</div>

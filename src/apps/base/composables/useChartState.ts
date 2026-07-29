@@ -29,8 +29,8 @@ const defaults: ChartState[] = [
     language: 'en',
     options: {},
     active: true
-  },
-  {
+  }
+  /* {
     id: 'ch-2',
     resolutionId: '5S',
     seriesId: 'candlestick',
@@ -40,7 +40,7 @@ const defaults: ChartState[] = [
     language: 'en',
     options: {},
     active: false
-  }
+  } */
 ]
 
 const storage = {
