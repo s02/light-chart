@@ -1,0 +1,62 @@
+name: Demo App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: PROD
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Configure Git Authentication
+        run: |
+          git config --local --unset-all http.https://github.com/.extraheader || true
+          git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/softwaffle-lab/".insteadOf "https://github.com/softwaffle-lab/"  
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Locales
+        run: node i18n.build.js  
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build:app
+
+      - name: Publish dist to target repository
+        env:
+          TARGET_REPO: ${{ vars.BUILD_TARGET_REPO }}
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          echo "TARGET_REPO=${TARGET_REPO}"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          git clone "https://x-access-token:${DEPLOY_TOKEN}@github.com/${TARGET_REPO}.git" target-repo
+
+          rm -rf target-repo/*
+          cp -r dist/app/. target-repo/
+
+          cd target-repo
+          echo "Files in target-repo:"
+          ls -la
+          git status
+          git add -A
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "build: ${{ github.run_number }}"
+          git push

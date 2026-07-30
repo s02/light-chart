@@ -8,6 +8,7 @@ import type { DrawingName, DrawingOptions, DrawingSelectFn } from '@engine/drawi
 import type { IChartApi, ISeriesApi, SeriesType } from 'lightweight-charts'
 import type { BaseDrawing } from './BaseDrawing'
 import type { StudyParams } from '@engine/schema'
+import { MobilePointsCollector } from '@engine/points/MobilePointsCollector'
 
 export type DrawingElement = {
   id: number
@@ -108,7 +109,7 @@ export class DrawingsManager {
       const pc: PointsManager =
         script.drawing.points === POINTS_MODE.BRUSH
           ? new ContinuousPointsCollector(this.#chart, this.#series)
-          : new PointsCollector(this.#chart, this.#series, script.drawing.points)
+          : new MobilePointsCollector(this.#chart, this.#series, script.drawing.points)
       this.#pendingAdd = { pc, drawing, reject }
       pc.subscribe((params) => {
         drawing.setAnchorsVisible(true)
